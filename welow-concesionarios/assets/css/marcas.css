@@ -1,0 +1,351 @@
+/**
+ * Estilos: Shortcodes de Marcas
+ * Welow Concesionarios
+ *
+ * Breakpoints Divi 5:
+ *   Desktop: > 980px
+ *   Tablet:  768px – 980px
+ *   Móvil:   < 768px
+ */
+
+/* ==========================================================================
+   GRID BASE (compartido por logos y cards)
+   ========================================================================== */
+
+.welow-marcas-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--welow-cols, 4), 1fr);
+    gap: 24px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Tablet */
+@media (max-width: 980px) {
+    .welow-marcas-grid {
+        grid-template-columns: repeat(var(--welow-cols-tablet, 3), 1fr);
+        gap: 20px;
+    }
+}
+
+/* Móvil */
+@media (max-width: 767px) {
+    .welow-marcas-grid {
+        grid-template-columns: repeat(var(--welow-cols-movil, 2), 1fr);
+        gap: 16px;
+    }
+}
+
+/* ==========================================================================
+   GRID DE LOGOS (compacto)
+   ========================================================================== */
+
+.welow-marca-logo-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    background: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.welow-marca-logo-item:hover {
+    border-color: #2563eb;
+    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.12);
+    transform: translateY(-2px);
+}
+
+.welow-marca-logo-wrap {
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.welow-marca-logo-wrap img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+.welow-marca-logo-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background: #f0f4ff;
+    border-radius: 50%;
+    font-size: 28px;
+    font-weight: 700;
+    color: #2563eb;
+    text-transform: uppercase;
+}
+
+.welow-marca-logo-nombre {
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    color: #1f2937;
+    line-height: 1.3;
+}
+
+/* Logos - Tablet */
+@media (max-width: 980px) {
+    .welow-marca-logo-item {
+        padding: 20px 12px;
+    }
+
+    .welow-marca-logo-wrap {
+        width: 80px;
+        height: 80px;
+    }
+
+    .welow-marca-logo-nombre {
+        font-size: 13px;
+    }
+}
+
+/* Logos - Móvil */
+@media (max-width: 767px) {
+    .welow-marca-logo-item {
+        padding: 16px 10px;
+    }
+
+    .welow-marca-logo-wrap {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 8px;
+    }
+
+    .welow-marca-logo-nombre {
+        font-size: 12px;
+    }
+}
+
+/* ==========================================================================
+   GRID DE CARDS (tarjetas con info)
+   ========================================================================== */
+
+.welow-marca-card {
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.welow-marca-card:hover {
+    border-color: #2563eb;
+    box-shadow: 0 8px 30px rgba(37, 99, 235, 0.1);
+    transform: translateY(-3px);
+}
+
+/* Card Header */
+.welow-marca-card-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 28px 20px 16px;
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+    text-align: center;
+}
+
+.welow-marca-card-logo {
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.welow-marca-card-logo img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+.welow-marca-card-titulo {
+    margin: 0 0 4px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1.3;
+}
+
+.welow-marca-card-slogan {
+    margin: 0;
+    font-size: 13px;
+    color: #6b7280;
+    font-style: italic;
+}
+
+/* Card Body */
+.welow-marca-card-body {
+    flex: 1;
+    padding: 0 20px 16px;
+}
+
+.welow-marca-card-desc {
+    font-size: 14px;
+    color: #4b5563;
+    line-height: 1.6;
+    margin: 0 0 12px;
+}
+
+/* Tags (categorías) */
+.welow-marca-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.welow-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    background: #f0f4ff;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 20px;
+    line-height: 1.4;
+}
+
+/* Badges (tipo de venta) */
+.welow-marca-card-tipos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.welow-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    background: #ecfdf5;
+    color: #059669;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    line-height: 1.4;
+}
+
+/* Card Footer */
+.welow-marca-card-footer {
+    padding: 0 20px 20px;
+    margin-top: auto;
+}
+
+/* Botón */
+.welow-btn {
+    display: inline-block;
+    width: 100%;
+    padding: 12px 20px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    cursor: pointer;
+    border: none;
+    line-height: 1.4;
+}
+
+.welow-btn-primary {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.welow-btn-primary:hover {
+    background: #1d4ed8;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+/* Cards - Tablet */
+@media (max-width: 980px) {
+    .welow-marca-card-header {
+        padding: 24px 16px 12px;
+    }
+
+    .welow-marca-card-logo {
+        width: 80px;
+        height: 80px;
+    }
+
+    .welow-marca-card-titulo {
+        font-size: 18px;
+    }
+
+    .welow-marca-card-body {
+        padding: 0 16px 12px;
+    }
+
+    .welow-marca-card-footer {
+        padding: 0 16px 16px;
+    }
+}
+
+/* Cards - Móvil */
+@media (max-width: 767px) {
+    .welow-marca-card-header {
+        padding: 20px 14px 10px;
+    }
+
+    .welow-marca-card-logo {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 12px;
+    }
+
+    .welow-marca-card-titulo {
+        font-size: 16px;
+    }
+
+    .welow-marca-card-desc {
+        font-size: 13px;
+    }
+
+    .welow-marca-card-body {
+        padding: 0 14px 10px;
+    }
+
+    .welow-marca-card-footer {
+        padding: 0 14px 14px;
+    }
+
+    .welow-btn {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+}
+
+/* ==========================================================================
+   NO RESULTS
+   ========================================================================== */
+
+.welow-no-results {
+    text-align: center;
+    color: #6b7280;
+    font-size: 15px;
+    padding: 40px 20px;
+}

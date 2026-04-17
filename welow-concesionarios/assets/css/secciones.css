@@ -1,0 +1,419 @@
+/**
+ * Estilos: Secciones de página de marca
+ * (Modelos, Slider CTA, Contenido)
+ * Welow Concesionarios
+ */
+
+/* ==========================================================================
+   MODELOS GRID
+   ========================================================================== */
+
+.welow-modelos-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--welow-cols, 3), 1fr);
+    gap: 28px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.welow-modelo-card {
+    background: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.welow-modelo-card:hover {
+    border-color: #2563eb;
+    box-shadow: 0 8px 30px rgba(37, 99, 235, 0.1);
+    transform: translateY(-3px);
+}
+
+.welow-modelo-card__imagen {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: #f8fafc;
+}
+
+.welow-modelo-card__imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.welow-modelo-card:hover .welow-modelo-card__imagen img {
+    transform: scale(1.03);
+}
+
+.welow-modelo-card__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f4ff;
+    color: #93c5fd;
+    font-size: 48px;
+}
+
+.welow-modelo-card__info {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.welow-modelo-card__nombre {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.welow-modelo-card__nombre a {
+    text-decoration: none;
+    color: #1f2937;
+    transition: color 0.2s;
+}
+
+.welow-modelo-card__nombre a:hover {
+    color: #2563eb;
+}
+
+.welow-modelo-card__desc {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.5;
+    margin: 0 0 16px;
+    flex: 1;
+}
+
+.welow-modelo-card__info .welow-btn {
+    margin-top: auto;
+}
+
+/* Modelos - Tablet */
+@media (max-width: 980px) {
+    .welow-modelos-grid {
+        grid-template-columns: repeat(var(--welow-cols-tablet, 2), 1fr);
+        gap: 20px;
+    }
+
+    .welow-modelo-card__info {
+        padding: 16px;
+    }
+
+    .welow-modelo-card__nombre {
+        font-size: 16px;
+    }
+}
+
+/* Modelos - Móvil */
+@media (max-width: 767px) {
+    .welow-modelos-grid {
+        grid-template-columns: repeat(var(--welow-cols-movil, 1), 1fr);
+        gap: 16px;
+    }
+
+    .welow-modelo-card__info {
+        padding: 14px;
+    }
+}
+
+/* ==========================================================================
+   SLIDER CTA (Hero con fondo)
+   ========================================================================== */
+
+.welow-cta {
+    position: relative;
+    width: 100%;
+    height: var(--welow-cta-altura, 500px);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.welow-cta__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+.welow-cta__bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.welow-cta__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+.welow-cta__content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    padding: 40px 24px;
+    color: #ffffff;
+}
+
+/* Alineaciones */
+.welow-cta--centro .welow-cta__content {
+    text-align: center;
+}
+
+.welow-cta--izquierda {
+    justify-content: flex-start;
+}
+.welow-cta--izquierda .welow-cta__content {
+    text-align: left;
+    padding-left: 60px;
+}
+
+.welow-cta--derecha {
+    justify-content: flex-end;
+}
+.welow-cta--derecha .welow-cta__content {
+    text-align: right;
+    padding-right: 60px;
+}
+
+.welow-cta__titulo {
+    font-size: 42px;
+    font-weight: 800;
+    margin: 0 0 12px;
+    line-height: 1.2;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.welow-cta__texto {
+    font-size: 20px;
+    margin: 0 0 28px;
+    line-height: 1.5;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Botón CTA */
+.welow-btn-cta {
+    display: inline-block;
+    padding: 14px 36px;
+    background: #ffffff;
+    color: #1f2937;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.welow-btn-cta:hover {
+    background: #2563eb;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+}
+
+/* CTA - Tablet */
+@media (max-width: 980px) {
+    .welow-cta__titulo {
+        font-size: 32px;
+    }
+
+    .welow-cta__texto {
+        font-size: 17px;
+    }
+
+    .welow-cta--izquierda .welow-cta__content,
+    .welow-cta--derecha .welow-cta__content {
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+}
+
+/* CTA - Móvil */
+@media (max-width: 767px) {
+    .welow-cta {
+        height: var(--welow-cta-altura-movil, 350px);
+    }
+
+    .welow-cta__titulo {
+        font-size: 24px;
+    }
+
+    .welow-cta__texto {
+        font-size: 15px;
+        margin-bottom: 20px;
+    }
+
+    .welow-btn-cta {
+        padding: 12px 28px;
+        font-size: 14px;
+    }
+
+    .welow-cta--izquierda .welow-cta__content,
+    .welow-cta--derecha .welow-cta__content {
+        padding: 24px 20px;
+    }
+
+    /* En móvil siempre centrado */
+    .welow-cta--izquierda,
+    .welow-cta--derecha {
+        justify-content: center;
+    }
+    .welow-cta--izquierda .welow-cta__content,
+    .welow-cta--derecha .welow-cta__content {
+        text-align: center;
+    }
+}
+
+/* ==========================================================================
+   SECCIÓN DE CONTENIDO
+   ========================================================================== */
+
+.welow-contenido {
+    width: 100%;
+    padding: 60px 0;
+    box-sizing: border-box;
+}
+
+.welow-contenido__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    box-sizing: border-box;
+}
+
+/* Layout: Imagen derecha / izquierda (dos columnas) */
+.welow-contenido--imagen-derecha .welow-contenido__inner,
+.welow-contenido--imagen-izquierda .welow-contenido__inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+}
+
+/* Imagen izquierda: invertir el orden visual */
+.welow-contenido--imagen-izquierda .welow-contenido__imagen {
+    order: -1;
+}
+
+/* Layout: Imagen arriba (apilado) */
+.welow-contenido--imagen-arriba .welow-contenido__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.welow-contenido--imagen-arriba .welow-contenido__imagen {
+    width: 100%;
+    max-width: 900px;
+    margin-bottom: 32px;
+}
+
+.welow-contenido--imagen-arriba .welow-contenido__texto {
+    max-width: 800px;
+    text-align: center;
+}
+
+/* Layout: Solo texto */
+.welow-contenido--solo-texto .welow-contenido__inner {
+    max-width: 800px;
+}
+
+/* Imagen */
+.welow-contenido__imagen img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    display: block;
+}
+
+/* Texto */
+.welow-contenido__titulo {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 16px;
+    line-height: 1.3;
+}
+
+.welow-contenido__body {
+    font-size: 16px;
+    color: #4b5563;
+    line-height: 1.7;
+}
+
+.welow-contenido__body p {
+    margin: 0 0 16px;
+}
+
+.welow-contenido__body p:last-child {
+    margin-bottom: 0;
+}
+
+.welow-contenido__cta {
+    margin-top: 24px;
+}
+
+/* Contenido - Tablet */
+@media (max-width: 980px) {
+    .welow-contenido {
+        padding: 40px 0;
+    }
+
+    .welow-contenido--imagen-derecha .welow-contenido__inner,
+    .welow-contenido--imagen-izquierda .welow-contenido__inner {
+        gap: 28px;
+    }
+
+    .welow-contenido__titulo {
+        font-size: 26px;
+    }
+
+    .welow-contenido__body {
+        font-size: 15px;
+    }
+}
+
+/* Contenido - Móvil */
+@media (max-width: 767px) {
+    .welow-contenido {
+        padding: 32px 0;
+    }
+
+    /* En móvil, todas las variantes se apilan */
+    .welow-contenido--imagen-derecha .welow-contenido__inner,
+    .welow-contenido--imagen-izquierda .welow-contenido__inner {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    /* Imagen siempre arriba en móvil */
+    .welow-contenido--imagen-izquierda .welow-contenido__imagen,
+    .welow-contenido--imagen-derecha .welow-contenido__imagen {
+        order: -1;
+    }
+
+    .welow-contenido__titulo {
+        font-size: 22px;
+    }
+
+    .welow-contenido__body {
+        font-size: 14px;
+    }
+
+    .welow-contenido__inner {
+        padding: 0 16px;
+    }
+}

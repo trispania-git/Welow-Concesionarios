@@ -1,0 +1,104 @@
+<?php
+/**
+ * Shortcodes de marcas:
+ * - [welow_marcas]       → Grid compacto de logos
+ * - [welow_marcas_cards] → Tarjetas con información
+ *
+ * @package Welow_Concesionarios
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+class Welow_Shortcode_Marcas {
+
+    public static function init() {
+        add_shortcode( 'welow_marcas', array( __CLASS__, 'render_grid_logos' ) );
+        add_shortcode( 'welow_marcas_cards', array( __CLASS__, 'render_grid_cards' ) );
+    }
+
+    /**
+     * Parámetros comunes para ambos shortcodes.
+     */
+    private static function parse_atts_comunes( $atts ) {
+        return shortcode_atts( array(
+            'columnas'        => '4',
+            'columnas_tablet' => '3',
+            'columnas_movil'  => '2',
+            'tipo'            => 'todos',
+            'orden'           => 'personalizado',
+            'max'             => '-1',
+        ), $atts );
+    }
+
+    /**
+     * Shortcode [welow_marcas] — Grid compacto de logos.
+     */
+    public static function render_grid_logos( $atts ) {
+        $atts = self::parse_atts_comunes( $atts );
+
+        $marcas = Welow_Helpers::get_marcas( array(
+            'tipo'  => $atts['tipo'],
+            'orden' => $atts['orden'],
+            'max'   => $atts['max'],
+        ) );
+
+        if ( empty( $marcas ) ) {
+            return '<p class="welow-no-results">No se encontraron marcas.</p>';
+        }
+
+        // Encolar CSS
+        wp_enqueue_style( 'welow-marcas' );
+
+        ob_start();
+        Welow_Helpers::get_template( 'marca-grid-logo.php', array(
+            'marcas'          => $marcas,
+            'columnas'        => intval( $atts['columnas'] ),
+            'columnas_tablet' => intval( $atts['columnas_tablet'] ),
+            'columnas_movil'  => intval( $atts['columnas_movil'] ),
+        ) );
+        return ob_get_clean();
+    }
+
+    /**
+     * Shortcode [welow_marcas_cards] — Tarjetas con info.
+     */
+    public static function render_grid_cards( $atts ) {
+        $atts = shortcode_atts( array(
+            'columnas'            => '3',
+            'columnas_tablet'     => '2',
+            'columnas_movil'      => '1',
+            'tipo'                => 'todos',
+            'orden'               => 'personalizado',
+            'max'                 => '-1',
+            'mostrar_descripcion' => 'si',
+            'mostrar_categorias'  => 'si',
+            'texto_boton'         => 'Ver marca',
+        ), $atts );
+
+        $marcas = Welow_Helpers::get_marcas( array(
+            'tipo'  => $atts['tipo'],
+            'orden' => $atts['orden'],
+            'max'   => $atts['max'],
+        ) );
+
+        if ( empty( $marcas ) ) {
+            return '<p class="welow-no-results">No se encontraron marcas.</p>';
+        }
+
+        wp_enqueue_style( 'welow-marcas' );
+
+        ob_start();
+        Welow_Helpers::get_template( 'marca-grid-card.php', array(
+            'marcas'              => $marcas,
+            'columnas'            => intval( $atts['columnas'] ),
+            'columnas_tablet'     => intval( $atts['columnas_tablet'] ),
+            'columnas_movil'      => intval( $atts['columnas_movil'] ),
+            'mostrar_descripcion' => ( 'si' === $atts['mostrar_descripcion'] ),
+            'mostrar_categorias'  => ( 'si' === $atts['mostrar_categorias'] ),
+            'texto_boton'         => sanitize_text_field( $atts['texto_boton'] ),
+        ) );
+        return ob_get_clean();
+    }
+}

@@ -1,0 +1,60 @@
+/**
+ * Estilos Admin: Metaboxes de Marca
+ * Welow Concesionarios
+ */
+
+.welow-metabox-table {
+    width: 100%;
+}
+
+.welow-metabox-table th {
+    width: 150px;
+    padding: 12px 10px 12px 0;
+    vertical-align: top;
+}
+
+.welow-metabox-table td {
+    padding: 8px 0;
+}
+
+.welow-media-field {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.welow-image-preview {
+    width: 300px;
+    max-height: 150px;
+    overflow: hidden;
+    border: 1px dashed #ccc;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fafafa;
+}
+
+.welow-image-preview img {
+    max-width: 100%;
+    max-height: 150px;
+    height: auto;
+    display: block;
+}
+
+.welow-image-preview:empty::after {
+    content: "Sin imagen";
+    color: #999;
+    font-size: 13px;
+}
+
+.welow-checkbox-label {
+    display: inline-block;
+    margin: 3px 0;
+    cursor: pointer;
+}
+
+.welow-checkbox-label input[type="checkbox"] {
+    margin-right: 4px;
+}
