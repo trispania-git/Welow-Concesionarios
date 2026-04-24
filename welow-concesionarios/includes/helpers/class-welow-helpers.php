@@ -125,6 +125,49 @@ class Welow_Helpers {
         return $labels;
     }
 
+    /**
+     * Obtiene la URL del logo de una marca según la variante.
+     *
+     * @since 1.1.0
+     * @param int    $marca_id ID de la marca.
+     * @param string $variante original | negro | blanco.
+     * @param string $size     Tamaño de imagen.
+     * @return string URL del logo (o de la imagen destacada como fallback).
+     */
+    public static function get_logo_url( $marca_id, $variante = 'original', $size = 'medium' ) {
+        if ( 'original' === $variante ) {
+            return get_the_post_thumbnail_url( $marca_id, $size );
+        }
+
+        $meta_key = 'negro' === $variante ? '_welow_marca_logo_negro' : '_welow_marca_logo_blanco';
+        $logo_id  = get_post_meta( $marca_id, $meta_key, true );
+
+        if ( $logo_id ) {
+            return wp_get_attachment_image_url( $logo_id, $size );
+        }
+
+        // Fallback: logo original
+        return get_the_post_thumbnail_url( $marca_id, $size );
+    }
+
+    /**
+     * Obtiene los banners de una marca.
+     *
+     * @since 1.1.0
+     * @param int    $marca_id
+     * @param string $tipo portada | media
+     * @return array{desktop: string, movil: string}
+     */
+    public static function get_marca_banners( $marca_id, $tipo = 'portada' ) {
+        $id_desktop = get_post_meta( $marca_id, '_welow_marca_banner_' . $tipo . '_desktop', true );
+        $id_movil   = get_post_meta( $marca_id, '_welow_marca_banner_' . $tipo . '_movil', true );
+
+        return array(
+            'desktop' => $id_desktop ? wp_get_attachment_image_url( $id_desktop, 'full' ) : '',
+            'movil'   => $id_movil ? wp_get_attachment_image_url( $id_movil, 'large' ) : '',
+        );
+    }
+
     // =========================================================================
     // SLIDES
     // =========================================================================
@@ -243,6 +286,53 @@ class Welow_Helpers {
         ) );
 
         return ! empty( $posts ) ? $posts[0] : false;
+    }
+
+    /**
+     * Obtiene las etiquetas asignadas a un modelo (objetos WP_Post).
+     *
+     * @since 1.1.0
+     * @param int $modelo_id
+     * @return WP_Post[] Array de posts de tipo welow_etiqueta.
+     */
+    public static function get_etiquetas_modelo( $modelo_id ) {
+        $ids = get_post_meta( $modelo_id, '_welow_modelo_etiquetas', true );
+        if ( ! is_array( $ids ) || empty( $ids ) ) return array();
+
+        $etiquetas = get_posts( array(
+            'post_type'      => 'welow_etiqueta',
+            'post__in'       => $ids,
+            'posts_per_page' => -1,
+            'orderby'        => 'post__in',
+            'meta_query'     => array(
+                array(
+                    'relation' => 'OR',
+                    array( 'key' => '_welow_etiqueta_activa', 'value' => '1' ),
+                    array( 'key' => '_welow_etiqueta_activa', 'compare' => 'NOT EXISTS' ),
+                ),
+            ),
+        ) );
+
+        return $etiquetas;
+    }
+
+    /**
+     * Obtiene el disclaimer efectivo de un modelo (override o global).
+     *
+     * @since 1.1.0
+     * @param int $modelo_id
+     * @return string
+     */
+    public static function get_modelo_disclaimer( $modelo_id ) {
+        $override = get_post_meta( $modelo_id, '_welow_modelo_disclaimer', true );
+        if ( ! empty( $override ) ) {
+            return $override;
+        }
+
+        if ( class_exists( 'Welow_Settings' ) ) {
+            return Welow_Settings::get( 'disclaimer_global', '' );
+        }
+        return '';
     }
 
     // =========================================================================

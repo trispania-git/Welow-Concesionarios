@@ -24,7 +24,8 @@ if ( ! defined( 'ABSPATH' ) ) {
             --welow-cols-movil: <?php echo esc_attr( $columnas_movil ); ?>;">
 
     <?php foreach ( $marcas as $marca ) :
-        $logo_url   = get_the_post_thumbnail_url( $marca->ID, 'medium' );
+        // v1.1.0 — Soporte para variante de logo (original | negro | blanco)
+        $logo_url   = Welow_Helpers::get_logo_url( $marca->ID, isset( $variante_logo ) ? $variante_logo : 'original', 'medium' );
         $link       = get_permalink( $marca->ID );
         $nombre     = get_the_title( $marca->ID );
         $desc_corta = Welow_Helpers::get_marca_meta( $marca->ID, 'desc_corta' );

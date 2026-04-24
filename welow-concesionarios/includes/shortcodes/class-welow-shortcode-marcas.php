@@ -20,6 +20,8 @@ class Welow_Shortcode_Marcas {
 
     /**
      * Parámetros comunes para ambos shortcodes.
+     *
+     * @since 1.1.0 — Añadido parámetro `variante_logo`.
      */
     private static function parse_atts_comunes( $atts ) {
         return shortcode_atts( array(
@@ -29,6 +31,7 @@ class Welow_Shortcode_Marcas {
             'tipo'            => 'todos',
             'orden'           => 'personalizado',
             'max'             => '-1',
+            'variante_logo'   => 'original', // original | negro | blanco
         ), $atts );
     }
 
@@ -57,6 +60,7 @@ class Welow_Shortcode_Marcas {
             'columnas'        => intval( $atts['columnas'] ),
             'columnas_tablet' => intval( $atts['columnas_tablet'] ),
             'columnas_movil'  => intval( $atts['columnas_movil'] ),
+            'variante_logo'   => sanitize_text_field( $atts['variante_logo'] ),
         ) );
         return ob_get_clean();
     }
@@ -75,6 +79,7 @@ class Welow_Shortcode_Marcas {
             'mostrar_descripcion' => 'si',
             'mostrar_categorias'  => 'si',
             'texto_boton'         => 'Ver marca',
+            'variante_logo'       => 'original',
         ), $atts );
 
         $marcas = Welow_Helpers::get_marcas( array(
@@ -98,6 +103,7 @@ class Welow_Shortcode_Marcas {
             'mostrar_descripcion' => ( 'si' === $atts['mostrar_descripcion'] ),
             'mostrar_categorias'  => ( 'si' === $atts['mostrar_categorias'] ),
             'texto_boton'         => sanitize_text_field( $atts['texto_boton'] ),
+            'variante_logo'       => sanitize_text_field( $atts['variante_logo'] ),
         ) );
         return ob_get_clean();
     }

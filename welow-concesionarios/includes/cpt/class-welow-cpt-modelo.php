@@ -52,16 +52,16 @@ class Welow_CPT_Modelo {
             'public'              => true,
             'publicly_queryable'  => true,
             'show_ui'             => true,
-            'show_in_menu'        => true,
+            'show_in_menu'        => 'welow_concesionarios',
             'show_in_rest'        => true,
             'query_var'           => true,
             'rewrite'             => array( 'slug' => 'modelo', 'with_front' => false ),
             'capability_type'     => 'post',
             'has_archive'         => false,
             'hierarchical'        => false,
-            'menu_position'       => 6,
             'menu_icon'           => 'dashicons-car',
-            'supports'            => array( 'title', 'editor', 'thumbnail' ),
+            'supports'            => array( 'title', 'editor', 'thumbnail', 'excerpt' ),
+            'taxonomies'          => array( 'welow_combustible' ),
         );
 
         register_post_type( self::POST_TYPE, $args );
@@ -81,6 +81,33 @@ class Welow_CPT_Modelo {
         );
 
         add_meta_box(
+            'welow_modelo_galeria',
+            'Galería de imágenes',
+            array( __CLASS__, 'render_metabox_galeria' ),
+            self::POST_TYPE,
+            'normal',
+            'high'
+        );
+
+        add_meta_box(
+            'welow_modelo_precio',
+            'Precio',
+            array( __CLASS__, 'render_metabox_precio' ),
+            self::POST_TYPE,
+            'normal',
+            'default'
+        );
+
+        add_meta_box(
+            'welow_modelo_etiquetas',
+            'Etiquetas visuales',
+            array( __CLASS__, 'render_metabox_etiquetas' ),
+            self::POST_TYPE,
+            'side',
+            'default'
+        );
+
+        add_meta_box(
             'welow_modelo_config',
             'Configuración',
             array( __CLASS__, 'render_metabox_config' ),
@@ -88,6 +115,180 @@ class Welow_CPT_Modelo {
             'side',
             'default'
         );
+    }
+
+    /**
+     * Helper: renderiza un campo de imagen con preview y botón.
+     */
+    private static function render_campo_imagen( $field_name, $label, $value = '' ) {
+        $img_url    = $value ? wp_get_attachment_image_url( $value, 'medium' ) : '';
+        $preview_id = $field_name . '_preview';
+        ?>
+        <div class="welow-img-field-group">
+            <label class="welow-img-label"><strong><?php echo esc_html( $label ); ?></strong></label>
+            <div class="welow-media-field">
+                <input type="hidden" id="<?php echo esc_attr( $field_name ); ?>"
+                       name="<?php echo esc_attr( $field_name ); ?>"
+                       value="<?php echo esc_attr( $value ); ?>" />
+                <div id="<?php echo esc_attr( $preview_id ); ?>" class="welow-image-preview">
+                    <?php if ( $img_url ) : ?>
+                        <img src="<?php echo esc_url( $img_url ); ?>" alt="" />
+                    <?php endif; ?>
+                </div>
+                <div class="welow-img-buttons">
+                    <button type="button" class="button welow-upload-btn"
+                            data-target="<?php echo esc_attr( $field_name ); ?>"
+                            data-preview="<?php echo esc_attr( $preview_id ); ?>">
+                        <?php echo $value ? 'Cambiar' : 'Seleccionar'; ?>
+                    </button>
+                    <?php if ( $value ) : ?>
+                        <button type="button" class="button welow-remove-btn"
+                                data-target="<?php echo esc_attr( $field_name ); ?>"
+                                data-preview="<?php echo esc_attr( $preview_id ); ?>">Quitar</button>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+
+    /**
+     * Metabox: Galería de imágenes (principal como featured + 4 adicionales).
+     *
+     * @since 1.1.0
+     */
+    public static function render_metabox_galeria( $post ) {
+        $img_principal = get_post_thumbnail_id( $post->ID );
+        $img_2 = get_post_meta( $post->ID, self::META_PREFIX . 'img_2', true );
+        $img_3 = get_post_meta( $post->ID, self::META_PREFIX . 'img_3', true );
+        $img_4 = get_post_meta( $post->ID, self::META_PREFIX . 'img_4', true );
+        $img_5 = get_post_meta( $post->ID, self::META_PREFIX . 'img_5', true );
+        ?>
+        <p class="description" style="margin-top:0;">
+            PNG transparentes, tamaño recomendado <strong>550×300px</strong>. La imagen principal se guarda como "Imagen destacada".
+        </p>
+        <div class="welow-galeria-grid">
+            <?php
+            self::render_campo_imagen( 'welow_img_principal_featured', 'Imagen principal (destacada)', $img_principal );
+            self::render_campo_imagen( 'welow_modelo_img_2', 'Imagen 2', $img_2 );
+            self::render_campo_imagen( 'welow_modelo_img_3', 'Imagen 3', $img_3 );
+            self::render_campo_imagen( 'welow_modelo_img_4', 'Imagen 4', $img_4 );
+            self::render_campo_imagen( 'welow_modelo_img_5', 'Imagen 5', $img_5 );
+            ?>
+        </div>
+        <style>
+            .welow-galeria-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+            .welow-galeria-grid .welow-image-preview { min-height: 80px; background: #f5f5f5; }
+            @media (max-width: 1400px) { .welow-galeria-grid { grid-template-columns: repeat(3, 1fr); } }
+            @media (max-width: 900px)  { .welow-galeria-grid { grid-template-columns: repeat(2, 1fr); } }
+        </style>
+        <?php
+    }
+
+    /**
+     * Metabox: Precio + disclaimer override.
+     *
+     * @since 1.1.0
+     */
+    public static function render_metabox_precio( $post ) {
+        $precio_desde = get_post_meta( $post->ID, self::META_PREFIX . 'precio_desde', true );
+        $disclaimer   = get_post_meta( $post->ID, self::META_PREFIX . 'disclaimer', true );
+        $moneda       = class_exists( 'Welow_Settings' ) ? Welow_Settings::get( 'moneda_simbolo', '€' ) : '€';
+
+        $disclaimer_global = class_exists( 'Welow_Settings' ) ? Welow_Settings::get( 'disclaimer_global', '' ) : '';
+        ?>
+        <table class="form-table welow-metabox-table">
+            <tr>
+                <th><label for="welow_precio_desde">Precio desde</label></th>
+                <td>
+                    <input type="number" id="welow_precio_desde" name="welow_precio_desde"
+                           value="<?php echo esc_attr( $precio_desde ); ?>"
+                           min="0" step="0.01" class="regular-text" />
+                    <span style="margin-left:8px;"><?php echo esc_html( $moneda ); ?></span>
+                    <p class="description">Precio "desde" del modelo. Déjalo vacío si no quieres mostrar precio.</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="welow_modelo_disclaimer">Disclaimer específico</label></th>
+                <td>
+                    <textarea id="welow_modelo_disclaimer" name="welow_modelo_disclaimer"
+                              rows="5" class="large-text"
+                              placeholder="<?php echo esc_attr( $disclaimer_global ?: 'Se usará el disclaimer global definido en Configuraciones.' ); ?>"><?php echo esc_textarea( $disclaimer ); ?></textarea>
+                    <p class="description">
+                        Si lo dejas vacío, se usará el disclaimer global de Configuraciones.
+                        <?php if ( $disclaimer_global ) : ?>
+                            <br><em>Global actual:</em> <?php echo esc_html( wp_trim_words( $disclaimer_global, 20 ) ); ?>
+                        <?php else : ?>
+                            <br><strong>Aviso:</strong> No hay disclaimer global definido.
+                            <a href="<?php echo esc_url( admin_url( 'admin.php?page=welow_settings' ) ); ?>">Configurarlo ahora →</a>
+                        <?php endif; ?>
+                    </p>
+                </td>
+            </tr>
+        </table>
+        <?php
+    }
+
+    /**
+     * Metabox: Etiquetas visuales (multi-select de CPT welow_etiqueta).
+     *
+     * @since 1.1.0
+     */
+    public static function render_metabox_etiquetas( $post ) {
+        $etiquetas_guardadas = get_post_meta( $post->ID, self::META_PREFIX . 'etiquetas', true );
+        if ( ! is_array( $etiquetas_guardadas ) ) $etiquetas_guardadas = array();
+
+        $etiquetas = get_posts( array(
+            'post_type'      => 'welow_etiqueta',
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+            'orderby'        => 'title',
+            'order'          => 'ASC',
+        ) );
+
+        if ( empty( $etiquetas ) ) {
+            ?>
+            <p><em>No hay etiquetas disponibles.</em></p>
+            <p>
+                <a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=welow_etiqueta' ) ); ?>" class="button">
+                    Crear primera etiqueta
+                </a>
+            </p>
+            <?php
+            return;
+        }
+        ?>
+        <p class="description" style="margin-top:0;">
+            Selecciona las etiquetas visuales a mostrar en este modelo.
+        </p>
+        <div class="welow-etiquetas-list">
+            <?php foreach ( $etiquetas as $et ) :
+                $img_id  = get_post_meta( $et->ID, '_welow_etiqueta_imagen', true );
+                $img_url = $img_id ? wp_get_attachment_image_url( $img_id, 'thumbnail' ) : '';
+            ?>
+                <label class="welow-etiqueta-item <?php echo in_array( $et->ID, $etiquetas_guardadas ) ? 'welow-etiqueta-item--selected' : ''; ?>">
+                    <input type="checkbox" name="welow_modelo_etiquetas[]"
+                           value="<?php echo esc_attr( $et->ID ); ?>"
+                           <?php checked( in_array( $et->ID, $etiquetas_guardadas ) ); ?> />
+                    <?php if ( $img_url ) : ?>
+                        <img src="<?php echo esc_url( $img_url ); ?>" alt="" />
+                    <?php endif; ?>
+                    <span><?php echo esc_html( $et->post_title ); ?></span>
+                </label>
+            <?php endforeach; ?>
+        </div>
+        <style>
+            .welow-etiquetas-list { display: flex; flex-direction: column; gap: 6px; }
+            .welow-etiqueta-item {
+                display: flex; align-items: center; gap: 8px;
+                padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;
+                cursor: pointer; transition: all 0.15s;
+            }
+            .welow-etiqueta-item:hover { border-color: #2563eb; background: #f0f9ff; }
+            .welow-etiqueta-item--selected { border-color: #2563eb; background: #eff6ff; }
+            .welow-etiqueta-item img { width: 32px; height: 32px; object-fit: contain; }
+        </style>
+        <?php
     }
 
     /**
@@ -200,6 +401,39 @@ class Welow_CPT_Modelo {
         // Activo
         $activo = isset( $_POST['welow_modelo_activo'] ) ? '1' : '0';
         update_post_meta( $post_id, self::META_PREFIX . 'activo', $activo );
+
+        // === v1.1.0: Galería + precio + disclaimer + etiquetas ===
+
+        // Imagen principal → se guarda como imagen destacada
+        if ( isset( $_POST['welow_img_principal_featured'] ) ) {
+            $featured = absint( $_POST['welow_img_principal_featured'] );
+            if ( $featured ) {
+                set_post_thumbnail( $post_id, $featured );
+            } else {
+                delete_post_thumbnail( $post_id );
+            }
+        }
+
+        // Imágenes adicionales 2..5
+        foreach ( array( 2, 3, 4, 5 ) as $n ) {
+            $key = 'welow_modelo_img_' . $n;
+            $val = isset( $_POST[ $key ] ) ? absint( $_POST[ $key ] ) : '';
+            update_post_meta( $post_id, self::META_PREFIX . 'img_' . $n, $val );
+        }
+
+        // Precio desde
+        $precio = isset( $_POST['welow_precio_desde'] ) ? sanitize_text_field( $_POST['welow_precio_desde'] ) : '';
+        update_post_meta( $post_id, self::META_PREFIX . 'precio_desde', $precio );
+
+        // Disclaimer específico (override)
+        $disclaimer = isset( $_POST['welow_modelo_disclaimer'] ) ? wp_kses_post( $_POST['welow_modelo_disclaimer'] ) : '';
+        update_post_meta( $post_id, self::META_PREFIX . 'disclaimer', $disclaimer );
+
+        // Etiquetas (array de IDs)
+        $etiquetas = isset( $_POST['welow_modelo_etiquetas'] ) && is_array( $_POST['welow_modelo_etiquetas'] )
+            ? array_map( 'absint', $_POST['welow_modelo_etiquetas'] )
+            : array();
+        update_post_meta( $post_id, self::META_PREFIX . 'etiquetas', $etiquetas );
     }
 
     /**

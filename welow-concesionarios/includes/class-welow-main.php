@@ -3,6 +3,8 @@
  * Clase principal del plugin Welow Concesionarios.
  *
  * @package Welow_Concesionarios
+ * @since 1.0.0
+ * @version 1.1.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -21,17 +23,27 @@ class Welow_Main {
     }
 
     private function __construct() {
-        // Registrar CPTs
+        // Admin (v1.1.0)
+        Welow_Admin_Menu::init();
+        Welow_Settings::init();
+        Welow_Importer::init();
+
+        // Taxonomías (v1.1.0)
+        Welow_Tax_Combustible::init();
+
+        // CPTs
         Welow_CPT_Marca::init();
         Welow_CPT_Slide::init();
         Welow_CPT_Modelo::init();
+        Welow_CPT_Etiqueta::init();
 
-        // Registrar Shortcodes
+        // Shortcodes
         Welow_Shortcode_Marcas::init();
         Welow_Shortcode_Slider::init();
         Welow_Shortcode_Modelos::init();
         Welow_Shortcode_Slider_CTA::init();
         Welow_Shortcode_Contenido::init();
+        Welow_Shortcode_Marca_Banner::init();
 
         // Enqueue assets
         add_action( 'wp_enqueue_scripts', array( $this, 'registrar_assets' ) );
@@ -75,19 +87,26 @@ class Welow_Main {
     }
 
     /**
-     * Assets para el admin (metaboxes con media uploader).
-     * Se cargan en los CPTs que lo necesitan.
+     * Assets para el admin.
+     *
+     * @since 1.1.0 — Añadido soporte para welow_etiqueta, welow_modelo y páginas del plugin.
      */
     public function registrar_admin_assets( $hook ) {
         $screen = get_current_screen();
-        if ( ! $screen ) {
-            return;
-        }
+        if ( ! $screen ) return;
 
-        // CPTs que usan el media uploader
-        $cpts_con_media = array( 'welow_marca', 'welow_slide' );
+        // CPTs y páginas que usan el media uploader
+        $cpts_con_media = array( 'welow_marca', 'welow_slide', 'welow_modelo', 'welow_etiqueta' );
+        $paginas_con_media = array(
+            'concesionarios_page_welow_settings',
+            'welow-concesionarios_page_welow_settings',
+        );
 
-        if ( in_array( $screen->post_type, $cpts_con_media, true ) ) {
+        $necesita_media = in_array( $screen->post_type, $cpts_con_media, true )
+            || in_array( $hook, $paginas_con_media, true )
+            || ( isset( $_GET['page'] ) && 'welow_settings' === $_GET['page'] );
+
+        if ( $necesita_media ) {
             wp_enqueue_media();
             wp_enqueue_style(
                 'welow-admin-marca',
