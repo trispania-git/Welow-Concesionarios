@@ -81,15 +81,14 @@ class Welow_CPT_Marca {
             'public'              => true,
             'publicly_queryable'  => true,
             'show_ui'             => true,
-            'show_in_menu'        => true,
+            'show_in_menu'        => 'welow_concesionarios',
             'show_in_rest'        => true,
             'query_var'           => true,
             'rewrite'             => array( 'slug' => 'marca', 'with_front' => false ),
             'capability_type'     => 'post',
             'has_archive'         => true,
             'hierarchical'        => false,
-            'menu_position'       => 5,
-            'menu_icon'           => 'dashicons-car',
+            'menu_icon'           => 'dashicons-awards',
             'supports'            => array( 'title', 'editor', 'thumbnail', 'excerpt' ),
         );
 
@@ -107,6 +106,24 @@ class Welow_CPT_Marca {
             self::POST_TYPE,
             'normal',
             'high'
+        );
+
+        add_meta_box(
+            'welow_marca_logos',
+            'Logos de la marca',
+            array( __CLASS__, 'render_metabox_logos' ),
+            self::POST_TYPE,
+            'normal',
+            'high'
+        );
+
+        add_meta_box(
+            'welow_marca_banners',
+            'Banners de la marca',
+            array( __CLASS__, 'render_metabox_banners' ),
+            self::POST_TYPE,
+            'normal',
+            'default'
         );
 
         add_meta_box(
@@ -129,7 +146,147 @@ class Welow_CPT_Marca {
     }
 
     /**
-     * Metabox: Datos principales de la marca.
+     * Helper: renderiza un campo de imagen con preview y botón.
+     */
+    private static function render_campo_imagen( $field_name, $label, $description = '', $value = '' ) {
+        $img_url  = $value ? wp_get_attachment_image_url( $value, 'medium' ) : '';
+        $preview_id = $field_name . '_preview';
+        ?>
+        <div class="welow-img-field-group">
+            <label class="welow-img-label"><strong><?php echo esc_html( $label ); ?></strong></label>
+            <div class="welow-media-field">
+                <input type="hidden" id="<?php echo esc_attr( $field_name ); ?>"
+                       name="<?php echo esc_attr( $field_name ); ?>"
+                       value="<?php echo esc_attr( $value ); ?>" />
+                <div id="<?php echo esc_attr( $preview_id ); ?>" class="welow-image-preview">
+                    <?php if ( $img_url ) : ?>
+                        <img src="<?php echo esc_url( $img_url ); ?>" alt="" />
+                    <?php endif; ?>
+                </div>
+                <div class="welow-img-buttons">
+                    <button type="button" class="button welow-upload-btn"
+                            data-target="<?php echo esc_attr( $field_name ); ?>"
+                            data-preview="<?php echo esc_attr( $preview_id ); ?>">
+                        <?php echo $value ? 'Cambiar' : 'Seleccionar'; ?>
+                    </button>
+                    <?php if ( $value ) : ?>
+                        <button type="button" class="button welow-remove-btn"
+                                data-target="<?php echo esc_attr( $field_name ); ?>"
+                                data-preview="<?php echo esc_attr( $preview_id ); ?>">Quitar</button>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?php if ( $description ) : ?>
+                <p class="description"><?php echo esc_html( $description ); ?></p>
+            <?php endif; ?>
+        </div>
+        <?php
+    }
+
+    /**
+     * Metabox: Logos (original, negro, blanco).
+     */
+    public static function render_metabox_logos( $post ) {
+        $logo_original = get_post_thumbnail_id( $post->ID );
+        $logo_negro    = get_post_meta( $post->ID, self::META_PREFIX . 'logo_negro', true );
+        $logo_blanco   = get_post_meta( $post->ID, self::META_PREFIX . 'logo_blanco', true );
+        ?>
+        <div class="welow-logos-grid">
+            <?php
+            self::render_campo_imagen(
+                'welow_logo_original_featured',
+                'Logo original',
+                'Se guarda como Imagen destacada. PNG sin fondo, 350×225px.',
+                $logo_original
+            );
+
+            self::render_campo_imagen(
+                'welow_logo_negro',
+                'Logo negro',
+                'PNG sin fondo, 350×225px.',
+                $logo_negro
+            );
+
+            self::render_campo_imagen(
+                'welow_logo_blanco',
+                'Logo blanco',
+                'PNG sin fondo, 350×225px.',
+                $logo_blanco
+            );
+            ?>
+        </div>
+        <style>
+            .welow-logos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+            .welow-logos-grid .welow-image-preview { background: #f5f5f5; padding: 10px; min-height: 100px; }
+            @media (max-width: 1200px) { .welow-logos-grid { grid-template-columns: 1fr; } }
+        </style>
+        <?php
+    }
+
+    /**
+     * Metabox: Banners (Portada + Zona media, cada uno con desktop + móvil).
+     */
+    public static function render_metabox_banners( $post ) {
+        $banner_portada_desktop = get_post_meta( $post->ID, self::META_PREFIX . 'banner_portada_desktop', true );
+        $banner_portada_movil   = get_post_meta( $post->ID, self::META_PREFIX . 'banner_portada_movil', true );
+        $banner_media_desktop   = get_post_meta( $post->ID, self::META_PREFIX . 'banner_media_desktop', true );
+        $banner_media_movil     = get_post_meta( $post->ID, self::META_PREFIX . 'banner_media_movil', true );
+        ?>
+        <h3 class="welow-banner-section-title">
+            <span class="dashicons dashicons-format-image"></span> Banner de Portada
+        </h3>
+        <div class="welow-banner-pair">
+            <?php
+            self::render_campo_imagen(
+                'welow_banner_portada_desktop',
+                'Escritorio (1920×600)',
+                'Se muestra en pantallas > 980px.',
+                $banner_portada_desktop
+            );
+
+            self::render_campo_imagen(
+                'welow_banner_portada_movil',
+                'Móvil (600×338)',
+                'Se muestra en pantallas ≤ 980px.',
+                $banner_portada_movil
+            );
+            ?>
+        </div>
+
+        <hr style="margin: 30px 0;">
+
+        <h3 class="welow-banner-section-title">
+            <span class="dashicons dashicons-align-center"></span> Banner de Zona Media
+        </h3>
+        <div class="welow-banner-pair">
+            <?php
+            self::render_campo_imagen(
+                'welow_banner_media_desktop',
+                'Escritorio (1920×400)',
+                'Se muestra en pantallas > 980px.',
+                $banner_media_desktop
+            );
+
+            self::render_campo_imagen(
+                'welow_banner_media_movil',
+                'Móvil (600×338)',
+                'Se muestra en pantallas ≤ 980px.',
+                $banner_media_movil
+            );
+            ?>
+        </div>
+        <style>
+            .welow-banner-section-title { display: flex; align-items: center; gap: 8px; margin: 0 0 15px; font-size: 15px; }
+            .welow-banner-section-title .dashicons { color: #2563eb; }
+            .welow-banner-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+            .welow-banner-pair .welow-image-preview { min-height: 120px; background: #f5f5f5; }
+            @media (max-width: 1200px) { .welow-banner-pair { grid-template-columns: 1fr; } }
+        </style>
+        <?php
+    }
+
+    /**
+     * Metabox: Datos textuales de la marca.
      */
     public static function render_metabox_datos( $post ) {
         wp_nonce_field( 'welow_marca_save', 'welow_marca_nonce' );
@@ -137,8 +294,6 @@ class Welow_CPT_Marca {
         $desc_corta = get_post_meta( $post->ID, self::META_PREFIX . 'desc_corta', true );
         $slogan     = get_post_meta( $post->ID, self::META_PREFIX . 'slogan', true );
         $web        = get_post_meta( $post->ID, self::META_PREFIX . 'web', true );
-        $banner_id  = get_post_meta( $post->ID, self::META_PREFIX . 'banner', true );
-        $banner_url = $banner_id ? wp_get_attachment_image_url( $banner_id, 'large' ) : '';
         ?>
         <table class="form-table welow-metabox-table">
             <tr>
@@ -158,26 +313,6 @@ class Welow_CPT_Marca {
                 <th><label for="welow_web">Web oficial</label></th>
                 <td>
                     <input type="url" id="welow_web" name="welow_web" value="<?php echo esc_url( $web ); ?>" class="large-text" placeholder="https://www.marca.com" />
-                </td>
-            </tr>
-            <tr>
-                <th><label>Imagen banner</label></th>
-                <td>
-                    <div class="welow-media-field">
-                        <input type="hidden" id="welow_banner" name="welow_banner" value="<?php echo esc_attr( $banner_id ); ?>" />
-                        <div id="welow-banner-preview" class="welow-image-preview">
-                            <?php if ( $banner_url ) : ?>
-                                <img src="<?php echo esc_url( $banner_url ); ?>" alt="" />
-                            <?php endif; ?>
-                        </div>
-                        <button type="button" class="button welow-upload-btn" data-target="welow_banner" data-preview="welow-banner-preview">
-                            <?php echo $banner_id ? 'Cambiar imagen' : 'Seleccionar imagen'; ?>
-                        </button>
-                        <?php if ( $banner_id ) : ?>
-                            <button type="button" class="button welow-remove-btn" data-target="welow_banner" data-preview="welow-banner-preview">Quitar</button>
-                        <?php endif; ?>
-                    </div>
-                    <p class="description">Imagen de cabecera para la página individual de la marca. Recomendado: 1920×600px.</p>
                 </td>
             </tr>
         </table>
@@ -275,9 +410,29 @@ class Welow_CPT_Marca {
         $web = isset( $_POST['welow_web'] ) ? esc_url_raw( $_POST['welow_web'] ) : '';
         update_post_meta( $post_id, self::META_PREFIX . 'web', $web );
 
-        // Banner (ID de imagen)
-        $banner = isset( $_POST['welow_banner'] ) ? absint( $_POST['welow_banner'] ) : '';
-        update_post_meta( $post_id, self::META_PREFIX . 'banner', $banner );
+        // Logo original → se guarda como imagen destacada
+        if ( isset( $_POST['welow_logo_original_featured'] ) ) {
+            $featured = absint( $_POST['welow_logo_original_featured'] );
+            if ( $featured ) {
+                set_post_thumbnail( $post_id, $featured );
+            } else {
+                delete_post_thumbnail( $post_id );
+            }
+        }
+
+        // Logos adicionales (negro, blanco)
+        $campos_imagen = array(
+            'welow_logo_negro'              => 'logo_negro',
+            'welow_logo_blanco'             => 'logo_blanco',
+            'welow_banner_portada_desktop'  => 'banner_portada_desktop',
+            'welow_banner_portada_movil'    => 'banner_portada_movil',
+            'welow_banner_media_desktop'    => 'banner_media_desktop',
+            'welow_banner_media_movil'      => 'banner_media_movil',
+        );
+        foreach ( $campos_imagen as $post_key => $meta_key ) {
+            $val = isset( $_POST[ $post_key ] ) ? absint( $_POST[ $post_key ] ) : '';
+            update_post_meta( $post_id, self::META_PREFIX . $meta_key, $val );
+        }
 
         // Categorías (array de checkboxes)
         $categorias = isset( $_POST['welow_categorias'] ) ? array_map( 'sanitize_text_field', $_POST['welow_categorias'] ) : array();
