@@ -12,14 +12,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Welow_Helpers {
 
     /**
-     * Obtiene marcas filtradas y ordenadas.
+     * Obtiene marcas activas, ordenadas.
+     *
+     * @since 1.0.0
+     * @version 1.2.0 — Eliminado filtro por `tipo` (la clasificación se gestiona a nivel modelo).
      *
      * @param array $args Argumentos de filtro.
      * @return WP_Post[] Array de posts de tipo marca.
      */
     public static function get_marcas( $args = array() ) {
         $defaults = array(
-            'tipo'  => 'todos',
             'orden' => 'personalizado',
             'max'   => -1,
         );
@@ -45,15 +47,6 @@ class Welow_Helpers {
                 ),
             ),
         );
-
-        // Filtrar por tipo de venta
-        if ( 'todos' !== $args['tipo'] ) {
-            $query_args['meta_query'][] = array(
-                'key'     => '_welow_marca_tipo_venta',
-                'value'   => $args['tipo'],
-                'compare' => 'LIKE',
-            );
-        }
 
         // Ordenación
         if ( 'nombre' === $args['orden'] ) {
@@ -81,48 +74,6 @@ class Welow_Helpers {
     public static function get_marca_meta( $post_id, $key, $default = '' ) {
         $value = get_post_meta( $post_id, '_welow_marca_' . $key, true );
         return ( '' !== $value && false !== $value ) ? $value : $default;
-    }
-
-    /**
-     * Obtiene las etiquetas legibles de los tipos de venta de una marca.
-     *
-     * @param int $post_id ID del post.
-     * @return string[] Array de labels.
-     */
-    public static function get_tipos_venta_labels( $post_id ) {
-        $tipos  = self::get_marca_meta( $post_id, 'tipo_venta', array() );
-        $todos  = Welow_CPT_Marca::get_tipos_venta();
-        $labels = array();
-
-        if ( is_array( $tipos ) ) {
-            foreach ( $tipos as $tipo ) {
-                if ( isset( $todos[ $tipo ] ) ) {
-                    $labels[] = $todos[ $tipo ];
-                }
-            }
-        }
-        return $labels;
-    }
-
-    /**
-     * Obtiene las etiquetas legibles de las categorías de una marca.
-     *
-     * @param int $post_id ID del post.
-     * @return string[] Array de labels.
-     */
-    public static function get_categorias_labels( $post_id ) {
-        $cats   = self::get_marca_meta( $post_id, 'categorias', array() );
-        $todos  = Welow_CPT_Marca::get_categorias_disponibles();
-        $labels = array();
-
-        if ( is_array( $cats ) ) {
-            foreach ( $cats as $cat ) {
-                if ( isset( $todos[ $cat ] ) ) {
-                    $labels[] = $todos[ $cat ];
-                }
-            }
-        }
-        return $labels;
     }
 
     /**

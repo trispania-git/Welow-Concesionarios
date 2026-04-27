@@ -10,6 +10,7 @@
  * @var string    $texto_boton     Texto del CTA.
  *
  * @since 1.1.0 — Añadidos: etiquetas visuales, precio desde, disclaimer, combustible.
+ * @version 1.2.0 — Añadidos: categoría de modelo (taxonomía) y plazas.
  * @package Welow_Concesionarios
  */
 
@@ -42,6 +43,10 @@ $icono_disclaimer_url = $icono_disclaimer_id ? wp_get_attachment_image_url( $ico
 
         // Combustible (taxonomía)
         $combustibles = wp_get_post_terms( $modelo->ID, 'welow_combustible' );
+
+        // v1.2.0 — Categoría de modelo (taxonomía) y plazas
+        $categorias_modelo = wp_get_post_terms( $modelo->ID, 'welow_categoria_modelo' );
+        $plazas            = Welow_Helpers::get_modelo_meta( $modelo->ID, 'plazas' );
     ?>
         <div class="welow-modelo-card">
 
@@ -78,13 +83,29 @@ $icono_disclaimer_url = $icono_disclaimer_id ? wp_get_attachment_image_url( $ico
 
             <div class="welow-modelo-card__info">
 
-                <?php if ( ! empty( $combustibles ) && ! is_wp_error( $combustibles ) ) : ?>
-                    <div class="welow-modelo-card__combustibles">
+                <?php // v1.2.0 — Badges de categoría + combustible + plazas (meta-info) ?>
+                <div class="welow-modelo-card__meta">
+
+                    <?php if ( ! empty( $categorias_modelo ) && ! is_wp_error( $categorias_modelo ) ) : ?>
+                        <?php foreach ( $categorias_modelo as $cat ) : ?>
+                            <span class="welow-badge welow-badge--categoria"><?php echo esc_html( $cat->name ); ?></span>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+
+                    <?php if ( ! empty( $combustibles ) && ! is_wp_error( $combustibles ) ) : ?>
                         <?php foreach ( $combustibles as $c ) : ?>
                             <span class="welow-badge welow-badge--combustible"><?php echo esc_html( $c->name ); ?></span>
                         <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
+                    <?php endif; ?>
+
+                    <?php if ( '' !== $plazas && null !== $plazas && intval( $plazas ) > 0 ) : ?>
+                        <span class="welow-badge welow-badge--plazas" title="Número de plazas">
+                            <span class="dashicons dashicons-groups"></span>
+                            <?php echo intval( $plazas ); ?>
+                        </span>
+                    <?php endif; ?>
+
+                </div>
 
                 <h3 class="welow-modelo-card__nombre">
                     <a href="<?php echo esc_url( $permalink ); ?>"><?php echo esc_html( $nombre ); ?></a>

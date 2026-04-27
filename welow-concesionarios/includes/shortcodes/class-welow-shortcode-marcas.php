@@ -5,6 +5,9 @@
  * - [welow_marcas_cards] → Tarjetas con información
  *
  * @package Welow_Concesionarios
+ * @since 1.0.0
+ * @version 1.2.0 — Eliminados parámetros `tipo` y `mostrar_categorias`
+ *                   (la clasificación se gestiona ahora a nivel modelo).
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -20,15 +23,12 @@ class Welow_Shortcode_Marcas {
 
     /**
      * Parámetros comunes para ambos shortcodes.
-     *
-     * @since 1.1.0 — Añadido parámetro `variante_logo`.
      */
     private static function parse_atts_comunes( $atts ) {
         return shortcode_atts( array(
             'columnas'        => '4',
             'columnas_tablet' => '3',
             'columnas_movil'  => '2',
-            'tipo'            => 'todos',
             'orden'           => 'personalizado',
             'max'             => '-1',
             'variante_logo'   => 'original', // original | negro | blanco
@@ -42,7 +42,6 @@ class Welow_Shortcode_Marcas {
         $atts = self::parse_atts_comunes( $atts );
 
         $marcas = Welow_Helpers::get_marcas( array(
-            'tipo'  => $atts['tipo'],
             'orden' => $atts['orden'],
             'max'   => $atts['max'],
         ) );
@@ -51,7 +50,6 @@ class Welow_Shortcode_Marcas {
             return '<p class="welow-no-results">No se encontraron marcas.</p>';
         }
 
-        // Encolar CSS
         wp_enqueue_style( 'welow-marcas' );
 
         ob_start();
@@ -73,17 +71,14 @@ class Welow_Shortcode_Marcas {
             'columnas'            => '3',
             'columnas_tablet'     => '2',
             'columnas_movil'      => '1',
-            'tipo'                => 'todos',
             'orden'               => 'personalizado',
             'max'                 => '-1',
             'mostrar_descripcion' => 'si',
-            'mostrar_categorias'  => 'si',
             'texto_boton'         => 'Ver marca',
             'variante_logo'       => 'original',
         ), $atts );
 
         $marcas = Welow_Helpers::get_marcas( array(
-            'tipo'  => $atts['tipo'],
             'orden' => $atts['orden'],
             'max'   => $atts['max'],
         ) );
@@ -101,7 +96,6 @@ class Welow_Shortcode_Marcas {
             'columnas_tablet'     => intval( $atts['columnas_tablet'] ),
             'columnas_movil'      => intval( $atts['columnas_movil'] ),
             'mostrar_descripcion' => ( 'si' === $atts['mostrar_descripcion'] ),
-            'mostrar_categorias'  => ( 'si' === $atts['mostrar_categorias'] ),
             'texto_boton'         => sanitize_text_field( $atts['texto_boton'] ),
             'variante_logo'       => sanitize_text_field( $atts['variante_logo'] ),
         ) );

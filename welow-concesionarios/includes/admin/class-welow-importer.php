@@ -36,21 +36,30 @@ class Welow_Importer {
      * DEFINICIÓN DE COLUMNAS
      * ========================================================================= */
 
+    /**
+     * @since 1.0.0
+     * @version 1.2.0 — Eliminadas columnas categorias/tipo_venta de marcas.
+     */
     public static function columnas_marcas() {
         return array(
             'nombre', 'slug', 'desc_corta', 'slogan', 'web',
-            'categorias', 'tipo_venta', 'orden', 'activa',
+            'orden', 'activa',
             'logo_url', 'logo_negro_url', 'logo_blanco_url',
             'banner_portada_desktop_url', 'banner_portada_movil_url',
             'banner_media_desktop_url', 'banner_media_movil_url',
         );
     }
 
+    /**
+     * @since 1.0.0
+     * @version 1.2.0 — Añadidas columnas categoria_modelo y plazas.
+     */
     public static function columnas_modelos() {
         return array(
             'nombre', 'slug', 'marca_slug', 'descripcion', 'excerpt',
             'enlace', 'texto_enlace', 'precio_desde', 'disclaimer',
-            'combustible', 'etiquetas', 'orden', 'activo',
+            'combustible', 'categoria_modelo', 'plazas',
+            'etiquetas', 'orden', 'activo',
             'imagen_url', 'imagen_2_url', 'imagen_3_url', 'imagen_4_url', 'imagen_5_url',
         );
     }
@@ -203,15 +212,15 @@ class Welow_Importer {
             <hr style="margin: 30px 0;">
 
             <h2>Formato de los CSV</h2>
-            <p>Los archivos CSV deben usar <strong>coma (,)</strong> como separador y <strong>UTF-8</strong> como codificación. Para campos que contienen múltiples valores (categorías, tipo_venta, etiquetas), usa el separador <strong>|</strong> (barra vertical).</p>
+            <p>Los archivos CSV deben usar <strong>coma (,)</strong> como separador y <strong>UTF-8</strong> como codificación. Para campos con múltiples valores (etiquetas, combustible, categoria_modelo), usa el separador <strong>|</strong> (barra vertical).</p>
 
             <h3>Ejemplo Marcas:</h3>
-            <pre style="background:#f5f5f5;padding:12px;border-radius:4px;overflow-x:auto;">nombre,slug,desc_corta,slogan,web,categorias,tipo_venta,orden,activa,logo_url
-Toyota,toyota,"Fiabilidad japonesa","Always a better way",https://toyota.es,"turismos|suv|hibridos","nuevos|ocasion",10,1,https://ejemplo.com/toyota.png</pre>
+            <pre style="background:#f5f5f5;padding:12px;border-radius:4px;overflow-x:auto;">nombre,slug,desc_corta,slogan,web,orden,activa,logo_url
+Toyota,toyota,"Fiabilidad japonesa","Always a better way",https://toyota.es,10,1,https://ejemplo.com/toyota.png</pre>
 
             <h3>Ejemplo Modelos:</h3>
-            <pre style="background:#f5f5f5;padding:12px;border-radius:4px;overflow-x:auto;">nombre,slug,marca_slug,descripcion,precio_desde,combustible,etiquetas,activo,imagen_url
-Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"eco|nuevo",1,https://ejemplo.com/corolla.png</pre>
+            <pre style="background:#f5f5f5;padding:12px;border-radius:4px;overflow-x:auto;">nombre,slug,marca_slug,descripcion,precio_desde,combustible,categoria_modelo,plazas,etiquetas,activo,imagen_url
+Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"berlina|compacto",5,"eco|nuevo",1,https://ejemplo.com/corolla.png</pre>
         </div>
 
         <style>
@@ -320,14 +329,16 @@ Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"eco|nuevo",1,https://e
         }
     }
 
+    /**
+     * @since 1.0.0
+     * @version 1.2.0 — Eliminadas categorias y tipo_venta.
+     */
     private static function fila_marca( $marca ) {
         $get_url = function( $meta_key ) use ( $marca ) {
             $id = get_post_meta( $marca->ID, $meta_key, true );
             return $id ? wp_get_attachment_url( $id ) : '';
         };
         $logo_id = get_post_thumbnail_id( $marca->ID );
-        $categorias = get_post_meta( $marca->ID, '_welow_marca_categorias', true ) ?: array();
-        $tipo_venta = get_post_meta( $marca->ID, '_welow_marca_tipo_venta', true ) ?: array();
 
         return array(
             $marca->post_title,
@@ -335,8 +346,6 @@ Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"eco|nuevo",1,https://e
             get_post_meta( $marca->ID, '_welow_marca_desc_corta', true ),
             get_post_meta( $marca->ID, '_welow_marca_slogan', true ),
             get_post_meta( $marca->ID, '_welow_marca_web', true ),
-            is_array( $categorias ) ? implode( '|', $categorias ) : '',
-            is_array( $tipo_venta ) ? implode( '|', $tipo_venta ) : '',
             get_post_meta( $marca->ID, '_welow_marca_orden', true ),
             get_post_meta( $marca->ID, '_welow_marca_activa', true ) ?: '1',
             $logo_id ? wp_get_attachment_url( $logo_id ) : '',
@@ -349,13 +358,18 @@ Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"eco|nuevo",1,https://e
         );
     }
 
+    /**
+     * @since 1.0.0
+     * @version 1.2.0 — Añadidas categoria_modelo y plazas.
+     */
     private static function fila_modelo( $modelo ) {
         $marca_id = get_post_meta( $modelo->ID, '_welow_modelo_marca', true );
         $marca_slug = $marca_id ? get_post_field( 'post_name', $marca_id ) : '';
 
-        $combustibles = wp_get_post_terms( $modelo->ID, 'welow_combustible', array( 'fields' => 'slugs' ) );
-        $etiquetas_ids = get_post_meta( $modelo->ID, '_welow_modelo_etiquetas', true ) ?: array();
-        $etiquetas_slugs = array();
+        $combustibles      = wp_get_post_terms( $modelo->ID, 'welow_combustible', array( 'fields' => 'slugs' ) );
+        $categorias_modelo = wp_get_post_terms( $modelo->ID, 'welow_categoria_modelo', array( 'fields' => 'slugs' ) );
+        $etiquetas_ids     = get_post_meta( $modelo->ID, '_welow_modelo_etiquetas', true ) ?: array();
+        $etiquetas_slugs   = array();
         if ( is_array( $etiquetas_ids ) ) {
             foreach ( $etiquetas_ids as $eid ) {
                 $et_slug = get_post_field( 'post_name', $eid );
@@ -380,7 +394,9 @@ Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"eco|nuevo",1,https://e
             get_post_meta( $modelo->ID, '_welow_modelo_texto_enlace', true ),
             get_post_meta( $modelo->ID, '_welow_modelo_precio_desde', true ),
             get_post_meta( $modelo->ID, '_welow_modelo_disclaimer', true ),
-            ! empty( $combustibles ) ? implode( '|', $combustibles ) : '',
+            ! empty( $combustibles ) && ! is_wp_error( $combustibles ) ? implode( '|', $combustibles ) : '',
+            ! empty( $categorias_modelo ) && ! is_wp_error( $categorias_modelo ) ? implode( '|', $categorias_modelo ) : '',
+            get_post_meta( $modelo->ID, '_welow_modelo_plazas', true ),
             implode( '|', $etiquetas_slugs ),
             get_post_meta( $modelo->ID, '_welow_modelo_orden', true ),
             get_post_meta( $modelo->ID, '_welow_modelo_activo', true ) ?: '1',
@@ -542,14 +558,6 @@ Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"eco|nuevo",1,https://e
             update_post_meta( $post_id, $key, $val );
         }
 
-        // Arrays (categorias, tipo_venta)
-        if ( isset( $fila['categorias'] ) && '' !== $fila['categorias'] ) {
-            update_post_meta( $post_id, '_welow_marca_categorias', array_map( 'trim', explode( '|', $fila['categorias'] ) ) );
-        }
-        if ( isset( $fila['tipo_venta'] ) && '' !== $fila['tipo_venta'] ) {
-            update_post_meta( $post_id, '_welow_marca_tipo_venta', array_map( 'trim', explode( '|', $fila['tipo_venta'] ) ) );
-        }
-
         // Imágenes desde URL
         if ( $descargar_imagenes ) {
             $mapeo_imagenes = array(
@@ -644,6 +652,7 @@ Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"eco|nuevo",1,https://e
             '_welow_modelo_texto_enlace' => $fila['texto_enlace'] ?? '',
             '_welow_modelo_precio_desde' => $fila['precio_desde'] ?? '',
             '_welow_modelo_disclaimer'   => $fila['disclaimer'] ?? '',
+            '_welow_modelo_plazas'       => $fila['plazas'] ?? '',
             '_welow_modelo_orden'        => $fila['orden'] ?? 0,
             '_welow_modelo_activo'       => isset( $fila['activo'] ) && '' !== $fila['activo'] ? $fila['activo'] : '1',
         );
@@ -655,6 +664,12 @@ Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"eco|nuevo",1,https://e
         if ( ! empty( $fila['combustible'] ) ) {
             $combustibles = array_map( 'trim', explode( '|', $fila['combustible'] ) );
             wp_set_object_terms( $post_id, $combustibles, 'welow_combustible', false );
+        }
+
+        // Categoría de modelo (taxonomía) — v1.2.0
+        if ( ! empty( $fila['categoria_modelo'] ) ) {
+            $cats_mod = array_map( 'trim', explode( '|', $fila['categoria_modelo'] ) );
+            wp_set_object_terms( $post_id, $cats_mod, 'welow_categoria_modelo', false );
         }
 
         // Etiquetas (por slug)

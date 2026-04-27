@@ -61,7 +61,7 @@ class Welow_CPT_Modelo {
             'hierarchical'        => false,
             'menu_icon'           => 'dashicons-car',
             'supports'            => array( 'title', 'editor', 'thumbnail', 'excerpt' ),
-            'taxonomies'          => array( 'welow_combustible' ),
+            'taxonomies'          => array( 'welow_combustible', 'welow_categoria_modelo' ),
         );
 
         register_post_type( self::POST_TYPE, $args );
@@ -292,7 +292,10 @@ class Welow_CPT_Modelo {
     }
 
     /**
-     * Metabox: Datos del modelo (marca, enlace).
+     * Metabox: Datos del modelo (marca, enlace, plazas).
+     *
+     * @since 1.0.0
+     * @version 1.2.0 — Añadido campo plazas.
      */
     public static function render_metabox_datos( $post ) {
         wp_nonce_field( 'welow_modelo_save', 'welow_modelo_nonce' );
@@ -300,6 +303,7 @@ class Welow_CPT_Modelo {
         $marca_id     = get_post_meta( $post->ID, self::META_PREFIX . 'marca', true );
         $enlace       = get_post_meta( $post->ID, self::META_PREFIX . 'enlace', true );
         $texto_enlace = get_post_meta( $post->ID, self::META_PREFIX . 'texto_enlace', true );
+        $plazas       = get_post_meta( $post->ID, self::META_PREFIX . 'plazas', true );
 
         // Obtener todas las marcas para el selector
         $marcas = get_posts( array(
@@ -337,6 +341,15 @@ class Welow_CPT_Modelo {
                 <th><label for="welow_modelo_texto_enlace">Texto del botón</label></th>
                 <td>
                     <input type="text" id="welow_modelo_texto_enlace" name="welow_modelo_texto_enlace" value="<?php echo esc_attr( $texto_enlace ); ?>" class="regular-text" placeholder="Ver modelo" />
+                </td>
+            </tr>
+            <tr>
+                <th><label for="welow_modelo_plazas">Plazas</label></th>
+                <td>
+                    <input type="number" id="welow_modelo_plazas" name="welow_modelo_plazas"
+                           value="<?php echo esc_attr( $plazas ); ?>"
+                           min="1" max="20" step="1" style="width: 80px;" />
+                    <p class="description">Número de plazas del vehículo (1–20). Déjalo vacío si no aplica.</p>
                 </td>
             </tr>
         </table>
@@ -393,6 +406,12 @@ class Welow_CPT_Modelo {
         // Texto enlace
         $texto = isset( $_POST['welow_modelo_texto_enlace'] ) ? sanitize_text_field( $_POST['welow_modelo_texto_enlace'] ) : '';
         update_post_meta( $post_id, self::META_PREFIX . 'texto_enlace', $texto );
+
+        // Plazas (v1.2.0)
+        $plazas = isset( $_POST['welow_modelo_plazas'] ) && '' !== $_POST['welow_modelo_plazas']
+            ? absint( $_POST['welow_modelo_plazas'] )
+            : '';
+        update_post_meta( $post_id, self::META_PREFIX . 'plazas', $plazas );
 
         // Orden
         $orden = isset( $_POST['welow_modelo_orden'] ) ? absint( $_POST['welow_modelo_orden'] ) : 0;

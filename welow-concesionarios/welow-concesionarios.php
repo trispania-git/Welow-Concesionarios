@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     1.1.0
+ * Version:     1.2.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,16 @@
  *
  * CHANGELOG
  * ---------
+ * 1.2.0 — Reorganización de campos
+ *   - Marcas: ELIMINADOS metabox "Clasificación y venta" (categorías + tipo_venta)
+ *   - Modelos: NUEVO campo "plazas" (número de plazas)
+ *   - Modelos: NUEVA taxonomía welow_categoria_modelo (Berlina, SUV,
+ *     Monovolumen, Coupé, Familiar, Pick-up, etc.)
+ *   - Template modelos-grid: muestra categoría, combustible y plazas
+ *   - Importador CSV actualizado con nuevas columnas
+ *   - Shortcodes [welow_marcas] / [welow_marcas_cards]: ELIMINADOS
+ *     parámetros `tipo` y `mostrar_categorias`
+ *
  * 1.1.0 (Fase 3) — Reestructuración administrativa + nuevos campos
  *   - Menú unificado "Concesionarios" con dashboard
  *   - Marcas: 3 logos (original, negro, blanco) + 2 banners (portada + zona media) con desktop/móvil
@@ -36,7 +46,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '1.1.0' );
+define( 'WELOW_CONC_VERSION', '1.2.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
@@ -55,8 +65,9 @@ require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-slide.php';
 require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-modelo.php';
 require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-etiqueta.php';
 
-// Taxonomías (v1.1.0)
-require_once WELOW_CONC_PATH . 'includes/taxonomies/class-welow-tax-combustible.php';
+// Taxonomías
+require_once WELOW_CONC_PATH . 'includes/taxonomies/class-welow-tax-combustible.php';        // v1.1.0
+require_once WELOW_CONC_PATH . 'includes/taxonomies/class-welow-tax-categoria-modelo.php';   // v1.2.0
 
 // Shortcodes
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-marcas.php';
@@ -83,6 +94,8 @@ register_activation_hook( __FILE__, function() {
     Welow_CPT_Etiqueta::registrar_cpt();
     Welow_Tax_Combustible::registrar_taxonomia();
     Welow_Tax_Combustible::crear_terminos_defecto();
+    Welow_Tax_Categoria_Modelo::registrar_taxonomia();   // v1.2.0
+    Welow_Tax_Categoria_Modelo::crear_terminos_defecto(); // v1.2.0
     flush_rewrite_rules();
 });
 

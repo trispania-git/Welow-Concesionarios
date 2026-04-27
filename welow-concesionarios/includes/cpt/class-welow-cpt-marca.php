@@ -3,6 +3,9 @@
  * CPT: Marca de vehículos.
  *
  * @package Welow_Concesionarios
+ * @since 1.0.0
+ * @version 1.2.0 — Eliminada clasificación (categorías + tipo_venta).
+ *                   Ahora la categoría/combustible se gestionan a nivel modelo.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -13,33 +16,6 @@ class Welow_CPT_Marca {
 
     const POST_TYPE = 'welow_marca';
     const META_PREFIX = '_welow_marca_';
-
-    /**
-     * Categorías de vehículos disponibles.
-     */
-    public static function get_categorias_disponibles() {
-        return array(
-            'turismos'     => 'Turismos',
-            'suv'          => 'SUV / Crossover',
-            'comerciales'  => 'Comerciales',
-            'electricos'   => 'Eléctricos',
-            'hibridos'     => 'Híbridos',
-            'deportivos'   => 'Deportivos',
-            'monovolumen'  => 'Monovolumen',
-            'pickup'       => 'Pick-up',
-        );
-    }
-
-    /**
-     * Tipos de venta disponibles.
-     */
-    public static function get_tipos_venta() {
-        return array(
-            'nuevos'  => 'Nuevos',
-            'ocasion' => 'Ocasión (2ª mano)',
-            'km0'     => 'KM0',
-        );
-    }
 
     public static function init() {
         add_action( 'init', array( __CLASS__, 'registrar_cpt' ) );
@@ -123,15 +99,6 @@ class Welow_CPT_Marca {
             array( __CLASS__, 'render_metabox_banners' ),
             self::POST_TYPE,
             'normal',
-            'default'
-        );
-
-        add_meta_box(
-            'welow_marca_clasificacion',
-            'Clasificación y venta',
-            array( __CLASS__, 'render_metabox_clasificacion' ),
-            self::POST_TYPE,
-            'side',
             'default'
         );
 
@@ -320,41 +287,6 @@ class Welow_CPT_Marca {
     }
 
     /**
-     * Metabox: Clasificación (categorías de vehículos y tipo de venta).
-     */
-    public static function render_metabox_clasificacion( $post ) {
-        $categorias_guardadas = get_post_meta( $post->ID, self::META_PREFIX . 'categorias', true );
-        $tipos_guardados      = get_post_meta( $post->ID, self::META_PREFIX . 'tipo_venta', true );
-
-        if ( ! is_array( $categorias_guardadas ) ) {
-            $categorias_guardadas = array();
-        }
-        if ( ! is_array( $tipos_guardados ) ) {
-            $tipos_guardados = array();
-        }
-        ?>
-        <p><strong>Categorías de vehículos:</strong></p>
-        <?php foreach ( self::get_categorias_disponibles() as $key => $label ) : ?>
-            <label class="welow-checkbox-label">
-                <input type="checkbox" name="welow_categorias[]" value="<?php echo esc_attr( $key ); ?>"
-                    <?php checked( in_array( $key, $categorias_guardadas, true ) ); ?> />
-                <?php echo esc_html( $label ); ?>
-            </label><br>
-        <?php endforeach; ?>
-
-        <hr />
-        <p><strong>Tipo de venta:</strong></p>
-        <?php foreach ( self::get_tipos_venta() as $key => $label ) : ?>
-            <label class="welow-checkbox-label">
-                <input type="checkbox" name="welow_tipo_venta[]" value="<?php echo esc_attr( $key ); ?>"
-                    <?php checked( in_array( $key, $tipos_guardados, true ) ); ?> />
-                <?php echo esc_html( $label ); ?>
-            </label><br>
-        <?php endforeach; ?>
-        <?php
-    }
-
-    /**
      * Metabox: Configuración de visualización.
      */
     public static function render_metabox_config( $post ) {
@@ -434,14 +366,6 @@ class Welow_CPT_Marca {
             update_post_meta( $post_id, self::META_PREFIX . $meta_key, $val );
         }
 
-        // Categorías (array de checkboxes)
-        $categorias = isset( $_POST['welow_categorias'] ) ? array_map( 'sanitize_text_field', $_POST['welow_categorias'] ) : array();
-        update_post_meta( $post_id, self::META_PREFIX . 'categorias', $categorias );
-
-        // Tipo de venta (array de checkboxes)
-        $tipo_venta = isset( $_POST['welow_tipo_venta'] ) ? array_map( 'sanitize_text_field', $_POST['welow_tipo_venta'] ) : array();
-        update_post_meta( $post_id, self::META_PREFIX . 'tipo_venta', $tipo_venta );
-
         // Orden
         $orden = isset( $_POST['welow_orden'] ) ? absint( $_POST['welow_orden'] ) : 0;
         update_post_meta( $post_id, self::META_PREFIX . 'orden', $orden );
@@ -459,10 +383,9 @@ class Welow_CPT_Marca {
         foreach ( $columns as $key => $value ) {
             $new_columns[ $key ] = $value;
             if ( 'title' === $key ) {
-                $new_columns['welow_logo']       = 'Logo';
-                $new_columns['welow_tipo_venta'] = 'Tipo de venta';
-                $new_columns['welow_orden']      = 'Orden';
-                $new_columns['welow_activa']     = 'Activa';
+                $new_columns['welow_logo']   = 'Logo';
+                $new_columns['welow_orden']  = 'Orden';
+                $new_columns['welow_activa'] = 'Activa';
             }
         }
         return $new_columns;
@@ -476,21 +399,6 @@ class Welow_CPT_Marca {
             case 'welow_logo':
                 $thumb = get_the_post_thumbnail( $post_id, array( 60, 60 ) );
                 echo $thumb ? $thumb : '<span class="dashicons dashicons-format-image" style="color:#ccc;font-size:40px;"></span>';
-                break;
-            case 'welow_tipo_venta':
-                $tipos = get_post_meta( $post_id, self::META_PREFIX . 'tipo_venta', true );
-                if ( is_array( $tipos ) && ! empty( $tipos ) ) {
-                    $labels = array();
-                    $todos  = self::get_tipos_venta();
-                    foreach ( $tipos as $tipo ) {
-                        if ( isset( $todos[ $tipo ] ) ) {
-                            $labels[] = $todos[ $tipo ];
-                        }
-                    }
-                    echo esc_html( implode( ', ', $labels ) );
-                } else {
-                    echo '—';
-                }
                 break;
             case 'welow_orden':
                 $orden = get_post_meta( $post_id, self::META_PREFIX . 'orden', true );

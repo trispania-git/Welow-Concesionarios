@@ -4,7 +4,7 @@
  *
  * @package Welow_Concesionarios
  * @since 1.0.0
- * @version 1.1.0
+ * @version 1.2.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -28,8 +28,9 @@ class Welow_Main {
         Welow_Settings::init();
         Welow_Importer::init();
 
-        // Taxonomías (v1.1.0)
-        Welow_Tax_Combustible::init();
+        // Taxonomías
+        Welow_Tax_Combustible::init();        // v1.1.0
+        Welow_Tax_Categoria_Modelo::init();   // v1.2.0
 
         // CPTs
         Welow_CPT_Marca::init();
