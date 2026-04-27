@@ -158,6 +158,9 @@ class Welow_Settings {
                 <a href="<?php echo esc_url( admin_url( 'edit-tags.php?taxonomy=welow_combustible&post_type=welow_modelo' ) ); ?>" class="button">
                     <span class="dashicons dashicons-category" style="margin-top:4px;"></span> Gestionar combustibles
                 </a>
+                <a href="<?php echo esc_url( admin_url( 'edit-tags.php?taxonomy=welow_categoria_modelo&post_type=welow_modelo' ) ); ?>" class="button">
+                    <span class="dashicons dashicons-car" style="margin-top:4px;"></span> Gestionar carrocerías
+                </a>
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=welow_importer' ) ); ?>" class="button">
                     <span class="dashicons dashicons-upload" style="margin-top:4px;"></span> Importar / Exportar
                 </a>

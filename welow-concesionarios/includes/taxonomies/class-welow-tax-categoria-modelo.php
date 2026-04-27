@@ -1,9 +1,13 @@
 <?php
 /**
  * Taxonomía: welow_categoria_modelo
- * Categoriza modelos por carrocería: Berlina, SUV, Monovolumen, Coupé, etc.
+ * Carrocería del modelo: Berlina, SUV, Monovolumen, Coupé, etc.
+ *
+ * NOTA: El slug interno se mantiene como `welow_categoria_modelo` para
+ * no romper datos existentes; las labels visibles son "Carrocería".
  *
  * @since 1.2.0
+ * @version 1.2.1 — Renombradas labels a "Carrocería" + alta en Configuraciones.
  * @package Welow_Concesionarios
  */
 
@@ -21,17 +25,17 @@ class Welow_Tax_Categoria_Modelo {
 
     public static function registrar_taxonomia() {
         $labels = array(
-            'name'              => 'Categorías de modelo',
-            'singular_name'     => 'Categoría de modelo',
-            'search_items'      => 'Buscar categorías',
-            'all_items'         => 'Todas las categorías',
-            'parent_item'       => 'Categoría padre',
-            'parent_item_colon' => 'Categoría padre:',
-            'edit_item'         => 'Editar categoría',
-            'update_item'       => 'Actualizar categoría',
-            'add_new_item'      => 'Añadir nueva categoría',
-            'new_item_name'     => 'Nueva categoría',
-            'menu_name'         => 'Categorías',
+            'name'              => 'Carrocerías',
+            'singular_name'     => 'Carrocería',
+            'search_items'      => 'Buscar carrocerías',
+            'all_items'         => 'Todas las carrocerías',
+            'parent_item'       => 'Carrocería padre',
+            'parent_item_colon' => 'Carrocería padre:',
+            'edit_item'         => 'Editar carrocería',
+            'update_item'       => 'Actualizar carrocería',
+            'add_new_item'      => 'Añadir nueva carrocería',
+            'new_item_name'     => 'Nueva carrocería',
+            'menu_name'         => 'Carrocerías',
         );
 
         $args = array(
@@ -43,7 +47,7 @@ class Welow_Tax_Categoria_Modelo {
             'show_in_rest'      => true,
             'show_in_menu'      => true,
             'query_var'         => true,
-            'rewrite'           => array( 'slug' => 'categoria-modelo' ),
+            'rewrite'           => array( 'slug' => 'carroceria' ),
         );
 
         register_taxonomy( self::TAXONOMY, array( 'welow_modelo' ), $args );

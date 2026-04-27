@@ -96,6 +96,12 @@ class Welow_Admin_Menu {
                     <p>Tipos de combustible / motorización.</p>
                 </a>
 
+                <a href="<?php echo esc_url( admin_url( 'edit-tags.php?taxonomy=welow_categoria_modelo&post_type=welow_modelo' ) ); ?>" class="welow-card">
+                    <span class="dashicons dashicons-car"></span>
+                    <h3>Carrocerías</h3>
+                    <p>Berlina, SUV, Monovolumen, Coupé, etc.</p>
+                </a>
+
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=welow_settings' ) ); ?>" class="welow-card">
                     <span class="dashicons dashicons-admin-settings"></span>
                     <h3>Configuraciones</h3>
