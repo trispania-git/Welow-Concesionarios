@@ -77,6 +77,67 @@ class Welow_Helpers {
     }
 
     /**
+     * Detecta la marca actual del contexto.
+     *
+     * Devuelve el ID si:
+     * 1. Estamos en un single de welow_marca → la marca actual
+     * 2. Estamos en un single de welow_modelo → la marca asociada al modelo
+     * 3. Estamos en un archive/taxonomía relacionada con marca (futuro)
+     *
+     * Útil para shortcodes con `marca="auto"` o sin parámetro marca.
+     *
+     * @since 1.3.0
+     * @return int|false ID de la marca actual, o false si no se detecta.
+     */
+    public static function get_current_marca_id() {
+        // Permitir override por filtro (útil para Theme Builder de Divi)
+        $forced = apply_filters( 'welow_current_marca_id', null );
+        if ( $forced ) {
+            return intval( $forced );
+        }
+
+        // Detectar desde el contexto del loop
+        $post_id = get_the_ID();
+        if ( ! $post_id ) {
+            // Fallback: intentar con queried_object
+            $obj = get_queried_object();
+            if ( $obj instanceof WP_Post ) {
+                $post_id = $obj->ID;
+            }
+        }
+
+        if ( ! $post_id ) {
+            return false;
+        }
+
+        $post_type = get_post_type( $post_id );
+
+        // Si estamos en una marca, esa es la actual
+        if ( Welow_CPT_Marca::POST_TYPE === $post_type ) {
+            return $post_id;
+        }
+
+        // Si estamos en un modelo, devolver su marca asociada
+        if ( Welow_CPT_Modelo::POST_TYPE === $post_type ) {
+            $marca_id = get_post_meta( $post_id, '_welow_modelo_marca', true );
+            return $marca_id ? intval( $marca_id ) : false;
+        }
+
+        return false;
+    }
+
+    /**
+     * Obtiene el slug de la marca actual del contexto.
+     *
+     * @since 1.3.0
+     * @return string|false Slug o false.
+     */
+    public static function get_current_marca_slug() {
+        $id = self::get_current_marca_id();
+        return $id ? get_post_field( 'post_name', $id ) : false;
+    }
+
+    /**
      * Obtiene la URL del logo de una marca según la variante.
      *
      * @since 1.1.0

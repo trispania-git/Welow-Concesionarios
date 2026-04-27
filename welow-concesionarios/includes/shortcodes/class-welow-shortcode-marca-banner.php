@@ -4,6 +4,8 @@
  * Muestra el banner (portada o zona media) de una marca con responsive desktop/móvil.
  *
  * @since 1.1.0
+ * @version 1.3.0 — Soporte de auto-detección: si no se pasa `marca` o se pasa "auto",
+ *                   se usa la marca del contexto actual (single de marca o modelo).
  * @package Welow_Concesionarios
  */
 
@@ -19,19 +21,23 @@ class Welow_Shortcode_Marca_Banner {
 
     public static function render( $atts ) {
         $atts = shortcode_atts( array(
-            'marca'  => '',
+            'marca'  => 'auto',      // auto | slug | ID
             'tipo'   => 'portada',   // portada | media
             'enlace' => '',
             'altura' => '',          // opcional: CSS value (ej: 500px)
         ), $atts );
 
-        if ( empty( $atts['marca'] ) ) {
-            return '<p class="welow-no-results">Shortcode [welow_marca_banner]: falta el parámetro "marca".</p>';
-        }
-
-        $marca_id = Welow_Helpers::resolver_marca_id( $atts['marca'] );
-        if ( ! $marca_id ) {
-            return '<p class="welow-no-results">Marca no encontrada: "' . esc_html( $atts['marca'] ) . '".</p>';
+        // v1.3.0 — Auto-detección
+        if ( '' === $atts['marca'] || 'auto' === $atts['marca'] ) {
+            $marca_id = Welow_Helpers::get_current_marca_id();
+            if ( ! $marca_id ) {
+                return '<!-- [welow_marca_banner]: no se detectó marca actual -->';
+            }
+        } else {
+            $marca_id = Welow_Helpers::resolver_marca_id( $atts['marca'] );
+            if ( ! $marca_id ) {
+                return '<p class="welow-no-results">Marca no encontrada: "' . esc_html( $atts['marca'] ) . '".</p>';
+            }
         }
 
         // Validar tipo

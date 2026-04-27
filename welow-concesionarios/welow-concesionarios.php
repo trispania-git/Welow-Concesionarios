@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     1.2.1
+ * Version:     1.3.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,18 @@
  *
  * CHANGELOG
  * ---------
+ * 1.3.0 — Auto-detección de marca (Theme Builder ready)
+ *   - Nuevo helper Welow_Helpers::get_current_marca_id() que detecta
+ *     la marca del contexto actual (single de marca o de modelo)
+ *   - [welow_marca_banner] sin marca → usa la marca actual automáticamente
+ *   - [welow_modelos] sin marca → muestra los modelos de la marca actual
+ *   - [welow_slider grupo="auto"] → busca el grupo "{slug-marca}-home"
+ *   - [welow_slider grupo="{marca}-ofertas"] → reemplaza {marca} por el
+ *     slug de la marca actual (placeholder dinámico)
+ *   - Filtro `welow_current_marca_id` para forzar la marca desde código
+ *   - Permite construir UNA plantilla en Divi Theme Builder que sirve
+ *     a las 13+ marcas
+ *
  * 1.2.1 — Renombrar Categoría de modelo → Carrocería
  *   - Taxonomía welow_categoria_modelo: labels visibles cambiadas a "Carrocería"
  *     (slug interno se mantiene para no romper datos existentes)
@@ -53,7 +65,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '1.2.1' );
+define( 'WELOW_CONC_VERSION', '1.3.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

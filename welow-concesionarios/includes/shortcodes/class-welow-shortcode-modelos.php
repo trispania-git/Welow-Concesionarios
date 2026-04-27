@@ -2,6 +2,9 @@
 /**
  * Shortcode: [welow_modelos] — Grid de modelos por marca.
  *
+ * @since 1.0.0
+ * @version 1.3.0 — Auto-detección de marca cuando se omite el parámetro
+ *                   o se pasa "auto" (útil en plantillas del Theme Builder).
  * @package Welow_Concesionarios
  */
 
@@ -17,7 +20,7 @@ class Welow_Shortcode_Modelos {
 
     public static function render( $atts ) {
         $atts = shortcode_atts( array(
-            'marca'           => '',
+            'marca'           => 'auto',     // auto | slug | ID
             'columnas'        => '3',
             'columnas_tablet' => '2',
             'columnas_movil'  => '1',
@@ -25,11 +28,17 @@ class Welow_Shortcode_Modelos {
             'texto_boton'     => 'Ver modelo',
         ), $atts );
 
-        if ( empty( $atts['marca'] ) ) {
-            return '<p class="welow-no-results">Shortcode [welow_modelos]: falta el parámetro "marca".</p>';
+        // v1.3.0 — Auto-detección
+        $marca_param = $atts['marca'];
+        if ( '' === $marca_param || 'auto' === $marca_param ) {
+            $marca_id = Welow_Helpers::get_current_marca_id();
+            if ( ! $marca_id ) {
+                return '<!-- [welow_modelos]: no se detectó marca actual -->';
+            }
+            $marca_param = $marca_id;
         }
 
-        $modelos = Welow_Helpers::get_modelos( $atts['marca'], intval( $atts['max'] ) );
+        $modelos = Welow_Helpers::get_modelos( $marca_param, intval( $atts['max'] ) );
 
         if ( empty( $modelos ) ) {
             return '<p class="welow-no-results">No se encontraron modelos para esta marca.</p>';
