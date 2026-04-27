@@ -23,10 +23,11 @@ class Welow_Main {
     }
 
     private function __construct() {
-        // Admin (v1.1.0)
-        Welow_Admin_Menu::init();
-        Welow_Settings::init();
-        Welow_Importer::init();
+        // Admin
+        Welow_Admin_Menu::init();              // v1.1.0
+        Welow_Settings::init();                // v1.1.0
+        Welow_Importer::init();                // v1.1.0
+        Welow_Divi_Library_Admin::init();      // v1.4.0
 
         // Taxonomías
         Welow_Tax_Combustible::init();        // v1.1.0
@@ -45,6 +46,7 @@ class Welow_Main {
         Welow_Shortcode_Slider_CTA::init();
         Welow_Shortcode_Contenido::init();
         Welow_Shortcode_Marca_Banner::init();
+        Welow_Shortcode_Divi::init();          // v1.4.0
 
         // Enqueue assets
         add_action( 'wp_enqueue_scripts', array( $this, 'registrar_assets' ) );

@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     1.3.0
+ * Version:     1.4.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,18 @@
  *
  * CHANGELOG
  * ---------
+ * 1.4.0 — Integración con la Biblioteca de Divi
+ *   - Nuevo shortcode [welow_divi id="X"] que inserta cualquier layout
+ *     guardado en la Biblioteca Divi (et_pb_layout): secciones, filas,
+ *     módulos o layouts completos
+ *   - Soporta búsqueda por id, slug o nombre del layout
+ *   - Parámetro `envolver="si"` añade un wrapper con clase para targeting CSS
+ *   - Mejora admin: en la lista de Biblioteca Divi se añade una columna
+ *     con el shortcode copiable al portapapeles (botón clipboard)
+ *   - Card de "Biblioteca Divi" añadida al dashboard de Concesionarios
+ *   - Permite reutilizar diseños complejos creados en Divi en cualquier
+ *     contexto: páginas, plantillas Theme Builder, otros shortcodes, etc.
+ *
  * 1.3.0 — Auto-detección de marca (Theme Builder ready)
  *   - Nuevo helper Welow_Helpers::get_current_marca_id() que detecta
  *     la marca del contexto actual (single de marca o de modelo)
@@ -65,7 +77,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '1.3.0' );
+define( 'WELOW_CONC_VERSION', '1.4.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
@@ -73,10 +85,11 @@ define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
 // Cargar clases
 require_once WELOW_CONC_PATH . 'includes/helpers/class-welow-helpers.php';
 
-// Admin (v1.1.0)
-require_once WELOW_CONC_PATH . 'includes/admin/class-welow-admin-menu.php';
-require_once WELOW_CONC_PATH . 'includes/admin/class-welow-settings.php';
-require_once WELOW_CONC_PATH . 'includes/admin/class-welow-importer.php';
+// Admin
+require_once WELOW_CONC_PATH . 'includes/admin/class-welow-admin-menu.php';         // v1.1.0
+require_once WELOW_CONC_PATH . 'includes/admin/class-welow-settings.php';            // v1.1.0
+require_once WELOW_CONC_PATH . 'includes/admin/class-welow-importer.php';            // v1.1.0
+require_once WELOW_CONC_PATH . 'includes/admin/class-welow-divi-library-admin.php';  // v1.4.0
 
 // CPTs
 require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-marca.php';
@@ -95,6 +108,7 @@ require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-modelo
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-slider-cta.php';
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-contenido.php';
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-marca-banner.php';
+require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-divi.php';          // v1.4.0
 
 // Principal
 require_once WELOW_CONC_PATH . 'includes/class-welow-main.php';

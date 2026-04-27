@@ -114,6 +114,14 @@ class Welow_Admin_Menu {
                     <p>Importar marcas y modelos desde CSV, o descargar plantillas.</p>
                 </a>
 
+                <?php if ( post_type_exists( 'et_pb_layout' ) ) : ?>
+                <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=et_pb_layout' ) ); ?>" class="welow-card welow-card-highlight">
+                    <span class="dashicons dashicons-layout"></span>
+                    <h3>Biblioteca Divi</h3>
+                    <p>Layouts guardados de Divi insertables vía <code>[welow_divi]</code>.</p>
+                </a>
+                <?php endif; ?>
+
             </div>
         </div>
 
