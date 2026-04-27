@@ -14,5 +14,8 @@ desktop.ini
 *.swo
 *~
 
+# Claude Code (settings locales por sesión)
+.claude/settings.local.json
+
 # Logs
 *.log
