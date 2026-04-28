@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     1.4.0
+ * Version:     2.0.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,51 @@
  *
  * CHANGELOG
  * ---------
+ * 2.0.0 — Coches en venta (ocasión, KM0, nuevos) y concesionarios físicos
+ *
+ *   ARQUITECTURA:
+ *   - Nuevo CPT welow_coche: unidades concretas en venta con relación
+ *     obligatoria a welow_modelo (hereda datos genéricos)
+ *   - Nuevo CPT welow_concesionario: ubicaciones físicas con dirección,
+ *     contacto, horario, mapa, marcas representadas
+ *
+ *   FICHA DEL COCHE (8 bloques):
+ *   - A. Identificación: modelo, versión, tipo_venta, estado, referencia,
+ *     mes/año matriculación, kilómetros
+ *   - B. Precio: contado, financiado, anterior (tachado), cuota, disclaimer
+ *   - C. Datos técnicos: cambio, marchas, CV/kW (auto-calc), cilindrada,
+ *     plazas, puertas, color, tipo pintura, etiqueta DGT
+ *   - D. Galería: imagen principal + hasta 30 imágenes (drag-reorder)
+ *   - E. Equipamiento: editor WYSIWYG libre
+ *   - F. Garantías: editor WYSIWYG libre
+ *   - G. Comercial: concesionario, programa especial
+ *   - H. Datos privados: matrícula, VIN (NO se muestran en frontend)
+ *
+ *   SISTEMA DE ICONOS:
+ *   - Nueva sección "Iconos" en Configuraciones para asignar iconos
+ *     personalizados a campos clave (km, año, combustible, etc.)
+ *   - Iconos por valor de select (manual/automático, etiquetas DGT...)
+ *   - Iconos por término de taxonomía (combustible, carrocería)
+ *   - Fallback automático a Dashicons si no hay icono asignado
+ *
+ *   SHORTCODES NUEVOS:
+ *   - [welow_coches] — grid filtrado de coches con paginación
+ *   - [welow_coche_ficha] — ficha individual completa con galería,
+ *     destacados, precio, equipamiento, garantías y concesionario.
+ *     Soporta id="auto" para detectar coche del contexto (Theme Builder)
+ *   - [welow_buscador_coches] — formulario de búsqueda con filtros
+ *
+ *   IMPORTADOR CSV:
+ *   - Soporte de coches y concesionarios
+ *   - Plantillas con ejemplos
+ *   - Descarga automática de imágenes (galería completa) desde URLs
+ *   - Modo actualizar por referencia/slug
+ *
+ *   COMPATIBILIDAD:
+ *   - Esta versión NO rompe nada de v1.x — solo añade.
+ *   - Todos los datos existentes (marcas, modelos, etiquetas, slides,
+ *     carrocerías, combustibles) siguen funcionando idénticamente.
+ *
  * 1.4.0 — Integración con la Biblioteca de Divi
  *   - Nuevo shortcode [welow_divi id="X"] que inserta cualquier layout
  *     guardado en la Biblioteca Divi (et_pb_layout): secciones, filas,
@@ -77,7 +122,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '1.4.0' );
+define( 'WELOW_CONC_VERSION', '2.0.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
@@ -90,14 +135,18 @@ require_once WELOW_CONC_PATH . 'includes/admin/class-welow-admin-menu.php';     
 require_once WELOW_CONC_PATH . 'includes/admin/class-welow-settings.php';            // v1.1.0
 require_once WELOW_CONC_PATH . 'includes/admin/class-welow-importer.php';            // v1.1.0
 require_once WELOW_CONC_PATH . 'includes/admin/class-welow-divi-library-admin.php';  // v1.4.0
+require_once WELOW_CONC_PATH . 'includes/admin/class-welow-icons.php';               // v2.0.0
 
 // CPTs
 require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-marca.php';
 require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-slide.php';
 require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-modelo.php';
 require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-etiqueta.php';
+require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-concesionario.php';     // v2.0.0
+require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-coche.php';             // v2.0.0
 
 // Taxonomías
+require_once WELOW_CONC_PATH . 'includes/taxonomies/trait-welow-tax-icon.php';                 // v2.0.0
 require_once WELOW_CONC_PATH . 'includes/taxonomies/class-welow-tax-combustible.php';        // v1.1.0
 require_once WELOW_CONC_PATH . 'includes/taxonomies/class-welow-tax-categoria-modelo.php';   // v1.2.0
 
@@ -109,6 +158,9 @@ require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-slider
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-contenido.php';
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-marca-banner.php';
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-divi.php';          // v1.4.0
+require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coches.php';        // v2.0.0
+require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coche-ficha.php';   // v2.0.0
+require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-buscador-coches.php';// v2.0.0
 
 // Principal
 require_once WELOW_CONC_PATH . 'includes/class-welow-main.php';
@@ -125,10 +177,12 @@ register_activation_hook( __FILE__, function() {
     Welow_CPT_Slide::registrar_cpt();
     Welow_CPT_Modelo::registrar_cpt();
     Welow_CPT_Etiqueta::registrar_cpt();
+    Welow_CPT_Concesionario::registrar_cpt();   // v2.0.0
+    Welow_CPT_Coche::registrar_cpt();           // v2.0.0
     Welow_Tax_Combustible::registrar_taxonomia();
     Welow_Tax_Combustible::crear_terminos_defecto();
-    Welow_Tax_Categoria_Modelo::registrar_taxonomia();   // v1.2.0
-    Welow_Tax_Categoria_Modelo::crear_terminos_defecto(); // v1.2.0
+    Welow_Tax_Categoria_Modelo::registrar_taxonomia();
+    Welow_Tax_Categoria_Modelo::crear_terminos_defecto();
     flush_rewrite_rules();
 });
 

@@ -55,6 +55,11 @@ class Welow_Settings {
             ? sanitize_text_field( $input['moneda_simbolo'] )
             : '€';
 
+        // v2.0.0 — Sección iconos
+        if ( isset( $input['iconos'] ) && class_exists( 'Welow_Icons' ) ) {
+            $output['iconos'] = Welow_Icons::sanitize( $input['iconos'] );
+        }
+
         return $output;
     }
 
@@ -145,6 +150,13 @@ class Welow_Settings {
                         </td>
                     </tr>
                 </table>
+
+                <?php
+                // v2.0.0 — Sección de iconos
+                if ( class_exists( 'Welow_Icons' ) ) {
+                    Welow_Icons::render_section();
+                }
+                ?>
 
                 <?php submit_button(); ?>
             </form>

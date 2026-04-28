@@ -64,6 +64,35 @@ class Welow_Importer {
         );
     }
 
+    /**
+     * @since 2.0.0
+     */
+    public static function columnas_concesionarios() {
+        return array(
+            'nombre', 'slug', 'direccion', 'cp', 'ciudad', 'provincia',
+            'telefono', 'email', 'horario', 'lat', 'lng',
+            'marcas', 'orden', 'activo', 'logo_url',
+        );
+    }
+
+    /**
+     * @since 2.0.0
+     */
+    public static function columnas_coches() {
+        return array(
+            'titulo', 'slug', 'referencia', 'modelo_slug', 'version',
+            'tipo_venta', 'estado',
+            'mes_matricula', 'anio_matricula', 'km',
+            'precio_contado', 'precio_financiado', 'precio_anterior', 'cuota', 'disclaimer',
+            'cambio', 'marchas', 'cv', 'cilindrada',
+            'color', 'tipo_pintura', 'etiqueta_dgt', 'plazas', 'puertas',
+            'combustible', 'carroceria', 'concesionario_slug', 'programa',
+            'equipamiento', 'garantias',
+            'matricula', 'vin',
+            'imagen_url', 'galeria_urls',
+        );
+    }
+
     /* =========================================================================
      * UI
      * ========================================================================= */
@@ -207,6 +236,103 @@ class Welow_Importer {
                         </button>
                     </form>
                 </div>
+
+                <!-- COCHES (v2.0.0) -->
+                <div class="welow-importer-card">
+                    <h2><span class="dashicons dashicons-car"></span> Coches en venta</h2>
+                    <p>Importa unidades concretas en venta (ocasión, KM0, nuevos).</p>
+
+                    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin-bottom:14px;">
+                        <?php wp_nonce_field( 'welow_plantilla_coches' ); ?>
+                        <input type="hidden" name="action" value="welow_descargar_plantilla">
+                        <input type="hidden" name="tipo" value="coches">
+                        <button type="submit" class="button">
+                            <span class="dashicons dashicons-download" style="margin-top:4px;"></span>
+                            Plantilla CSV
+                        </button>
+                    </form>
+
+                    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" enctype="multipart/form-data">
+                        <?php wp_nonce_field( 'welow_importar_coches' ); ?>
+                        <input type="hidden" name="action" value="welow_importar_csv">
+                        <input type="hidden" name="tipo" value="coches">
+                        <p><input type="file" name="archivo_csv" accept=".csv" required></p>
+                        <p>
+                            <label>
+                                <input type="checkbox" name="actualizar" value="1" checked>
+                                Actualizar coches existentes (por referencia o slug)
+                            </label>
+                        </p>
+                        <p>
+                            <label>
+                                <input type="checkbox" name="descargar_imagenes" value="1" checked>
+                                Descargar imágenes desde URLs
+                            </label>
+                        </p>
+                        <p>
+                            <button type="submit" class="button button-primary">
+                                <span class="dashicons dashicons-upload" style="margin-top:4px;"></span>
+                                Importar coches
+                            </button>
+                        </p>
+                    </form>
+
+                    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin-top:14px;">
+                        <?php wp_nonce_field( 'welow_exportar_coches' ); ?>
+                        <input type="hidden" name="action" value="welow_exportar_csv">
+                        <input type="hidden" name="tipo" value="coches">
+                        <button type="submit" class="button">
+                            <span class="dashicons dashicons-migrate" style="margin-top:4px;"></span>
+                            Exportar todos los coches
+                        </button>
+                    </form>
+                </div>
+
+                <!-- CONCESIONARIOS (v2.0.0) -->
+                <div class="welow-importer-card">
+                    <h2><span class="dashicons dashicons-store"></span> Concesionarios físicos</h2>
+                    <p>Ubicaciones físicas con dirección y datos de contacto.</p>
+
+                    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin-bottom:14px;">
+                        <?php wp_nonce_field( 'welow_plantilla_concesionarios' ); ?>
+                        <input type="hidden" name="action" value="welow_descargar_plantilla">
+                        <input type="hidden" name="tipo" value="concesionarios">
+                        <button type="submit" class="button">
+                            <span class="dashicons dashicons-download" style="margin-top:4px;"></span>
+                            Plantilla CSV
+                        </button>
+                    </form>
+
+                    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" enctype="multipart/form-data">
+                        <?php wp_nonce_field( 'welow_importar_concesionarios' ); ?>
+                        <input type="hidden" name="action" value="welow_importar_csv">
+                        <input type="hidden" name="tipo" value="concesionarios">
+                        <p><input type="file" name="archivo_csv" accept=".csv" required></p>
+                        <p>
+                            <label>
+                                <input type="checkbox" name="actualizar" value="1" checked>
+                                Actualizar existentes (por slug)
+                            </label>
+                        </p>
+                        <p>
+                            <button type="submit" class="button button-primary">
+                                <span class="dashicons dashicons-upload" style="margin-top:4px;"></span>
+                                Importar concesionarios
+                            </button>
+                        </p>
+                    </form>
+
+                    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin-top:14px;">
+                        <?php wp_nonce_field( 'welow_exportar_concesionarios' ); ?>
+                        <input type="hidden" name="action" value="welow_exportar_csv">
+                        <input type="hidden" name="tipo" value="concesionarios">
+                        <button type="submit" class="button">
+                            <span class="dashicons dashicons-migrate" style="margin-top:4px;"></span>
+                            Exportar concesionarios
+                        </button>
+                    </form>
+                </div>
+
             </div>
 
             <hr style="margin: 30px 0;">
@@ -275,8 +401,8 @@ Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"berlina|compacto",5,"e
             $columnas = self::columnas_marcas();
             $ejemplo = array(
                 'Toyota', 'toyota', 'Fiabilidad japonesa', 'Always a better way', 'https://toyota.es',
-                'turismos|suv|hibridos', 'nuevos|ocasion', '10', '1',
-                '', '', '', '', '', '', ''
+                '10', '1',
+                '', '', '', '', '', '', '',
             );
             $filename = 'plantilla-marcas.csv';
         } elseif ( 'modelos' === $tipo ) {
@@ -284,10 +410,38 @@ Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"berlina|compacto",5,"e
             $ejemplo = array(
                 'Corolla', 'corolla', 'toyota', 'Compacto híbrido de última generación', 'Desde 24.990€',
                 '', 'Ver modelo', '24990', '',
-                'hibrido', 'eco|nuevo', '10', '1',
-                '', '', '', '', ''
+                'hibrido', 'berlina|compacto', '5',
+                'eco|nuevo', '10', '1',
+                '', '', '', '', '',
             );
             $filename = 'plantilla-modelos.csv';
+        } elseif ( 'coches' === $tipo ) {
+            $columnas = self::columnas_coches();
+            $ejemplo = array(
+                'Toyota Aygo X Cross 2022', '', '7539', 'aygo-x-cross', '1.0 VVT-I 72CV Play',
+                'ocasion', 'disponible',
+                '7', '2022', '76050',
+                '13990', '13990', '', '199', '',
+                'manual', '5', '72', '998',
+                'Blanco mate', 'mate', 'c', '4', '5',
+                'gasolina', 'suv', 'gamboa-madrid', 'Toyota Ocasión',
+                '<ul><li>Aire acondicionado</li><li>Bluetooth</li></ul>',
+                '<ul><li>Garantía 24 meses</li></ul>',
+                '', '',
+                'https://ejemplo.com/principal.jpg',
+                'https://ejemplo.com/foto2.jpg|https://ejemplo.com/foto3.jpg',
+            );
+            $filename = 'plantilla-coches.csv';
+        } elseif ( 'concesionarios' === $tipo ) {
+            $columnas = self::columnas_concesionarios();
+            $ejemplo = array(
+                'Gamboa Madrid Centro', 'gamboa-madrid', 'Calle Velázquez 123', '28006', 'Madrid', 'Madrid',
+                '+34 91 234 56 78', 'info@gamboa.com', 'Lunes a Viernes 9:00-20:00 / Sábados 10:00-14:00',
+                '40.4322', '-3.6789',
+                'toyota|hyundai', '10', '1',
+                'https://ejemplo.com/logo-gamboa.png',
+            );
+            $filename = 'plantilla-concesionarios.csv';
         } else {
             wp_die( 'Tipo desconocido' );
         }
@@ -326,6 +480,28 @@ Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"berlina|compacto",5,"e
                 $rows[] = self::fila_modelo( $m );
             }
             self::enviar_csv( 'modelos-' . gmdate( 'Y-m-d' ) . '.csv', $rows );
+
+        } elseif ( 'coches' === $tipo ) {
+            $columnas = self::columnas_coches();
+            $rows = array( $columnas );
+            $coches = get_posts( array(
+                'post_type' => 'welow_coche', 'post_status' => 'any', 'posts_per_page' => -1,
+            ) );
+            foreach ( $coches as $c ) {
+                $rows[] = self::fila_coche( $c );
+            }
+            self::enviar_csv( 'coches-' . gmdate( 'Y-m-d' ) . '.csv', $rows );
+
+        } elseif ( 'concesionarios' === $tipo ) {
+            $columnas = self::columnas_concesionarios();
+            $rows = array( $columnas );
+            $cs = get_posts( array(
+                'post_type' => 'welow_concesionario', 'post_status' => 'any', 'posts_per_page' => -1,
+            ) );
+            foreach ( $cs as $c ) {
+                $rows[] = self::fila_concesionario( $c );
+            }
+            self::enviar_csv( 'concesionarios-' . gmdate( 'Y-m-d' ) . '.csv', $rows );
         }
     }
 
@@ -408,6 +584,107 @@ Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"berlina|compacto",5,"e
         );
     }
 
+    /**
+     * @since 2.0.0
+     */
+    private static function fila_coche( $coche ) {
+        $modelo_id = get_post_meta( $coche->ID, '_welow_coche_modelo', true );
+        $modelo_slug = $modelo_id ? get_post_field( 'post_name', $modelo_id ) : '';
+
+        $conc_id = get_post_meta( $coche->ID, '_welow_coche_concesionario', true );
+        $conc_slug = $conc_id ? get_post_field( 'post_name', $conc_id ) : '';
+
+        $combustibles = wp_get_post_terms( $coche->ID, 'welow_combustible', array( 'fields' => 'slugs' ) );
+        $carrocerias  = wp_get_post_terms( $coche->ID, 'welow_categoria_modelo', array( 'fields' => 'slugs' ) );
+
+        $thumb_id = get_post_thumbnail_id( $coche->ID );
+        $galeria_ids = get_post_meta( $coche->ID, '_welow_coche_galeria', true ) ?: array();
+        $galeria_urls = array();
+        if ( is_array( $galeria_ids ) ) {
+            foreach ( $galeria_ids as $gid ) {
+                $u = wp_get_attachment_url( $gid );
+                if ( $u ) $galeria_urls[] = $u;
+            }
+        }
+
+        $g = function( $key ) use ( $coche ) {
+            return get_post_meta( $coche->ID, '_welow_coche_' . $key, true );
+        };
+
+        return array(
+            $coche->post_title,
+            $coche->post_name,
+            $g( 'referencia' ),
+            $modelo_slug,
+            $g( 'version' ),
+            $g( 'tipo_venta' ),
+            $g( 'estado' ),
+            $g( 'mes_matricula' ),
+            $g( 'anio_matricula' ),
+            $g( 'km' ),
+            $g( 'precio_contado' ),
+            $g( 'precio_financiado' ),
+            $g( 'precio_anterior' ),
+            $g( 'cuota' ),
+            $g( 'disclaimer' ),
+            $g( 'cambio' ),
+            $g( 'marchas' ),
+            $g( 'cv' ),
+            $g( 'cilindrada' ),
+            $g( 'color' ),
+            $g( 'tipo_pintura' ),
+            $g( 'etiqueta_dgt' ),
+            $g( 'plazas' ),
+            $g( 'puertas' ),
+            ! empty( $combustibles ) && ! is_wp_error( $combustibles ) ? implode( '|', $combustibles ) : '',
+            ! empty( $carrocerias ) && ! is_wp_error( $carrocerias ) ? implode( '|', $carrocerias ) : '',
+            $conc_slug,
+            $g( 'programa' ),
+            $g( 'equipamiento' ),
+            $g( 'garantias' ),
+            $g( 'matricula' ),
+            $g( 'vin' ),
+            $thumb_id ? wp_get_attachment_url( $thumb_id ) : '',
+            implode( '|', $galeria_urls ),
+        );
+    }
+
+    /**
+     * @since 2.0.0
+     */
+    private static function fila_concesionario( $conc ) {
+        $g = function( $key ) use ( $conc ) {
+            return get_post_meta( $conc->ID, '_welow_conc_' . $key, true );
+        };
+        $marcas_ids = get_post_meta( $conc->ID, '_welow_conc_marcas', true ) ?: array();
+        $marcas_slugs = array();
+        if ( is_array( $marcas_ids ) ) {
+            foreach ( $marcas_ids as $mid ) {
+                $s = get_post_field( 'post_name', $mid );
+                if ( $s ) $marcas_slugs[] = $s;
+            }
+        }
+        $logo_id = get_post_thumbnail_id( $conc->ID );
+
+        return array(
+            $conc->post_title,
+            $conc->post_name,
+            $g( 'direccion' ),
+            $g( 'cp' ),
+            $g( 'ciudad' ),
+            $g( 'provincia' ),
+            $g( 'telefono' ),
+            $g( 'email' ),
+            $g( 'horario' ),
+            $g( 'lat' ),
+            $g( 'lng' ),
+            implode( '|', $marcas_slugs ),
+            $g( 'orden' ),
+            $g( 'activo' ) ?: '1',
+            $logo_id ? wp_get_attachment_url( $logo_id ) : '',
+        );
+    }
+
     private static function enviar_csv( $filename, $rows ) {
         header( 'Content-Type: text/csv; charset=UTF-8' );
         header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
@@ -465,6 +742,26 @@ Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"berlina|compacto",5,"e
             foreach ( $filas as $i => $fila ) {
                 try {
                     $resultado = self::procesar_fila_modelo( $fila, $actualizar, $descargar_imagenes );
+                    if ( 'creado' === $resultado ) $creados++;
+                    if ( 'actualizado' === $resultado ) $actualizados++;
+                } catch ( Exception $e ) {
+                    $errores[] = 'Fila ' . ( $i + 2 ) . ': ' . $e->getMessage();
+                }
+            }
+        } elseif ( 'coches' === $tipo ) {
+            foreach ( $filas as $i => $fila ) {
+                try {
+                    $resultado = self::procesar_fila_coche( $fila, $actualizar, $descargar_imagenes );
+                    if ( 'creado' === $resultado ) $creados++;
+                    if ( 'actualizado' === $resultado ) $actualizados++;
+                } catch ( Exception $e ) {
+                    $errores[] = 'Fila ' . ( $i + 2 ) . ': ' . $e->getMessage();
+                }
+            }
+        } elseif ( 'concesionarios' === $tipo ) {
+            foreach ( $filas as $i => $fila ) {
+                try {
+                    $resultado = self::procesar_fila_concesionario( $fila, $actualizar );
                     if ( 'creado' === $resultado ) $creados++;
                     if ( 'actualizado' === $resultado ) $actualizados++;
                 } catch ( Exception $e ) {
@@ -710,6 +1007,216 @@ Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"berlina|compacto",5,"e
                     }
                 }
             }
+        }
+
+        return $tipo_resultado;
+    }
+
+    /**
+     * Procesa una fila CSV de coche (v2.0.0).
+     */
+    private static function procesar_fila_coche( $fila, $actualizar, $descargar_imagenes ) {
+        // Identificación: por referencia (preferente) o slug
+        $titulo = $fila['titulo'] ?? '';
+        $slug   = sanitize_title( $fila['slug'] ?? '' );
+        $referencia = $fila['referencia'] ?? '';
+
+        if ( ! $titulo && ! $slug && ! $referencia ) {
+            throw new Exception( 'Falta titulo, slug o referencia.' );
+        }
+
+        // Resolver modelo
+        $modelo_slug = sanitize_title( $fila['modelo_slug'] ?? '' );
+        if ( ! $modelo_slug ) {
+            throw new Exception( 'Falta modelo_slug.' );
+        }
+        $modelo_id = Welow_Helpers::resolver_post_id_by_slug( $modelo_slug, 'welow_modelo' );
+        if ( ! $modelo_id ) {
+            throw new Exception( 'Modelo no encontrado: ' . $modelo_slug );
+        }
+
+        // Buscar existente por referencia
+        $existente = null;
+        if ( $referencia ) {
+            $found = get_posts( array(
+                'post_type' => 'welow_coche', 'posts_per_page' => 1,
+                'meta_query' => array( array( 'key' => '_welow_coche_referencia', 'value' => $referencia ) ),
+                'post_status' => 'any',
+            ) );
+            $existente = ! empty( $found ) ? $found[0] : null;
+        }
+        if ( ! $existente && $slug ) {
+            $found = get_posts( array(
+                'post_type' => 'welow_coche', 'name' => $slug,
+                'posts_per_page' => 1, 'post_status' => 'any',
+            ) );
+            $existente = ! empty( $found ) ? $found[0] : null;
+        }
+
+        if ( $existente && ! $actualizar ) {
+            throw new Exception( 'Coche ya existe (modo actualizar desactivado).' );
+        }
+
+        // Auto-generar título si no viene
+        if ( ! $titulo ) {
+            $modelo = get_post( $modelo_id );
+            $marca_id = get_post_meta( $modelo_id, '_welow_modelo_marca', true );
+            $marca = $marca_id ? get_post( $marca_id ) : null;
+            $titulo = ( $marca ? $marca->post_title . ' ' : '' ) . ( $modelo ? $modelo->post_title : '' );
+            if ( $referencia ) $titulo .= ' #' . $referencia;
+        }
+
+        $post_data = array(
+            'post_type'    => 'welow_coche',
+            'post_status'  => 'publish',
+            'post_title'   => $titulo,
+            'post_name'    => $slug ?: '',
+        );
+        if ( $existente ) {
+            $post_data['ID'] = $existente->ID;
+            $coche_id = wp_update_post( $post_data, true );
+            $tipo_resultado = 'actualizado';
+        } else {
+            $coche_id = wp_insert_post( $post_data, true );
+            $tipo_resultado = 'creado';
+        }
+        if ( is_wp_error( $coche_id ) ) {
+            throw new Exception( $coche_id->get_error_message() );
+        }
+
+        update_post_meta( $coche_id, '_welow_coche_modelo', $modelo_id );
+
+        // Metas simples
+        $metas = array(
+            'referencia', 'version', 'tipo_venta', 'estado',
+            'mes_matricula', 'anio_matricula', 'km',
+            'precio_contado', 'precio_financiado', 'precio_anterior', 'cuota', 'disclaimer',
+            'cambio', 'marchas', 'cv', 'cilindrada',
+            'color', 'tipo_pintura', 'etiqueta_dgt', 'plazas', 'puertas',
+            'programa', 'matricula', 'vin',
+        );
+        foreach ( $metas as $key ) {
+            if ( isset( $fila[ $key ] ) ) {
+                update_post_meta( $coche_id, '_welow_coche_' . $key, $fila[ $key ] );
+            }
+        }
+
+        // Calcular kW si solo hay CV
+        $cv = floatval( $fila['cv'] ?? 0 );
+        if ( $cv > 0 ) {
+            update_post_meta( $coche_id, '_welow_coche_kw', round( $cv * 0.7355, 1 ) );
+        }
+
+        // WYSIWYG
+        if ( isset( $fila['equipamiento'] ) ) {
+            update_post_meta( $coche_id, '_welow_coche_equipamiento', wp_kses_post( $fila['equipamiento'] ) );
+        }
+        if ( isset( $fila['garantias'] ) ) {
+            update_post_meta( $coche_id, '_welow_coche_garantias', wp_kses_post( $fila['garantias'] ) );
+        }
+
+        // Concesionario
+        if ( ! empty( $fila['concesionario_slug'] ) ) {
+            $conc_id = Welow_Helpers::resolver_post_id_by_slug( $fila['concesionario_slug'], 'welow_concesionario' );
+            if ( $conc_id ) {
+                update_post_meta( $coche_id, '_welow_coche_concesionario', $conc_id );
+            }
+        }
+
+        // Taxonomías
+        if ( ! empty( $fila['combustible'] ) ) {
+            $combs = array_map( 'trim', explode( '|', $fila['combustible'] ) );
+            wp_set_object_terms( $coche_id, $combs, 'welow_combustible', false );
+        }
+        if ( ! empty( $fila['carroceria'] ) ) {
+            $cars = array_map( 'trim', explode( '|', $fila['carroceria'] ) );
+            wp_set_object_terms( $coche_id, $cars, 'welow_categoria_modelo', false );
+        }
+
+        // Imágenes
+        if ( $descargar_imagenes ) {
+            // Imagen principal
+            if ( ! empty( $fila['imagen_url'] ) ) {
+                $img_id = self::sideload_imagen( $fila['imagen_url'], $coche_id );
+                if ( $img_id ) set_post_thumbnail( $coche_id, $img_id );
+            }
+            // Galería
+            if ( ! empty( $fila['galeria_urls'] ) ) {
+                $urls = array_map( 'trim', explode( '|', $fila['galeria_urls'] ) );
+                $ids = array();
+                foreach ( $urls as $u ) {
+                    if ( ! $u ) continue;
+                    $iid = self::sideload_imagen( $u, $coche_id );
+                    if ( $iid ) $ids[] = $iid;
+                    if ( count( $ids ) >= 30 ) break;
+                }
+                if ( ! empty( $ids ) ) {
+                    update_post_meta( $coche_id, '_welow_coche_galeria', $ids );
+                }
+            }
+        }
+
+        return $tipo_resultado;
+    }
+
+    /**
+     * Procesa una fila CSV de concesionario (v2.0.0).
+     */
+    private static function procesar_fila_concesionario( $fila, $actualizar ) {
+        $nombre = $fila['nombre'] ?? '';
+        $slug   = sanitize_title( $fila['slug'] ?? $nombre );
+        if ( ! $nombre ) throw new Exception( 'Falta nombre.' );
+
+        $existente = get_posts( array(
+            'post_type' => 'welow_concesionario', 'name' => $slug,
+            'posts_per_page' => 1, 'post_status' => 'any',
+        ) );
+
+        $post_data = array(
+            'post_type'   => 'welow_concesionario',
+            'post_status' => 'publish',
+            'post_title'  => $nombre,
+            'post_name'   => $slug,
+        );
+
+        if ( ! empty( $existente ) ) {
+            if ( ! $actualizar ) throw new Exception( 'Ya existe (actualizar desactivado).' );
+            $post_data['ID'] = $existente[0]->ID;
+            $id = wp_update_post( $post_data, true );
+            $tipo_resultado = 'actualizado';
+        } else {
+            $id = wp_insert_post( $post_data, true );
+            $tipo_resultado = 'creado';
+        }
+
+        if ( is_wp_error( $id ) ) throw new Exception( $id->get_error_message() );
+
+        $metas_text = array( 'direccion', 'cp', 'ciudad', 'provincia', 'telefono', 'email',
+                             'horario', 'lat', 'lng', 'orden' );
+        foreach ( $metas_text as $key ) {
+            if ( isset( $fila[ $key ] ) ) {
+                update_post_meta( $id, '_welow_conc_' . $key, $fila[ $key ] );
+            }
+        }
+        if ( isset( $fila['activo'] ) ) {
+            update_post_meta( $id, '_welow_conc_activo', $fila['activo'] ? '1' : '0' );
+        }
+
+        // Marcas
+        if ( ! empty( $fila['marcas'] ) ) {
+            $slugs = array_map( 'trim', explode( '|', $fila['marcas'] ) );
+            $marca_ids = array();
+            foreach ( $slugs as $s ) {
+                $mid = Welow_Helpers::resolver_post_id_by_slug( $s, 'welow_marca' );
+                if ( $mid ) $marca_ids[] = $mid;
+            }
+            update_post_meta( $id, '_welow_conc_marcas', $marca_ids );
+        }
+
+        // Logo
+        if ( ! empty( $fila['logo_url'] ) ) {
+            $img_id = self::sideload_imagen( $fila['logo_url'], $id );
+            if ( $img_id ) set_post_thumbnail( $id, $img_id );
         }
 
         return $tipo_resultado;

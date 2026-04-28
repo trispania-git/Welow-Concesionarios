@@ -4,7 +4,7 @@
  *
  * @package Welow_Concesionarios
  * @since 1.0.0
- * @version 1.2.0
+ * @version 2.0.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -38,6 +38,8 @@ class Welow_Main {
         Welow_CPT_Slide::init();
         Welow_CPT_Modelo::init();
         Welow_CPT_Etiqueta::init();
+        Welow_CPT_Concesionario::init();       // v2.0.0
+        Welow_CPT_Coche::init();               // v2.0.0
 
         // Shortcodes
         Welow_Shortcode_Marcas::init();
@@ -47,6 +49,9 @@ class Welow_Main {
         Welow_Shortcode_Contenido::init();
         Welow_Shortcode_Marca_Banner::init();
         Welow_Shortcode_Divi::init();          // v1.4.0
+        Welow_Shortcode_Coches::init();        // v2.0.0
+        Welow_Shortcode_Coche_Ficha::init();   // v2.0.0
+        Welow_Shortcode_Buscador_Coches::init(); // v2.0.0
 
         // Enqueue assets
         add_action( 'wp_enqueue_scripts', array( $this, 'registrar_assets' ) );
@@ -79,10 +84,37 @@ class Welow_Main {
             WELOW_CONC_VERSION
         );
 
+        // === v2.0.0: Coches ===
+        wp_register_style(
+            'welow-coches',
+            WELOW_CONC_URL . 'assets/css/coches.css',
+            array(),
+            WELOW_CONC_VERSION
+        );
+        wp_register_style(
+            'welow-coche-ficha',
+            WELOW_CONC_URL . 'assets/css/coche-ficha.css',
+            array(),
+            WELOW_CONC_VERSION
+        );
+        wp_register_style(
+            'welow-buscador',
+            WELOW_CONC_URL . 'assets/css/buscador.css',
+            array(),
+            WELOW_CONC_VERSION
+        );
+
         // JS
         wp_register_script(
             'welow-slider',
             WELOW_CONC_URL . 'assets/js/slider.js',
+            array(),
+            WELOW_CONC_VERSION,
+            true
+        );
+        wp_register_script(
+            'welow-coche-galeria',
+            WELOW_CONC_URL . 'assets/js/coche-galeria.js',
             array(),
             WELOW_CONC_VERSION,
             true
@@ -99,7 +131,10 @@ class Welow_Main {
         if ( ! $screen ) return;
 
         // CPTs y páginas que usan el media uploader
-        $cpts_con_media = array( 'welow_marca', 'welow_slide', 'welow_modelo', 'welow_etiqueta' );
+        $cpts_con_media = array(
+            'welow_marca', 'welow_slide', 'welow_modelo', 'welow_etiqueta',
+            'welow_concesionario', 'welow_coche',  // v2.0.0
+        );
         $paginas_con_media = array(
             'concesionarios_page_welow_settings',
             'welow-concesionarios_page_welow_settings',
@@ -107,10 +142,15 @@ class Welow_Main {
 
         $necesita_media = in_array( $screen->post_type, $cpts_con_media, true )
             || in_array( $hook, $paginas_con_media, true )
-            || ( isset( $_GET['page'] ) && 'welow_settings' === $_GET['page'] );
+            || ( isset( $_GET['page'] ) && 'welow_settings' === $_GET['page'] )
+            || ( 'edit-tags.php' === $hook || 'term.php' === $hook );
 
         if ( $necesita_media ) {
             wp_enqueue_media();
+            // jQuery UI sortable para galería del coche
+            if ( 'welow_coche' === $screen->post_type ) {
+                wp_enqueue_script( 'jquery-ui-sortable' );
+            }
             wp_enqueue_style(
                 'welow-admin-marca',
                 WELOW_CONC_URL . 'assets/css/admin-marca.css',

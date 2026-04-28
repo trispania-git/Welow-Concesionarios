@@ -1,0 +1,349 @@
+/**
+ * Estilos: Ficha individual del coche.
+ * @since 2.0.0
+ */
+
+/* Iconos genéricos del sistema */
+.welow-icon { display: inline-flex; align-items: center; justify-content: center; }
+.welow-icon--img { width: 24px; height: 24px; object-fit: contain; }
+.welow-icon--dashicon { font-size: 22px; width: 22px; height: 22px; line-height: 22px; color: #2563eb; }
+
+/* Container ficha */
+.welow-coche-ficha {
+    max-width: 1200px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+/* Header */
+.welow-coche-ficha__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 24px;
+}
+.welow-coche-ficha__titulo {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.2;
+}
+.welow-coche-ficha__version {
+    margin: 6px 0 0;
+    font-size: 16px;
+    color: #475569;
+}
+
+@media (max-width: 767px) {
+    .welow-coche-ficha__titulo { font-size: 22px; }
+    .welow-coche-ficha__version { font-size: 14px; }
+    .welow-coche-ficha__header { flex-direction: column; padding: 14px 0; }
+}
+
+/* Layout 2 columnas */
+.welow-coche-ficha__layout {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 32px;
+}
+@media (max-width: 1024px) {
+    .welow-coche-ficha__layout { grid-template-columns: 1fr; }
+}
+
+/* === Galería === */
+.welow-galeria-ficha { margin-bottom: 24px; }
+.welow-galeria-ficha__main {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: #f1f5f9;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+.welow-galeria-ficha__slide { display: none; width: 100%; height: 100%; }
+.welow-galeria-ficha__slide.is-active { display: block; }
+.welow-galeria-ficha__slide a { display: block; width: 100%; height: 100%; }
+.welow-galeria-ficha__slide img {
+    width: 100%; height: 100%; object-fit: cover;
+}
+
+.welow-galeria-ficha__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: #0f172a;
+    z-index: 5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.2s;
+}
+.welow-galeria-ficha__arrow:hover { background: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.18); }
+.welow-galeria-ficha__arrow--prev { left: 12px; }
+.welow-galeria-ficha__arrow--next { right: 12px; }
+
+.welow-galeria-ficha__counter {
+    position: absolute;
+    bottom: 12px; right: 12px;
+    background: rgba(15, 23, 42, 0.7);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 5;
+}
+
+.welow-galeria-ficha__thumbs {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 6px;
+}
+.welow-galeria-ficha__thumb {
+    aspect-ratio: 4/3;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    background: #f1f5f9;
+    padding: 0;
+    transition: all 0.2s;
+}
+.welow-galeria-ficha__thumb img { width: 100%; height: 100%; object-fit: cover; }
+.welow-galeria-ficha__thumb:hover { opacity: 0.8; }
+.welow-galeria-ficha__thumb.is-active { border-color: #2563eb; }
+
+@media (max-width: 980px) {
+    .welow-galeria-ficha__thumbs { grid-template-columns: repeat(6, 1fr); }
+}
+@media (max-width: 767px) {
+    .welow-galeria-ficha__thumbs { grid-template-columns: repeat(4, 1fr); gap: 4px; }
+    .welow-galeria-ficha__arrow { width: 36px; height: 36px; }
+}
+
+/* === Destacados === */
+.welow-coche-destacados {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+.welow-destacados-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+}
+.welow-destacado {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+}
+.welow-destacado__icono {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    background: #fff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.welow-destacado__icono .welow-icon--img { width: 20px; height: 20px; }
+.welow-destacado__icono .welow-icon--dashicon { font-size: 18px; width: 18px; height: 18px; line-height: 1; }
+
+.welow-destacado__valor {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    line-height: 1.3;
+}
+.welow-destacado__valor small {
+    display: block;
+    font-weight: 400;
+    color: #64748b;
+    font-size: 12px;
+}
+
+/* === Precio (sidebar) === */
+.welow-coche-precio {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    position: sticky;
+    top: 80px;
+}
+.welow-coche-precio__anterior {
+    color: #94a3b8;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+.welow-coche-precio__anterior span { text-decoration: line-through; }
+
+.welow-coche-precio__contado {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 14px;
+}
+.welow-coche-precio__label {
+    font-size: 12px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+.welow-coche-precio__valor {
+    font-size: 36px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.1;
+}
+.welow-coche-precio__valor small { font-size: 22px; font-weight: 600; }
+.welow-coche-precio__valor-sec {
+    font-size: 18px;
+    font-weight: 700;
+    color: #475569;
+}
+.welow-coche-precio__financiado {
+    padding-top: 12px;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+}
+.welow-coche-precio__cuota {
+    margin-top: 14px;
+    padding: 10px 14px;
+    background: #ecfdf5;
+    color: #047857;
+    border-radius: 8px;
+    font-size: 14px;
+}
+.welow-coche-precio__disclaimer {
+    margin-top: 16px;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border-left: 3px solid #cbd5e1;
+    border-radius: 4px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    font-size: 11px;
+    color: #64748b;
+    line-height: 1.5;
+}
+.welow-coche-precio__disclaimer-icono img,
+.welow-coche-precio__disclaimer-icono .dashicons {
+    width: 16px; height: 16px; font-size: 16px; line-height: 1; color: #94a3b8;
+}
+
+@media (max-width: 1024px) {
+    .welow-coche-precio { position: static; }
+}
+
+/* === Equipamiento / Garantías === */
+.welow-coche-equipamiento,
+.welow-coche-garantias {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+.welow-coche-equipamiento h2,
+.welow-coche-garantias h2 {
+    margin: 0 0 16px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #0f172a;
+}
+.welow-coche-equipamiento__contenido,
+.welow-coche-garantias__contenido {
+    color: #334155;
+    line-height: 1.7;
+    font-size: 15px;
+}
+.welow-coche-equipamiento__contenido ul,
+.welow-coche-garantias__contenido ul {
+    columns: 2;
+    column-gap: 30px;
+    list-style: disc;
+    padding-left: 20px;
+}
+@media (max-width: 600px) {
+    .welow-coche-equipamiento__contenido ul,
+    .welow-coche-garantias__contenido ul { columns: 1; }
+}
+
+.welow-coche-garantias__programa {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fef3c7;
+    color: #78350f;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+/* === Concesionario === */
+.welow-coche-concesionario {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 24px;
+}
+.welow-coche-concesionario h2 {
+    margin: 0 0 14px;
+    font-size: 18px;
+    font-weight: 700;
+}
+.welow-coche-concesionario__logo img {
+    max-width: 140px;
+    height: auto;
+    margin-bottom: 12px;
+}
+.welow-coche-concesionario__nombre {
+    margin: 0 0 16px;
+    font-size: 17px;
+    font-weight: 700;
+    color: #0f172a;
+}
+.welow-coche-concesionario__datos {
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 0;
+    font-size: 14px;
+    color: #475569;
+    line-height: 1.6;
+}
+.welow-coche-concesionario__datos li {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+.welow-coche-concesionario__datos .dashicons {
+    color: #2563eb;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+.welow-coche-concesionario__datos a {
+    color: #2563eb;
+    text-decoration: none;
+}
+.welow-coche-concesionario__datos a:hover { text-decoration: underline; }

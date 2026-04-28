@@ -54,6 +54,24 @@ class Welow_Admin_Menu {
 
             <div class="welow-dashboard-grid">
 
+                <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=welow_coche' ) ); ?>" class="welow-card welow-card-highlight">
+                    <span class="dashicons dashicons-car"></span>
+                    <h3>Coches en venta</h3>
+                    <p>Unidades de ocasión, KM0 y nuevos.</p>
+                    <span class="welow-count">
+                        <?php echo post_type_exists( 'welow_coche' ) ? intval( wp_count_posts( 'welow_coche' )->publish ) : 0; ?> publicados
+                    </span>
+                </a>
+
+                <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=welow_concesionario' ) ); ?>" class="welow-card">
+                    <span class="dashicons dashicons-store"></span>
+                    <h3>Concesionarios</h3>
+                    <p>Ubicaciones físicas y datos de contacto.</p>
+                    <span class="welow-count">
+                        <?php echo post_type_exists( 'welow_concesionario' ) ? intval( wp_count_posts( 'welow_concesionario' )->publish ) : 0; ?> publicados
+                    </span>
+                </a>
+
                 <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=welow_marca' ) ); ?>" class="welow-card">
                     <span class="dashicons dashicons-awards"></span>
                     <h3>Marcas</h3>

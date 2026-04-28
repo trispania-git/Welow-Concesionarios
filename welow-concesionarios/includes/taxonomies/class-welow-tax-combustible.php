@@ -12,11 +12,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Welow_Tax_Combustible {
+    use Welow_Tax_Icon_Trait;  // v2.0.0 — soporte de icono por término
 
     const TAXONOMY = 'welow_combustible';
 
     public static function init() {
         add_action( 'init', array( __CLASS__, 'registrar_taxonomia' ), 5 );
+        self::init_iconos();  // v2.0.0
     }
 
     public static function registrar_taxonomia() {
