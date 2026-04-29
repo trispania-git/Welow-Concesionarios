@@ -229,10 +229,10 @@ abstract class Welow_CPT_Coche_Base {
                 <th><label>Potencia</label></th>
                 <td>
                     <input type="number" name="welow_coche_cv" value="<?php echo esc_attr( $cv ); ?>"
-                           min="0" step="1" placeholder="CV" style="width:90px;" /> CV
+                           min="0" step="0.1" placeholder="CV" style="width:90px;" /> CV
                     <input type="number" name="welow_coche_kw" value="<?php echo esc_attr( $kw ); ?>"
-                           min="0" step="1" placeholder="kW" style="width:90px;margin-left:10px;" /> kW
-                    <p class="description">Si solo rellenas uno, el otro se calcula automáticamente (kW = CV × 0.7355).</p>
+                           min="0" step="0.1" placeholder="kW" style="width:90px;margin-left:10px;" /> kW
+                    <p class="description">Si solo rellenas uno, el otro se calcula automáticamente (kW = CV × 0.7355). Acepta decimales.</p>
                 </td>
             </tr>
             <tr>

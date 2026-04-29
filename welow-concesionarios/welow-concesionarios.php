@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.3.0
+ * Version:     2.3.1
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,16 @@
  *
  * CHANGELOG
  * ---------
+ * 2.3.1 — Fix: campos CV/kW aceptan decimales
+ *   - Los campos `Potencia (CV)` y `Potencia (kW)` en el metabox de
+ *     datos técnicos del coche tenían `step="1"` (solo enteros), lo
+ *     que bloqueaba el guardado cuando el cálculo automático
+ *     kW = CV × 0.7355 producía un decimal (ej: 140 CV → 102.97 kW).
+ *   - Cambiado `step="1"` a `step="0.1"` en ambos inputs.
+ *   - El cálculo automático y el guardado ya soportaban decimales
+ *     (`floatval` + `round( ..., 1 )`), solo era el input HTML el que
+ *     bloqueaba la validación del navegador.
+ *
  * 2.3.0 — Catálogo completo de marcas externas (99 marcas)
  *   - Ampliada la lista de marcas pre-cargadas de 20 a 99 (catálogo
  *     completo del mercado: Abarth, Acura, Aeolus, Aion, Aiways,
@@ -241,7 +251,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.3.0' );
+define( 'WELOW_CONC_VERSION', '2.3.1' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
