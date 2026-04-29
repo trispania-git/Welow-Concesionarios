@@ -59,6 +59,10 @@ class Welow_Main {
         Welow_Shortcode_Coche_Ficha::init();       // v2.0.0
         Welow_Shortcode_Buscador_Coches::init();   // v2.0.0
         Welow_Shortcode_Listado_Completo::init();  // v2.4.0
+        Welow_Shortcode_Coche_Extras::init();      // v2.5.0
+
+        // Permalinks personalizados de coches
+        Welow_Coche_Permalinks::init();            // v2.5.0
 
         // Enqueue assets
         add_action( 'wp_enqueue_scripts', array( $this, 'registrar_assets' ) );
@@ -107,6 +111,13 @@ class Welow_Main {
         wp_register_style(
             'welow-buscador',
             WELOW_CONC_URL . 'assets/css/buscador.css',
+            array(),
+            WELOW_CONC_VERSION
+        );
+
+        wp_register_style(
+            'welow-coche-extras',
+            WELOW_CONC_URL . 'assets/css/coche-extras.css',
             array(),
             WELOW_CONC_VERSION
         );

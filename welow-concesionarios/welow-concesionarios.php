@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.4.0
+ * Version:     2.5.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,36 @@
  *
  * CHANGELOG
  * ---------
+ * 2.5.0 — Ficha del coche: URLs personalizadas + 4 shortcodes nuevos
+ *
+ *   URLs PERSONALIZADAS:
+ *   - Coches NUEVOS:    /coches/{marca}/{modelo}/{slug}/
+ *   - Coches OCASIÓN:   /coches/segunda-mano/{marca}/{modelo}/{slug}/
+ *   - Rewrite rules + filtro post_type_link
+ *   - Auto-flush al activar v2.5.0 (option `welow_rewrite_rules_v2_5_0`)
+ *   - Si no resuelve marca/modelo: fallback al permalink por defecto
+ *
+ *   NUEVOS SHORTCODES PARA LA FICHA:
+ *   - [welow_coche_breadcrumb]    Inicio › Coches › Segunda mano › Marca › Modelo › Versión
+ *   - [welow_coches_similares]    Coches relacionados (misma marca y CPT)
+ *                                  Si no hay suficientes con la misma marca,
+ *                                  completa con otros del mismo tipo
+ *   - [welow_coche_compartir]     Botones WhatsApp · Facebook · X · Email · Copiar URL
+ *                                  con SVGs vectoriales y "Copiado!" feedback
+ *   - [welow_coche_formulario]    Formulario contacto pre-rellenado con datos del coche.
+ *                                  Envía email al concesionario asociado (o admin).
+ *                                  Hook `welow_coche_contacto_enviado` para CRMs externos.
+ *
+ *   PÁGINA DE AYUDA:
+ *   - Nueva pestaña "🚗 Ficha del coche" con guía paso a paso para
+ *     montar la plantilla en Divi Theme Builder
+ *   - Documentación de los 4 shortcodes nuevos
+ *
+ *   ARCHIVOS NUEVOS:
+ *   - includes/class-welow-coche-permalinks.php
+ *   - includes/shortcodes/class-welow-shortcode-coche-extras.php
+ *   - assets/css/coche-extras.css
+ *
  * 2.4.0 — Página de ayuda + datos para chatbots (shortcode + REST API)
  *
  *   PÁGINA DE AYUDA EN ADMIN:
@@ -347,7 +377,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.4.0' );
+define( 'WELOW_CONC_VERSION', '2.5.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
@@ -397,6 +427,10 @@ require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coches
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coche-ficha.php';        // v2.0.0
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-buscador-coches.php';    // v2.0.0
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-listado-completo.php';   // v2.4.0
+require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coche-extras.php';      // v2.5.0
+
+// Permalinks de coches
+require_once WELOW_CONC_PATH . 'includes/class-welow-coche-permalinks.php';                       // v2.5.0
 
 // Principal
 require_once WELOW_CONC_PATH . 'includes/class-welow-main.php';

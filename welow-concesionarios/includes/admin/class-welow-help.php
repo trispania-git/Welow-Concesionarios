@@ -260,6 +260,59 @@ class Welow_Help {
                 ),
             ),
 
+            'welow_coche_breadcrumb' => array(
+                'titulo' => 'Breadcrumb de la ficha del coche',
+                'desc'   => 'Genera un breadcrumb dinámico: Inicio › Coches › [Segunda mano] › Marca › Modelo › Versión. Auto-detecta el coche del contexto.',
+                'params' => array(
+                    'separador' => array( 'def' => '›', 'desc' => 'Carácter separador entre niveles' ),
+                    'inicio'    => array( 'def' => 'Inicio', 'desc' => 'Texto del primer enlace' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_coche_breadcrumb]',
+                    '[welow_coche_breadcrumb separador="/" inicio="Home"]',
+                ),
+            ),
+
+            'welow_coches_similares' => array(
+                'titulo' => 'Grid de coches similares al actual',
+                'desc'   => 'Muestra coches relacionados al coche actual (misma marca y mismo CPT — nuevos o ocasión). Si no hay suficientes con la misma marca, completa con otros del mismo tipo.',
+                'params' => array(
+                    'max'      => array( 'def' => '4', 'desc' => 'Número máximo de coches a mostrar' ),
+                    'columnas' => array( 'def' => '4', 'desc' => 'Columnas en desktop' ),
+                    'titulo'   => array( 'def' => 'Otros coches que pueden interesarte', 'desc' => 'Título de la sección' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_coches_similares]',
+                    '[welow_coches_similares max="6" columnas="3" titulo="También te puede interesar"]',
+                ),
+            ),
+
+            'welow_coche_compartir' => array(
+                'titulo' => 'Botones de compartir en redes',
+                'desc'   => 'Botones para compartir la ficha del coche en WhatsApp, Facebook, X (Twitter), Email o copiar URL.',
+                'params' => array(
+                    'redes'  => array( 'def' => 'whatsapp,facebook,twitter,email,copiar', 'desc' => 'Lista de redes separadas por coma' ),
+                    'titulo' => array( 'def' => 'Compartir', 'desc' => 'Título antes de los botones' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_coche_compartir]',
+                    '[welow_coche_compartir redes="whatsapp,email" titulo=""]',
+                ),
+            ),
+
+            'welow_coche_formulario' => array(
+                'titulo' => 'Formulario de contacto pre-rellenado',
+                'desc'   => 'Formulario con nombre/teléfono/email/mensaje + checkbox RGPD. Pre-rellena automáticamente la referencia del coche. Envía email al concesionario asociado (o al admin si no hay).',
+                'params' => array(
+                    'titulo'      => array( 'def' => '¿Te interesa este coche?', 'desc' => 'Título del bloque' ),
+                    'mostrar_ref' => array( 'def' => 'si', 'desc' => 'si | no — mostrar la referencia del coche' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_coche_formulario]',
+                    '[welow_coche_formulario titulo="Solicita más información" mostrar_ref="no"]',
+                ),
+            ),
+
             'welow_listado_completo' => array(
                 'titulo' => '🤖 Listado completo para chatbots',
                 'desc'   => 'Vuelca TODOS los datos en HTML estructurado para consumo de chatbots y crawlers. La página que lo contenga se marca automáticamente como noindex,nofollow.',
@@ -293,6 +346,7 @@ class Welow_Help {
 
             <h2 class="nav-tab-wrapper">
                 <a href="?page=<?php echo esc_attr( self::PAGE_SLUG ); ?>&tab=shortcodes" class="nav-tab <?php echo $tab === 'shortcodes' ? 'nav-tab-active' : ''; ?>">📋 Shortcodes</a>
+                <a href="?page=<?php echo esc_attr( self::PAGE_SLUG ); ?>&tab=ficha" class="nav-tab <?php echo $tab === 'ficha' ? 'nav-tab-active' : ''; ?>">🚗 Ficha del coche</a>
                 <a href="?page=<?php echo esc_attr( self::PAGE_SLUG ); ?>&tab=estructura" class="nav-tab <?php echo $tab === 'estructura' ? 'nav-tab-active' : ''; ?>">🏗️ Estructura</a>
                 <a href="?page=<?php echo esc_attr( self::PAGE_SLUG ); ?>&tab=csv" class="nav-tab <?php echo $tab === 'csv' ? 'nav-tab-active' : ''; ?>">📥 Importación CSV</a>
                 <a href="?page=<?php echo esc_attr( self::PAGE_SLUG ); ?>&tab=chatbot" class="nav-tab <?php echo $tab === 'chatbot' ? 'nav-tab-active' : ''; ?>">🤖 Chatbots / API</a>
@@ -301,6 +355,7 @@ class Welow_Help {
             <div class="welow-help-content">
                 <?php
                 if ( $tab === 'shortcodes' ) self::render_tab_shortcodes( $shortcodes );
+                elseif ( $tab === 'ficha' ) self::render_tab_ficha();
                 elseif ( $tab === 'estructura' ) self::render_tab_estructura();
                 elseif ( $tab === 'csv' ) self::render_tab_csv();
                 elseif ( $tab === 'chatbot' ) self::render_tab_chatbot();
@@ -410,6 +465,78 @@ class Welow_Help {
                 <?php endif; ?>
             </div>
         <?php endforeach; ?>
+        <?php
+    }
+
+    private static function render_tab_ficha() {
+        ?>
+        <h2>🚗 Construir la ficha del coche</h2>
+        <p>La ficha individual del coche se monta con varios shortcodes complementarios. La forma recomendada es usar <strong>Divi Theme Builder</strong> con una sola plantilla que sirve a TODOS los coches automáticamente.</p>
+
+        <div class="welow-info-box">
+            <strong>URLs personalizadas (v2.5.0):</strong>
+            <ul style="margin: 8px 0 0 20px; list-style: disc;">
+                <li>Coches nuevos: <code>/coches/{marca}/{modelo}/{slug}/</code></li>
+                <li>Coches ocasión: <code>/coches/segunda-mano/{marca}/{modelo}/{slug}/</code></li>
+            </ul>
+            Si no ves las URLs nuevas, ve a <strong>Ajustes → Enlaces permanentes</strong> y guarda (refresca rewrite rules).
+        </div>
+
+        <h3>Paso 1: Crear la plantilla en Divi Theme Builder</h3>
+        <ol>
+            <li>Ve a <strong>Divi → Theme Builder</strong></li>
+            <li>Click en <strong>+ Add Custom Header / Body / Footer</strong> en la zona "Add New Template"</li>
+            <li>En el modal, marca <strong>"Build Custom Body"</strong></li>
+            <li>Marca también <strong>"All Coche Ocasion Posts"</strong> (y/o "All Coche Nuevo Posts")</li>
+            <li>Click en "Create Template" → "Build Custom Body"</li>
+        </ol>
+
+        <h3>Paso 2: Estructura recomendada (estilo Grupo Gamboa)</h3>
+        <p>Dentro del Theme Builder, añade módulos <strong>Texto</strong> con los shortcodes en este orden:</p>
+
+        <pre style="background:#1e293b;color:#e2e8f0;padding:16px;border-radius:6px;overflow-x:auto;font-size:13px;line-height:1.7;">
+<span style="color:#94a3b8;">// 1. Breadcrumb arriba del todo</span>
+[welow_coche_breadcrumb]
+
+<span style="color:#94a3b8;">// 2. Ficha completa (galería + destacados + precio + concesionario + equipamiento + garantías)</span>
+[welow_coche_ficha id="auto"]
+
+<span style="color:#94a3b8;">// 3. Compartir en redes sociales</span>
+[welow_coche_compartir]
+
+<span style="color:#94a3b8;">// 4. Formulario de contacto pre-rellenado</span>
+[welow_coche_formulario]
+
+<span style="color:#94a3b8;">// 5. Coches similares al final</span>
+[welow_coches_similares max="4" columnas="4"]
+</pre>
+
+        <h3>Paso 3: Personalizar (opcional)</h3>
+        <p>Puedes envolver cada shortcode en su propia <strong>sección</strong>/<strong>fila</strong> de Divi para aplicar fondos, márgenes, animaciones, etc. También puedes intercalarlos con módulos de Divi (ej: un banner publicitario entre el formulario y los similares).</p>
+
+        <h3>Variantes de la ficha</h3>
+
+        <p><strong>Mostrar solo algunos bloques de la ficha</strong>:</p>
+        <pre style="background:#1e293b;color:#e2e8f0;padding:12px;border-radius:4px;font-size:12px;">[welow_coche_ficha mostrar="galeria,destacados,precio"]</pre>
+        <p>Bloques disponibles: <code>galeria</code>, <code>destacados</code>, <code>precio</code>, <code>equipamiento</code>, <code>garantias</code>, <code>concesionario</code></p>
+
+        <p><strong>Compartir solo algunas redes</strong>:</p>
+        <pre style="background:#1e293b;color:#e2e8f0;padding:12px;border-radius:4px;font-size:12px;">[welow_coche_compartir redes="whatsapp,email,copiar"]</pre>
+
+        <p><strong>Coches similares con título personalizado</strong>:</p>
+        <pre style="background:#1e293b;color:#e2e8f0;padding:12px;border-radius:4px;font-size:12px;">[welow_coches_similares max="6" columnas="3" titulo="También te puede interesar"]</pre>
+
+        <h3>Formulario de contacto: ¿a dónde llegan los emails?</h3>
+        <p>El formulario envía emails con esta lógica:</p>
+        <ol>
+            <li>Si el coche tiene un <strong>concesionario asignado</strong> con email → ese email</li>
+            <li>Si no → el email del admin de WordPress (configurable en Ajustes → Generales)</li>
+        </ol>
+        <p>El email incluye: datos del cliente (nombre, teléfono, email), referencia del coche, URL de la ficha y mensaje.</p>
+
+        <div class="welow-info-box">
+            <strong>💡 Hook para integraciones:</strong> existe la acción <code>welow_coche_contacto_enviado</code> que recibe un array con todos los datos de la solicitud. Útil para enviarlo a un CRM externo, Google Sheets, etc.
+        </div>
         <?php
     }
 
