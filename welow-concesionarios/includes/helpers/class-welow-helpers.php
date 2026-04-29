@@ -348,20 +348,24 @@ class Welow_Helpers {
     }
 
     // =========================================================================
-    // COCHES (v2.0.0)
+    // COCHES (v2.1.0 - separados nuevos / ocasión)
     // =========================================================================
 
     /**
-     * Obtiene coches con filtros.
+     * Obtiene coches con filtros. Se puede limitar a un CPT concreto.
      *
      * @since 2.0.0
-     * @param array $args Argumentos de filtro.
+     * @version 2.1.0 — Soporte de dos CPTs (welow_coche_nuevo, welow_coche_ocasion).
+     * @param array $args Argumentos de filtro. Clave 'cpt' acepta:
+     *               'welow_coche_nuevo', 'welow_coche_ocasion' o array de ambos.
      * @return WP_Post[]
      */
     public static function get_coches( $args = array() ) {
         $defaults = array(
+            'cpt'             => array( 'welow_coche_nuevo', 'welow_coche_ocasion' ),
             'marca'           => '',
             'modelo'          => '',
+            'marca_externa'   => '',
             'tipo_venta'      => 'todos',
             'combustible'     => '',
             'carroceria'      => '',
@@ -378,7 +382,7 @@ class Welow_Helpers {
         $args = wp_parse_args( $args, $defaults );
 
         $query_args = array(
-            'post_type'      => 'welow_coche',
+            'post_type'      => $args['cpt'],
             'post_status'    => 'publish',
             'posts_per_page' => intval( $args['max'] ),
             'paged'          => max( 1, intval( $args['paged'] ) ),
@@ -386,21 +390,19 @@ class Welow_Helpers {
             'tax_query'      => array( 'relation' => 'AND' ),
         );
 
-        // Estado (default: disponible)
         if ( $args['estado'] && 'todos' !== $args['estado'] ) {
             $query_args['meta_query'][] = array(
                 'key' => '_welow_coche_estado', 'value' => $args['estado'], 'compare' => '=',
             );
         }
 
-        // Tipo de venta
         if ( 'todos' !== $args['tipo_venta'] && $args['tipo_venta'] ) {
             $query_args['meta_query'][] = array(
                 'key' => '_welow_coche_tipo_venta', 'value' => $args['tipo_venta'], 'compare' => '=',
             );
         }
 
-        // Modelo directo
+        // Modelo (solo aplica a coches nuevos)
         if ( $args['modelo'] ) {
             $modelo_id = is_numeric( $args['modelo'] ) ? intval( $args['modelo'] )
                 : self::resolver_post_id_by_slug( $args['modelo'], 'welow_modelo' );
@@ -411,7 +413,7 @@ class Welow_Helpers {
             }
         }
 
-        // Marca → encuentra todos los modelos de esa marca y filtra coches
+        // Marca oficial (catálogo) → encuentra modelos y filtra (solo nuevos)
         if ( $args['marca'] ) {
             $marca_id = self::resolver_marca_id( $args['marca'] );
             if ( $marca_id ) {
@@ -433,7 +435,13 @@ class Welow_Helpers {
             }
         }
 
-        // Concesionario
+        // Marca externa (taxonomía, solo aplica a ocasión)
+        if ( $args['marca_externa'] ) {
+            $query_args['tax_query'][] = array(
+                'taxonomy' => 'welow_marca_externa', 'field' => 'slug', 'terms' => $args['marca_externa'],
+            );
+        }
+
         if ( $args['concesionario'] ) {
             $conc_id = is_numeric( $args['concesionario'] ) ? intval( $args['concesionario'] )
                 : self::resolver_post_id_by_slug( $args['concesionario'], 'welow_concesionario' );
@@ -444,7 +452,6 @@ class Welow_Helpers {
             }
         }
 
-        // Filtros numéricos
         if ( $args['precio_min'] !== '' && $args['precio_min'] > 0 ) {
             $query_args['meta_query'][] = array(
                 'key' => '_welow_coche_precio_contado', 'value' => floatval( $args['precio_min'] ),
@@ -470,7 +477,6 @@ class Welow_Helpers {
             );
         }
 
-        // Taxonomías
         if ( $args['combustible'] ) {
             $query_args['tax_query'][] = array(
                 'taxonomy' => 'welow_combustible', 'field' => 'slug', 'terms' => $args['combustible'],
@@ -482,7 +488,6 @@ class Welow_Helpers {
             );
         }
 
-        // Orden
         switch ( $args['orden'] ) {
             case 'precio_asc':
                 $query_args['meta_key'] = '_welow_coche_precio_contado';
@@ -514,6 +519,34 @@ class Welow_Helpers {
     }
 
     /**
+     * Atajo: solo coches nuevos.
+     * @since 2.1.0
+     */
+    public static function get_coches_nuevos( $args = array() ) {
+        $args['cpt'] = 'welow_coche_nuevo';
+        return self::get_coches( $args );
+    }
+
+    /**
+     * Atajo: solo coches de ocasión / KM0.
+     * @since 2.1.0
+     */
+    public static function get_coches_ocasion( $args = array() ) {
+        $args['cpt'] = 'welow_coche_ocasion';
+        return self::get_coches( $args );
+    }
+
+    /**
+     * Devuelve true si el coche es nuevo, false si es de ocasión, null si no es coche.
+     */
+    public static function es_coche_nuevo( $coche_id ) {
+        $type = get_post_type( $coche_id );
+        if ( 'welow_coche_nuevo' === $type ) return true;
+        if ( 'welow_coche_ocasion' === $type ) return false;
+        return null;
+    }
+
+    /**
      * @since 2.0.0
      */
     public static function get_coche_meta( $coche_id, $key, $default = '' ) {
@@ -522,21 +555,64 @@ class Welow_Helpers {
     }
 
     /**
-     * Devuelve el WP_Post del modelo asociado al coche.
+     * Devuelve el WP_Post del modelo asociado (solo coches nuevos).
      */
     public static function get_coche_modelo( $coche_id ) {
+        if ( ! self::es_coche_nuevo( $coche_id ) ) return null;
         $modelo_id = self::get_coche_meta( $coche_id, 'modelo' );
         return $modelo_id ? get_post( $modelo_id ) : null;
     }
 
     /**
-     * Devuelve el WP_Post de la marca asociada (vía modelo).
+     * Devuelve el WP_Post de la marca asociada (vía modelo, solo coches nuevos).
      */
     public static function get_coche_marca( $coche_id ) {
         $modelo = self::get_coche_modelo( $coche_id );
         if ( ! $modelo ) return null;
         $marca_id = get_post_meta( $modelo->ID, '_welow_modelo_marca', true );
         return $marca_id ? get_post( $marca_id ) : null;
+    }
+
+    /**
+     * Devuelve el nombre legible de la marca según el CPT del coche.
+     *
+     * @since 2.1.0
+     * @return string
+     */
+    public static function get_coche_marca_nombre( $coche_id ) {
+        $es_nuevo = self::es_coche_nuevo( $coche_id );
+        if ( null === $es_nuevo ) return '';
+
+        if ( $es_nuevo ) {
+            $marca = self::get_coche_marca( $coche_id );
+            return $marca ? $marca->post_title : '';
+        }
+
+        // Ocasión: marca desde taxonomía welow_marca_externa
+        $terms = wp_get_post_terms( $coche_id, 'welow_marca_externa' );
+        if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+            return $terms[0]->name;
+        }
+        return '';
+    }
+
+    /**
+     * Devuelve el nombre legible del modelo según el CPT del coche.
+     *
+     * @since 2.1.0
+     * @return string
+     */
+    public static function get_coche_modelo_nombre( $coche_id ) {
+        $es_nuevo = self::es_coche_nuevo( $coche_id );
+        if ( null === $es_nuevo ) return '';
+
+        if ( $es_nuevo ) {
+            $modelo = self::get_coche_modelo( $coche_id );
+            return $modelo ? $modelo->post_title : '';
+        }
+
+        // Ocasión: texto libre
+        return self::get_coche_meta( $coche_id, 'modelo_texto', '' );
     }
 
     /**
@@ -561,42 +637,59 @@ class Welow_Helpers {
     }
 
     /**
-     * Datos completos para la ficha del coche.
+     * Datos completos para la ficha del coche. Detecta el CPT automáticamente.
+     *
+     * @since 2.0.0
+     * @version 2.1.0 — Soporte para ambos CPTs.
      */
     public static function get_coche_ficha_data( $coche_id ) {
         $coche = get_post( $coche_id );
-        if ( ! $coche || 'welow_coche' !== $coche->post_type ) return null;
+        if ( ! $coche ) return null;
 
-        $modelo = self::get_coche_modelo( $coche_id );
-        $marca  = self::get_coche_marca( $coche_id );
+        $es_nuevo = self::es_coche_nuevo( $coche_id );
+        if ( null === $es_nuevo ) return null;
+
+        // Marca y modelo (texto legible) según CPT
+        $marca_nombre  = self::get_coche_marca_nombre( $coche_id );
+        $modelo_nombre = self::get_coche_modelo_nombre( $coche_id );
+
+        // Para nuevos: WP_Posts de marca y modelo (si existen). Para ocasión: null.
+        $modelo = $es_nuevo ? self::get_coche_modelo( $coche_id ) : null;
+        $marca  = $es_nuevo ? self::get_coche_marca( $coche_id ) : null;
 
         $combustibles = wp_get_post_terms( $coche_id, 'welow_combustible' );
         $carrocerias  = wp_get_post_terms( $coche_id, 'welow_categoria_modelo' );
 
-        // Si el coche no tiene combustible/carrocería propios, intentar heredar del modelo
-        if ( empty( $combustibles ) && ! is_wp_error( $combustibles ) && $modelo ) {
-            $combustibles = wp_get_post_terms( $modelo->ID, 'welow_combustible' );
-        }
-        if ( empty( $carrocerias ) && ! is_wp_error( $carrocerias ) && $modelo ) {
-            $carrocerias = wp_get_post_terms( $modelo->ID, 'welow_categoria_modelo' );
+        // Si nuevo y no tiene combustible/carrocería propios, hereda del modelo del catálogo
+        if ( $es_nuevo && $modelo ) {
+            if ( empty( $combustibles ) && ! is_wp_error( $combustibles ) ) {
+                $combustibles = wp_get_post_terms( $modelo->ID, 'welow_combustible' );
+            }
+            if ( empty( $carrocerias ) && ! is_wp_error( $carrocerias ) ) {
+                $carrocerias = wp_get_post_terms( $modelo->ID, 'welow_categoria_modelo' );
+            }
         }
 
-        // Plazas: si el coche no tiene, hereda del modelo
+        // Plazas: si nuevo y no tiene, hereda del modelo
         $plazas = self::get_coche_meta( $coche_id, 'plazas' );
-        if ( '' === $plazas && $modelo ) {
+        if ( '' === $plazas && $es_nuevo && $modelo ) {
             $plazas = get_post_meta( $modelo->ID, '_welow_modelo_plazas', true );
         }
 
         return array(
-            'id'           => $coche_id,
-            'post'         => $coche,
-            'modelo'       => $modelo,
-            'marca'        => $marca,
-            'combustibles' => is_wp_error( $combustibles ) ? array() : $combustibles,
-            'carrocerias'  => is_wp_error( $carrocerias ) ? array() : $carrocerias,
-            'plazas'       => $plazas,
-            'galeria'      => self::get_coche_galeria( $coche_id ),
-            'disclaimer'   => self::get_coche_disclaimer( $coche_id ),
+            'id'               => $coche_id,
+            'post'             => $coche,
+            'es_nuevo'         => $es_nuevo,
+            'cpt'              => $coche->post_type,
+            'modelo'           => $modelo,                // WP_Post o null
+            'marca'            => $marca,                 // WP_Post o null
+            'marca_nombre'     => $marca_nombre,
+            'modelo_nombre'    => $modelo_nombre,
+            'combustibles'     => is_wp_error( $combustibles ) ? array() : $combustibles,
+            'carrocerias'      => is_wp_error( $carrocerias ) ? array() : $carrocerias,
+            'plazas'           => $plazas,
+            'galeria'          => self::get_coche_galeria( $coche_id ),
+            'disclaimer'       => self::get_coche_disclaimer( $coche_id ),
             'concesionario_id' => self::get_coche_meta( $coche_id, 'concesionario' ),
         );
     }
@@ -662,9 +755,10 @@ class Welow_Helpers {
     }
 
     /**
-     * Detecta el coche actual del contexto (single de welow_coche).
+     * Detecta el coche actual del contexto (single de welow_coche_nuevo o _ocasion).
      *
      * @since 2.0.0
+     * @version 2.1.0 — Detecta los dos CPTs.
      */
     public static function get_current_coche_id() {
         $forced = apply_filters( 'welow_current_coche_id', null );
@@ -677,7 +771,8 @@ class Welow_Helpers {
         }
         if ( ! $post_id ) return false;
 
-        return ( 'welow_coche' === get_post_type( $post_id ) ) ? $post_id : false;
+        $type = get_post_type( $post_id );
+        return ( in_array( $type, array( 'welow_coche_nuevo', 'welow_coche_ocasion' ), true ) ) ? $post_id : false;
     }
 
     // =========================================================================

@@ -1,20 +1,18 @@
 <?php
 /**
- * Template: Grid de coches.
+ * Template: Grid de coches de OCASIÓN / KM0.
  *
  * @var WP_Post[] $coches
- * @var int       $columnas
- * @var int       $columnas_tablet
- * @var int       $columnas_movil
+ * @var int       $columnas, $columnas_tablet, $columnas_movil
  *
- * @since 2.0.0
+ * @since 2.1.0
  * @package Welow_Concesionarios
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 $moneda = class_exists( 'Welow_Settings' ) ? Welow_Settings::get( 'moneda_simbolo', '€' ) : '€';
-$tipos_venta = Welow_CPT_Coche::get_tipo_venta_options();
+$tipos_ocasion = array( 'ocasion' => 'Ocasión', 'km0' => 'KM0' );
 ?>
 <div class="welow-coches-grid"
      style="--welow-cols: <?php echo esc_attr( $columnas ); ?>;
@@ -22,11 +20,10 @@ $tipos_venta = Welow_CPT_Coche::get_tipo_venta_options();
             --welow-cols-movil: <?php echo esc_attr( $columnas_movil ); ?>;">
 
     <?php foreach ( $coches as $coche ) :
-        $modelo = Welow_Helpers::get_coche_modelo( $coche->ID );
-        $marca  = Welow_Helpers::get_coche_marca( $coche->ID );
-
+        $marca_nom  = Welow_Helpers::get_coche_marca_nombre( $coche->ID );
+        $modelo_nom = Welow_Helpers::get_coche_modelo_nombre( $coche->ID );
         $version    = Welow_Helpers::get_coche_meta( $coche->ID, 'version' );
-        $tipo_venta = Welow_Helpers::get_coche_meta( $coche->ID, 'tipo_venta' );
+        $tipo_venta = Welow_Helpers::get_coche_meta( $coche->ID, 'tipo_venta', 'ocasion' );
         $km         = Welow_Helpers::get_coche_meta( $coche->ID, 'km' );
         $anio       = Welow_Helpers::get_coche_meta( $coche->ID, 'anio_matricula' );
         $cv         = Welow_Helpers::get_coche_meta( $coche->ID, 'cv' );
@@ -37,11 +34,11 @@ $tipos_venta = Welow_CPT_Coche::get_tipo_venta_options();
         $combustibles = wp_get_post_terms( $coche->ID, 'welow_combustible' );
         $combustible_label = ! empty( $combustibles ) && ! is_wp_error( $combustibles ) ? $combustibles[0]->name : '';
 
-        $img = get_the_post_thumbnail_url( $coche->ID, 'large' );
+        $img       = get_the_post_thumbnail_url( $coche->ID, 'large' );
         $permalink = get_permalink( $coche->ID );
+        $titulo    = trim( $marca_nom . ' ' . $modelo_nom );
 
-        $titulo = ( $marca ? $marca->post_title . ' ' : '' ) . ( $modelo ? $modelo->post_title : '' );
-        $tipo_class = 'welow-tipo-' . sanitize_html_class( $tipo_venta );
+        $tipo_label = $tipos_ocasion[ $tipo_venta ] ?? 'Ocasión';
     ?>
         <article class="welow-coche-card">
 
@@ -51,12 +48,9 @@ $tipos_venta = Welow_CPT_Coche::get_tipo_venta_options();
                 <?php else : ?>
                     <span class="welow-coche-card__placeholder dashicons dashicons-car"></span>
                 <?php endif; ?>
-
-                <?php if ( $tipo_venta && isset( $tipos_venta[ $tipo_venta ] ) ) : ?>
-                    <span class="welow-coche-tipo <?php echo esc_attr( $tipo_class ); ?>">
-                        <?php echo esc_html( $tipos_venta[ $tipo_venta ] ); ?>
-                    </span>
-                <?php endif; ?>
+                <span class="welow-coche-tipo welow-tipo-<?php echo esc_attr( $tipo_venta ); ?>">
+                    <?php echo esc_html( $tipo_label ); ?>
+                </span>
             </a>
 
             <div class="welow-coche-card__body">
@@ -79,7 +73,7 @@ $tipos_venta = Welow_CPT_Coche::get_tipo_venta_options();
                         <li><?php echo esc_html( $combustible_label ); ?></li>
                     <?php endif; ?>
                     <?php if ( $cambio ) :
-                        $cambios = Welow_CPT_Coche::get_cambio_options();
+                        $cambios = Welow_CPT_Coche_Base::get_cambio_options();
                     ?>
                         <li><?php echo esc_html( $cambios[ $cambio ] ?? $cambio ); ?></li>
                     <?php endif; ?>

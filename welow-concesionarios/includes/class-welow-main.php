@@ -4,7 +4,7 @@
  *
  * @package Welow_Concesionarios
  * @since 1.0.0
- * @version 2.0.0
+ * @version 2.1.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -30,8 +30,9 @@ class Welow_Main {
         Welow_Divi_Library_Admin::init();      // v1.4.0
 
         // Taxonomías
-        Welow_Tax_Combustible::init();        // v1.1.0
-        Welow_Tax_Categoria_Modelo::init();   // v1.2.0
+        Welow_Tax_Combustible::init();         // v1.1.0
+        Welow_Tax_Categoria_Modelo::init();    // v1.2.0
+        Welow_Tax_Marca_Externa::init();       // v2.1.0
 
         // CPTs
         Welow_CPT_Marca::init();
@@ -39,7 +40,8 @@ class Welow_Main {
         Welow_CPT_Modelo::init();
         Welow_CPT_Etiqueta::init();
         Welow_CPT_Concesionario::init();       // v2.0.0
-        Welow_CPT_Coche::init();               // v2.0.0
+        Welow_CPT_Coche_Nuevo::init();         // v2.1.0
+        Welow_CPT_Coche_Ocasion::init();       // v2.1.0
 
         // Shortcodes
         Welow_Shortcode_Marcas::init();
@@ -48,10 +50,11 @@ class Welow_Main {
         Welow_Shortcode_Slider_CTA::init();
         Welow_Shortcode_Contenido::init();
         Welow_Shortcode_Marca_Banner::init();
-        Welow_Shortcode_Divi::init();          // v1.4.0
-        Welow_Shortcode_Coches::init();        // v2.0.0
-        Welow_Shortcode_Coche_Ficha::init();   // v2.0.0
-        Welow_Shortcode_Buscador_Coches::init(); // v2.0.0
+        Welow_Shortcode_Divi::init();              // v1.4.0
+        Welow_Shortcode_Coches_Nuevos::init();     // v2.1.0
+        Welow_Shortcode_Coches_Ocasion::init();    // v2.1.0
+        Welow_Shortcode_Coche_Ficha::init();       // v2.0.0
+        Welow_Shortcode_Buscador_Coches::init();   // v2.0.0
 
         // Enqueue assets
         add_action( 'wp_enqueue_scripts', array( $this, 'registrar_assets' ) );
@@ -133,7 +136,8 @@ class Welow_Main {
         // CPTs y páginas que usan el media uploader
         $cpts_con_media = array(
             'welow_marca', 'welow_slide', 'welow_modelo', 'welow_etiqueta',
-            'welow_concesionario', 'welow_coche',  // v2.0.0
+            'welow_concesionario',                              // v2.0.0
+            'welow_coche_nuevo', 'welow_coche_ocasion',         // v2.1.0
         );
         $paginas_con_media = array(
             'concesionarios_page_welow_settings',
@@ -148,7 +152,7 @@ class Welow_Main {
         if ( $necesita_media ) {
             wp_enqueue_media();
             // jQuery UI sortable para galería del coche
-            if ( 'welow_coche' === $screen->post_type ) {
+            if ( in_array( $screen->post_type, array( 'welow_coche_nuevo', 'welow_coche_ocasion' ), true ) ) {
                 wp_enqueue_script( 'jquery-ui-sortable' );
             }
             wp_enqueue_style(

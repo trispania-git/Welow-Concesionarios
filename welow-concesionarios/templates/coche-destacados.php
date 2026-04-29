@@ -27,8 +27,8 @@ $etiqueta_dgt = Welow_Helpers::get_coche_meta( $id, 'etiqueta_dgt' );
 $combustibles = $data['combustibles'];
 $carrocerias  = $data['carrocerias'];
 
-$cambio_options = Welow_CPT_Coche::get_cambio_options();
-$dgt_options    = Welow_CPT_Coche::get_etiqueta_dgt_options();
+$cambio_options = Welow_CPT_Coche_Base::get_cambio_options();
+$dgt_options    = Welow_CPT_Coche_Base::get_etiqueta_dgt_options();
 
 // Helper inline para construir el item
 $render_item = function( $campo, $valor, $sub = '' ) {

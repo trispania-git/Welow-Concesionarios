@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.0.0
+ * Version:     2.1.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,54 @@
  *
  * CHANGELOG
  * ---------
+ * 2.1.0 — Separación clara: Coches NUEVOS vs Coches de OCASIÓN
+ *
+ *   CAMBIO ARQUITECTÓNICO:
+ *   - Eliminado el CPT único `welow_coche` de v2.0.0 (estaba mezclando
+ *     coches del catálogo oficial con ocasión, lo cual no era correcto).
+ *   - Creados DOS CPTs separados:
+ *     · welow_coche_nuevo  → catálogo oficial (relación con welow_modelo)
+ *     · welow_coche_ocasion → cualquier marca, segunda mano y KM0
+ *
+ *   COCHES NUEVOS (welow_coche_nuevo):
+ *   - Relación obligatoria con welow_modelo (catálogo del concesionario)
+ *   - Hereda carrocería, plazas y datos genéricos del modelo
+ *   - URL: /coche-nuevo/{slug}/
+ *   - Sin campos km/año (no procede para coches sin matricular)
+ *
+ *   COCHES DE OCASIÓN (welow_coche_ocasion):
+ *   - Marca por taxonomía welow_marca_externa (BMW, Audi, Renault...)
+ *   - Modelo en texto libre
+ *   - Tipo: ocasion / km0
+ *   - Campos completos de matriculación (mes, año, kilómetros)
+ *   - URL: /coche-ocasion/{slug}/
+ *
+ *   NUEVA TAXONOMÍA:
+ *   - welow_marca_externa con 20 marcas pre-cargadas
+ *   - Soporte de icono/logo por término (vía Welow_Tax_Icon_Trait)
+ *
+ *   REFACTOR:
+ *   - Clase abstracta Welow_CPT_Coche_Base con todos los campos comunes
+ *     (precio, técnicos, galería, equipamiento, garantías, comercial,
+ *      privados). Cada CPT solo define su metabox de identificación.
+ *
+ *   SHORTCODES:
+ *   - [welow_coches] (de v2.0.0) ELIMINADO
+ *   - [welow_coches_nuevos] NUEVO
+ *   - [welow_coches_ocasion] NUEVO (con filtros de tipo, km, año, etc.)
+ *   - [welow_coche_ficha id="auto"] adaptado: detecta automáticamente
+ *     si el coche es nuevo o de ocasión y muestra los datos correctos
+ *   - [welow_buscador_coches tipo="nuevos|ocasion|todos"] con filtros
+ *     adaptables al tipo
+ *
+ *   IMPORTADOR CSV:
+ *   - Dos secciones separadas: "Coches NUEVOS" y "Coches OCASIÓN"
+ *   - Plantillas CSV distintas con columnas específicas para cada tipo
+ *
+ *   COMPATIBILIDAD:
+ *   - Como en v2.0.0 no había datos cargados aún (acabamos de subirla),
+ *     este es un breaking change limpio. El CPT welow_coche desaparece.
+ *
  * 2.0.0 — Coches en venta (ocasión, KM0, nuevos) y concesionarios físicos
  *
  *   ARQUITECTURA:
@@ -122,7 +170,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.0.0' );
+define( 'WELOW_CONC_VERSION', '2.1.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
@@ -142,13 +190,17 @@ require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-marca.php';
 require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-slide.php';
 require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-modelo.php';
 require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-etiqueta.php';
-require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-concesionario.php';     // v2.0.0
-require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-coche.php';             // v2.0.0
+require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-concesionario.php';        // v2.0.0
+// CPTs de coches (v2.1.0): clase base + dos especializaciones
+require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-coche-base.php';           // v2.1.0
+require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-coche-nuevo.php';          // v2.1.0
+require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-coche-ocasion.php';        // v2.1.0
 
 // Taxonomías
 require_once WELOW_CONC_PATH . 'includes/taxonomies/trait-welow-tax-icon.php';                 // v2.0.0
-require_once WELOW_CONC_PATH . 'includes/taxonomies/class-welow-tax-combustible.php';        // v1.1.0
-require_once WELOW_CONC_PATH . 'includes/taxonomies/class-welow-tax-categoria-modelo.php';   // v1.2.0
+require_once WELOW_CONC_PATH . 'includes/taxonomies/class-welow-tax-combustible.php';          // v1.1.0
+require_once WELOW_CONC_PATH . 'includes/taxonomies/class-welow-tax-categoria-modelo.php';     // v1.2.0
+require_once WELOW_CONC_PATH . 'includes/taxonomies/class-welow-tax-marca-externa.php';        // v2.1.0
 
 // Shortcodes
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-marcas.php';
@@ -158,9 +210,10 @@ require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-slider
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-contenido.php';
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-marca-banner.php';
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-divi.php';          // v1.4.0
-require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coches.php';        // v2.0.0
-require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coche-ficha.php';   // v2.0.0
-require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-buscador-coches.php';// v2.0.0
+require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coches-nuevos.php';   // v2.1.0
+require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coches-ocasion.php';  // v2.1.0
+require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coche-ficha.php';     // v2.0.0
+require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-buscador-coches.php'; // v2.0.0
 
 // Principal
 require_once WELOW_CONC_PATH . 'includes/class-welow-main.php';
@@ -177,12 +230,15 @@ register_activation_hook( __FILE__, function() {
     Welow_CPT_Slide::registrar_cpt();
     Welow_CPT_Modelo::registrar_cpt();
     Welow_CPT_Etiqueta::registrar_cpt();
-    Welow_CPT_Concesionario::registrar_cpt();   // v2.0.0
-    Welow_CPT_Coche::registrar_cpt();           // v2.0.0
+    Welow_CPT_Concesionario::registrar_cpt();      // v2.0.0
+    Welow_CPT_Coche_Nuevo::registrar_cpt();        // v2.1.0
+    Welow_CPT_Coche_Ocasion::registrar_cpt();      // v2.1.0
     Welow_Tax_Combustible::registrar_taxonomia();
     Welow_Tax_Combustible::crear_terminos_defecto();
     Welow_Tax_Categoria_Modelo::registrar_taxonomia();
     Welow_Tax_Categoria_Modelo::crear_terminos_defecto();
+    Welow_Tax_Marca_Externa::registrar_taxonomia();      // v2.1.0
+    Welow_Tax_Marca_Externa::crear_terminos_defecto();   // v2.1.0
     flush_rewrite_rules();
 });
 

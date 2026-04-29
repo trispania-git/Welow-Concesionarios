@@ -11,14 +11,24 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-$coche  = $data['post'];
-$modelo = $data['modelo'];
-$marca  = $data['marca'];
+$coche       = $data['post'];
+$es_nuevo    = $data['es_nuevo'];
+$marca_nom   = $data['marca_nombre'];
+$modelo_nom  = $data['modelo_nombre'];
 
-$titulo = ( $marca ? $marca->post_title . ' ' : '' ) . ( $modelo ? $modelo->post_title : '' );
+$titulo  = trim( $marca_nom . ' ' . $modelo_nom );
 $version = Welow_Helpers::get_coche_meta( $coche->ID, 'version' );
 $tipo_venta = Welow_Helpers::get_coche_meta( $coche->ID, 'tipo_venta' );
-$tipos_venta = Welow_CPT_Coche::get_tipo_venta_options();
+
+// Etiqueta de tipo según CPT
+if ( $es_nuevo ) {
+    $tipo_label = 'Nuevo';
+    $tipo_class = 'nuevo';
+} else {
+    $tipos_ocasion = array( 'ocasion' => 'Ocasión', 'km0' => 'KM0' );
+    $tipo_label = $tipos_ocasion[ $tipo_venta ] ?? 'Ocasión';
+    $tipo_class = $tipo_venta ?: 'ocasion';
+}
 ?>
 <article class="welow-coche-ficha">
 
@@ -29,11 +39,9 @@ $tipos_venta = Welow_CPT_Coche::get_tipo_venta_options();
                 <p class="welow-coche-ficha__version"><?php echo esc_html( $version ); ?></p>
             <?php endif; ?>
         </div>
-        <?php if ( $tipo_venta && isset( $tipos_venta[ $tipo_venta ] ) ) : ?>
-            <span class="welow-coche-tipo welow-tipo-<?php echo esc_attr( $tipo_venta ); ?>">
-                <?php echo esc_html( $tipos_venta[ $tipo_venta ] ); ?>
-            </span>
-        <?php endif; ?>
+        <span class="welow-coche-tipo welow-tipo-<?php echo esc_attr( $tipo_class ); ?>">
+            <?php echo esc_html( $tipo_label ); ?>
+        </span>
     </header>
 
     <div class="welow-coche-ficha__layout">

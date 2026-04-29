@@ -54,12 +54,21 @@ class Welow_Admin_Menu {
 
             <div class="welow-dashboard-grid">
 
-                <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=welow_coche' ) ); ?>" class="welow-card welow-card-highlight">
+                <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=welow_coche_nuevo' ) ); ?>" class="welow-card welow-card-highlight">
                     <span class="dashicons dashicons-car"></span>
-                    <h3>Coches en venta</h3>
-                    <p>Unidades de ocasión, KM0 y nuevos.</p>
+                    <h3>Coches NUEVOS</h3>
+                    <p>Catálogo oficial. Vinculados a un modelo.</p>
                     <span class="welow-count">
-                        <?php echo post_type_exists( 'welow_coche' ) ? intval( wp_count_posts( 'welow_coche' )->publish ) : 0; ?> publicados
+                        <?php echo post_type_exists( 'welow_coche_nuevo' ) ? intval( wp_count_posts( 'welow_coche_nuevo' )->publish ) : 0; ?> publicados
+                    </span>
+                </a>
+
+                <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=welow_coche_ocasion' ) ); ?>" class="welow-card welow-card-highlight">
+                    <span class="dashicons dashicons-car"></span>
+                    <h3>Coches OCASIÓN / KM0</h3>
+                    <p>Cualquier marca. Segunda mano y KM0.</p>
+                    <span class="welow-count">
+                        <?php echo post_type_exists( 'welow_coche_ocasion' ) ? intval( wp_count_posts( 'welow_coche_ocasion' )->publish ) : 0; ?> publicados
                     </span>
                 </a>
 
@@ -74,17 +83,23 @@ class Welow_Admin_Menu {
 
                 <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=welow_marca' ) ); ?>" class="welow-card">
                     <span class="dashicons dashicons-awards"></span>
-                    <h3>Marcas</h3>
-                    <p>Gestionar las marcas del concesionario.</p>
+                    <h3>Marcas oficiales</h3>
+                    <p>Catálogo del concesionario (Toyota, Hyundai, JAECOO...).</p>
                     <span class="welow-count">
                         <?php echo intval( wp_count_posts( 'welow_marca' )->publish ); ?> publicadas
                     </span>
                 </a>
 
+                <a href="<?php echo esc_url( admin_url( 'edit-tags.php?taxonomy=welow_marca_externa&post_type=welow_coche_ocasion' ) ); ?>" class="welow-card">
+                    <span class="dashicons dashicons-tag"></span>
+                    <h3>Marcas externas</h3>
+                    <p>BMW, Audi, Renault... para coches de ocasión.</p>
+                </a>
+
                 <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=welow_modelo' ) ); ?>" class="welow-card">
                     <span class="dashicons dashicons-car"></span>
-                    <h3>Modelos</h3>
-                    <p>Gestionar modelos de vehículos por marca.</p>
+                    <h3>Modelos (catálogo)</h3>
+                    <p>Modelos genéricos de las marcas oficiales (para coches nuevos).</p>
                     <span class="welow-count">
                         <?php echo intval( wp_count_posts( 'welow_modelo' )->publish ); ?> publicados
                     </span>

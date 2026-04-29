@@ -1,11 +1,14 @@
 <?php
 /**
- * CPT: Coche (unidad concreta en venta).
+ * Clase abstracta base para CPTs de coches (nuevos y ocasión).
  *
- * Cada post = un vehículo físico individual con su km, año, fotos y precio reales.
- * Se vincula a un welow_modelo y hereda sus datos genéricos (combustible, plazas, etc.).
+ * Contiene la lógica común: precio, datos técnicos, galería, equipamiento,
+ * garantías, comercial, datos privados. Las clases hijas deben definir
+ * POST_TYPE, las labels y el metabox de identificación.
  *
- * @since 2.0.0
+ * Uso: late static binding (`static::POST_TYPE`).
+ *
+ * @since 2.1.0
  * @package Welow_Concesionarios
  */
 
@@ -13,21 +16,21 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-class Welow_CPT_Coche {
+abstract class Welow_CPT_Coche_Base {
 
-    const POST_TYPE   = 'welow_coche';
     const META_PREFIX = '_welow_coche_';
     const GALERIA_MAX = 30;
 
-    /* Opciones de selects */
+    /* Las clases hijas deben definir:
+       const POST_TYPE
+       static function get_labels()
+       static function get_args_extra()         (opcional, args extra para register_post_type)
+       static function render_metabox_identificacion( $post )
+    */
 
-    public static function get_tipo_venta_options() {
-        return array(
-            'ocasion' => 'Ocasión',
-            'km0'     => 'KM0',
-            'nuevo'   => 'Nuevo',
-        );
-    }
+    /* ========================================================================
+       OPCIONES DE SELECTS (compartidas)
+       ======================================================================== */
 
     public static function get_estado_options() {
         return array(
@@ -64,52 +67,61 @@ class Welow_CPT_Coche {
         );
     }
 
-    public static function init() {
-        add_action( 'init', array( __CLASS__, 'registrar_cpt' ) );
-        add_action( 'add_meta_boxes', array( __CLASS__, 'registrar_metaboxes' ) );
-        add_action( 'save_post_' . self::POST_TYPE, array( __CLASS__, 'guardar_meta' ), 10, 2 );
+    /* ========================================================================
+       INIT (debe llamarse desde init() de la clase hija con su POST_TYPE)
+       ======================================================================== */
 
-        add_filter( 'manage_' . self::POST_TYPE . '_posts_columns', array( __CLASS__, 'columnas_admin' ) );
-        add_action( 'manage_' . self::POST_TYPE . '_posts_custom_column', array( __CLASS__, 'contenido_columnas' ), 10, 2 );
-        add_filter( 'manage_edit-' . self::POST_TYPE . '_sortable_columns', array( __CLASS__, 'columnas_ordenables' ) );
+    /**
+     * Registra todos los hooks comunes. Debe ser invocado desde la clase hija.
+     *
+     * @param string $post_type CPT de la clase hija (no se puede usar static::POST_TYPE
+     *                          aquí porque ::class al pasar callback estático no resuelve
+     *                          late static binding en algunos contextos).
+     */
+    protected static function init_base( $post_type ) {
+        add_action( 'init', array( static::class, 'registrar_cpt' ) );
+        add_action( 'add_meta_boxes', array( static::class, 'registrar_metaboxes' ) );
+        add_action( 'save_post_' . $post_type, array( static::class, 'guardar_meta' ), 10, 2 );
+
+        add_filter( 'manage_' . $post_type . '_posts_columns', array( static::class, 'columnas_admin' ) );
+        add_action( 'manage_' . $post_type . '_posts_custom_column', array( static::class, 'contenido_columnas' ), 10, 2 );
+        add_filter( 'manage_edit-' . $post_type . '_sortable_columns', array( static::class, 'columnas_ordenables' ) );
     }
 
-    public static function registrar_cpt() {
-        $labels = array(
-            'name'                  => 'Coches',
-            'singular_name'        => 'Coche',
-            'menu_name'            => 'Coches',
-            'add_new'              => 'Añadir coche',
-            'add_new_item'         => 'Añadir nuevo coche',
-            'edit_item'            => 'Editar coche',
-            'view_item'            => 'Ver coche',
-            'all_items'            => 'Todos los coches',
-            'search_items'         => 'Buscar coches',
-            'not_found'            => 'No se encontraron coches',
-            'not_found_in_trash'   => 'No hay coches en la papelera',
-            'featured_image'       => 'Imagen principal',
-            'set_featured_image'   => 'Establecer imagen principal',
-        );
+    /* ========================================================================
+       REGISTRAR CPT (la clase hija provee labels y args_extra)
+       ======================================================================== */
 
-        $args = array(
-            'labels'              => $labels,
+    public static function registrar_cpt() {
+        $args = array_merge( array(
+            'labels'              => static::get_labels(),
             'public'              => true,
             'publicly_queryable'  => true,
             'show_ui'             => true,
             'show_in_menu'        => 'welow_concesionarios',
             'show_in_rest'        => true,
             'query_var'           => true,
-            'rewrite'             => array( 'slug' => 'coche', 'with_front' => false ),
             'capability_type'     => 'post',
             'has_archive'         => true,
             'hierarchical'        => false,
             'menu_icon'           => 'dashicons-car',
             'supports'            => array( 'title', 'thumbnail', 'excerpt' ),
             'taxonomies'          => array( 'welow_combustible', 'welow_categoria_modelo' ),
-        );
+        ), static::get_args_extra() );
 
-        register_post_type( self::POST_TYPE, $args );
+        register_post_type( static::POST_TYPE, $args );
     }
+
+    /**
+     * Por defecto sin args extra. Las clases hijas pueden override.
+     */
+    public static function get_args_extra() {
+        return array();
+    }
+
+    /* ========================================================================
+       METABOXES — REGISTRO COMÚN
+       ======================================================================== */
 
     public static function registrar_metaboxes() {
         $boxes = array(
@@ -125,108 +137,9 @@ class Welow_CPT_Coche {
 
         foreach ( $boxes as $box ) {
             add_meta_box( $box['id'], $box['titulo'],
-                array( __CLASS__, $box['callback'] ),
-                self::POST_TYPE, $box['context'], $box['priority'] );
+                array( static::class, $box['callback'] ),
+                static::POST_TYPE, $box['context'], $box['priority'] );
         }
-    }
-
-    /* ========================================================================
-       METABOX A: Identificación
-       ======================================================================== */
-    public static function render_metabox_identificacion( $post ) {
-        wp_nonce_field( 'welow_coche_save', 'welow_coche_nonce' );
-
-        $modelo_id    = get_post_meta( $post->ID, self::META_PREFIX . 'modelo', true );
-        $version      = get_post_meta( $post->ID, self::META_PREFIX . 'version', true );
-        $tipo_venta   = get_post_meta( $post->ID, self::META_PREFIX . 'tipo_venta', true );
-        $estado       = get_post_meta( $post->ID, self::META_PREFIX . 'estado', true );
-        $referencia   = get_post_meta( $post->ID, self::META_PREFIX . 'referencia', true );
-        $mes          = get_post_meta( $post->ID, self::META_PREFIX . 'mes_matricula', true );
-        $anio         = get_post_meta( $post->ID, self::META_PREFIX . 'anio_matricula', true );
-        $km           = get_post_meta( $post->ID, self::META_PREFIX . 'km', true );
-
-        if ( '' === $tipo_venta ) $tipo_venta = 'ocasion';
-        if ( '' === $estado ) $estado = 'disponible';
-
-        // Modelos para el selector, agrupados por marca
-        $modelos = get_posts( array(
-            'post_type' => 'welow_modelo', 'post_status' => 'publish',
-            'posts_per_page' => -1, 'orderby' => 'title', 'order' => 'ASC',
-        ) );
-        ?>
-        <table class="form-table welow-metabox-table">
-            <tr>
-                <th><label for="welow_coche_modelo">Modelo *</label></th>
-                <td>
-                    <select id="welow_coche_modelo" name="welow_coche_modelo" class="widefat" required>
-                        <option value="">— Seleccionar modelo —</option>
-                        <?php foreach ( $modelos as $m ) :
-                            $marca_id = get_post_meta( $m->ID, '_welow_modelo_marca', true );
-                            $marca    = $marca_id ? get_post( $marca_id ) : null;
-                            $label    = ( $marca ? $marca->post_title . ' — ' : '' ) . $m->post_title;
-                        ?>
-                            <option value="<?php echo esc_attr( $m->ID ); ?>" <?php selected( $modelo_id, $m->ID ); ?>>
-                                <?php echo esc_html( $label ); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <p class="description">El coche heredará carrocería, plazas y otros datos del modelo.</p>
-                </td>
-            </tr>
-            <tr>
-                <th><label for="welow_coche_version">Versión / Acabado</label></th>
-                <td><input type="text" id="welow_coche_version" name="welow_coche_version"
-                           value="<?php echo esc_attr( $version ); ?>" class="large-text"
-                           placeholder="ej: 1.0 VVT-I 72CV Play" /></td>
-            </tr>
-            <tr>
-                <th><label>Tipo de venta / Estado</label></th>
-                <td>
-                    <select name="welow_coche_tipo_venta">
-                        <?php foreach ( self::get_tipo_venta_options() as $key => $label ) : ?>
-                            <option value="<?php echo esc_attr( $key ); ?>" <?php selected( $tipo_venta, $key ); ?>>
-                                <?php echo esc_html( $label ); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <select name="welow_coche_estado" style="margin-left:10px;">
-                        <?php foreach ( self::get_estado_options() as $key => $label ) : ?>
-                            <option value="<?php echo esc_attr( $key ); ?>" <?php selected( $estado, $key ); ?>>
-                                <?php echo esc_html( $label ); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <th><label for="welow_coche_referencia">Referencia</label></th>
-                <td><input type="text" id="welow_coche_referencia" name="welow_coche_referencia"
-                           value="<?php echo esc_attr( $referencia ); ?>" class="regular-text"
-                           placeholder="ej: 7539" /></td>
-            </tr>
-            <tr>
-                <th><label>Matriculación</label></th>
-                <td>
-                    <select name="welow_coche_mes_matricula">
-                        <option value="">Mes</option>
-                        <?php for ( $i = 1; $i <= 12; $i++ ) : ?>
-                            <option value="<?php echo $i; ?>" <?php selected( intval($mes), $i ); ?>>
-                                <?php echo str_pad($i, 2, '0', STR_PAD_LEFT); ?>
-                            </option>
-                        <?php endfor; ?>
-                    </select>
-                    <input type="number" name="welow_coche_anio_matricula" value="<?php echo esc_attr( $anio ); ?>"
-                           min="1980" max="<?php echo intval( date( 'Y' ) ) + 1; ?>"
-                           placeholder="Año" style="width:90px;" />
-                </td>
-            </tr>
-            <tr>
-                <th><label for="welow_coche_km">Kilómetros</label></th>
-                <td><input type="number" id="welow_coche_km" name="welow_coche_km"
-                           value="<?php echo esc_attr( $km ); ?>" min="0" step="1" style="width:140px;" /> km</td>
-            </tr>
-        </table>
-        <?php
     }
 
     /* ========================================================================
@@ -279,7 +192,7 @@ class Welow_CPT_Coche {
     }
 
     /* ========================================================================
-       METABOX C: Datos técnicos básicos
+       METABOX C: Datos técnicos básicos (con cilindrada)
        ======================================================================== */
     public static function render_metabox_tecnico( $post ) {
         $cambio       = get_post_meta( $post->ID, self::META_PREFIX . 'cambio', true );
@@ -294,7 +207,7 @@ class Welow_CPT_Coche {
         $etiqueta_dgt = get_post_meta( $post->ID, self::META_PREFIX . 'etiqueta_dgt', true );
         ?>
         <p class="description" style="margin-top:0;">
-            Combustible y carrocería se gestionan en el lateral derecho (taxonomías nativas).
+            Combustible y carrocería se gestionan en el lateral derecho (taxonomías).
         </p>
         <table class="form-table welow-metabox-table">
             <tr>
@@ -319,7 +232,7 @@ class Welow_CPT_Coche {
                            min="0" step="1" placeholder="CV" style="width:90px;" /> CV
                     <input type="number" name="welow_coche_kw" value="<?php echo esc_attr( $kw ); ?>"
                            min="0" step="1" placeholder="kW" style="width:90px;margin-left:10px;" /> kW
-                    <p class="description">Si solo rellenas uno de los dos, el otro se calcula automáticamente (kW = CV × 0.7355).</p>
+                    <p class="description">Si solo rellenas uno, el otro se calcula automáticamente (kW = CV × 0.7355).</p>
                 </td>
             </tr>
             <tr>
@@ -379,7 +292,7 @@ class Welow_CPT_Coche {
         $video = get_post_meta( $post->ID, self::META_PREFIX . 'video', true );
         ?>
         <p class="description" style="margin-top:0;">
-            La <strong>imagen principal</strong> se establece como Imagen Destacada (panel lateral derecho).
+            La <strong>imagen principal</strong> se establece como Imagen Destacada (panel lateral).
             Aquí añade hasta <strong><?php echo self::GALERIA_MAX; ?> imágenes adicionales</strong>.
         </p>
 
@@ -416,7 +329,6 @@ class Welow_CPT_Coche {
                     <input type="url" id="welow_coche_video" name="welow_coche_video"
                            value="<?php echo esc_url( $video ); ?>" class="large-text"
                            placeholder="https://www.youtube.com/watch?v=..." />
-                    <p class="description">Opcional. Soporta YouTube y Vimeo.</p>
                 </td>
             </tr>
         </table>
@@ -450,9 +362,7 @@ class Welow_CPT_Coche {
             }
             .welow-galeria-remove:hover { background: #dc2626; }
             .welow-galeria-count {
-                margin-left: 15px;
-                color: #64748b;
-                font-size: 13px;
+                margin-left: 15px; color: #64748b; font-size: 13px;
             }
         </style>
 
@@ -495,8 +405,7 @@ class Welow_CPT_Coche {
                         if (current.indexOf(id) !== -1) return;
                         current.push(id);
                         var thumbUrl = att.attributes.sizes && att.attributes.sizes.thumbnail
-                            ? att.attributes.sizes.thumbnail.url
-                            : att.attributes.url;
+                            ? att.attributes.sizes.thumbnail.url : att.attributes.url;
                         $thumbs.append(
                             '<div class="welow-galeria-thumb" data-id="' + id + '">' +
                             '<img src="' + thumbUrl + '" alt="" />' +
@@ -517,7 +426,6 @@ class Welow_CPT_Coche {
                 setIds(current);
             });
 
-            // Reordenamiento por drag
             if ($.fn.sortable) {
                 $thumbs.sortable({
                     update: function(){
@@ -592,7 +500,7 @@ class Welow_CPT_Coche {
     }
 
     /* ========================================================================
-       METABOX H: Datos privados (no se muestran en frontend)
+       METABOX H: Datos privados
        ======================================================================== */
     public static function render_metabox_privados( $post ) {
         $matricula = get_post_meta( $post->ID, self::META_PREFIX . 'matricula', true );
@@ -615,25 +523,26 @@ class Welow_CPT_Coche {
     }
 
     /* ========================================================================
-       GUARDADO
+       GUARDADO COMÚN
        ======================================================================== */
     public static function guardar_meta( $post_id, $post ) {
         if ( ! isset( $_POST['welow_coche_nonce'] ) || ! wp_verify_nonce( $_POST['welow_coche_nonce'], 'welow_coche_save' ) ) return;
         if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) return;
         if ( ! current_user_can( 'edit_post', $post_id ) ) return;
 
-        // A: Identificación
-        $intfields = array( 'modelo', 'mes_matricula', 'anio_matricula', 'km' );
-        foreach ( $intfields as $f ) {
-            $val = isset( $_POST[ 'welow_coche_' . $f ] ) ? absint( $_POST[ 'welow_coche_' . $f ] ) : '';
-            update_post_meta( $post_id, self::META_PREFIX . $f, $val );
-        }
-        $textfields = array( 'version', 'tipo_venta', 'estado', 'referencia' );
-        foreach ( $textfields as $f ) {
-            $val = isset( $_POST[ 'welow_coche_' . $f ] ) ? sanitize_text_field( $_POST[ 'welow_coche_' . $f ] ) : '';
-            update_post_meta( $post_id, self::META_PREFIX . $f, $val );
-        }
+        // 1. Guardar metadatos comunes
+        self::guardar_meta_comunes( $post_id );
 
+        // 2. Permitir a la clase hija guardar su lógica específica
+        if ( method_exists( static::class, 'guardar_meta_especifico' ) ) {
+            static::guardar_meta_especifico( $post_id );
+        }
+    }
+
+    /**
+     * Guarda los metadatos comunes (precio, técnicos, galería, etc.).
+     */
+    protected static function guardar_meta_comunes( $post_id ) {
         // B: Precio
         $precios = array( 'precio_contado', 'precio_financiado', 'precio_anterior', 'cuota' );
         foreach ( $precios as $f ) {
@@ -643,14 +552,14 @@ class Welow_CPT_Coche {
         $disclaimer = isset( $_POST['welow_coche_disclaimer'] ) ? sanitize_textarea_field( $_POST['welow_coche_disclaimer'] ) : '';
         update_post_meta( $post_id, self::META_PREFIX . 'disclaimer', $disclaimer );
 
-        // C: Datos técnicos
+        // C: Datos técnicos texto
         $tecn_text = array( 'cambio', 'color', 'tipo_pintura', 'etiqueta_dgt' );
         foreach ( $tecn_text as $f ) {
             $val = isset( $_POST[ 'welow_coche_' . $f ] ) ? sanitize_text_field( $_POST[ 'welow_coche_' . $f ] ) : '';
             update_post_meta( $post_id, self::META_PREFIX . $f, $val );
         }
 
-        // CV/kW con cálculo automático si solo viene uno
+        // CV/kW con auto-cálculo
         $cv = isset( $_POST['welow_coche_cv'] ) ? floatval( $_POST['welow_coche_cv'] ) : 0;
         $kw = isset( $_POST['welow_coche_kw'] ) ? floatval( $_POST['welow_coche_kw'] ) : 0;
         if ( $cv > 0 && $kw == 0 )       $kw = round( $cv * 0.7355, 1 );
@@ -674,7 +583,7 @@ class Welow_CPT_Coche {
         $video = isset( $_POST['welow_coche_video'] ) ? esc_url_raw( $_POST['welow_coche_video'] ) : '';
         update_post_meta( $post_id, self::META_PREFIX . 'video', $video );
 
-        // E/F: WYSIWYG (permitir HTML básico)
+        // E/F: WYSIWYG
         $equipamiento = isset( $_POST['welow_coche_equipamiento'] ) ? wp_kses_post( $_POST['welow_coche_equipamiento'] ) : '';
         update_post_meta( $post_id, self::META_PREFIX . 'equipamiento', $equipamiento );
 
@@ -697,7 +606,7 @@ class Welow_CPT_Coche {
     }
 
     /* ========================================================================
-       COLUMNAS ADMIN
+       COLUMNAS ADMIN — base, las clases hijas pueden override
        ======================================================================== */
     public static function columnas_admin( $columns ) {
         $new = array();
@@ -705,9 +614,8 @@ class Welow_CPT_Coche {
             $new[ $key ] = $label;
             if ( 'title' === $key ) {
                 $new['welow_imagen']     = 'Imagen';
-                $new['welow_modelo']     = 'Modelo';
+                $new['welow_marca_modelo'] = 'Marca / Modelo';
                 $new['welow_referencia'] = 'Ref.';
-                $new['welow_tipo_venta'] = 'Tipo';
                 $new['welow_km']         = 'Km';
                 $new['welow_precio']     = 'Precio';
                 $new['welow_estado']     = 'Estado';
@@ -723,28 +631,16 @@ class Welow_CPT_Coche {
                 $thumb = get_the_post_thumbnail( $post_id, array( 60, 45 ) );
                 echo $thumb ?: '<span style="color:#ccc;">—</span>';
                 break;
-            case 'welow_modelo':
-                $modelo_id = get_post_meta( $post_id, self::META_PREFIX . 'modelo', true );
-                if ( $modelo_id ) {
-                    $modelo   = get_post( $modelo_id );
-                    $marca_id = get_post_meta( $modelo_id, '_welow_modelo_marca', true );
-                    $marca    = $marca_id ? get_post( $marca_id ) : null;
-                    echo '<a href="' . esc_url( get_edit_post_link( $modelo_id ) ) . '">';
-                    echo esc_html( ( $marca ? $marca->post_title . ' ' : '' ) . ( $modelo ? $modelo->post_title : '' ) );
-                    echo '</a>';
+            case 'welow_marca_modelo':
+                // Cada CPT decide cómo mostrar la marca/modelo
+                if ( method_exists( static::class, 'render_columna_marca_modelo' ) ) {
+                    static::render_columna_marca_modelo( $post_id );
                 } else {
-                    echo '<span style="color:#dc3232;">Sin modelo</span>';
+                    echo '—';
                 }
                 break;
             case 'welow_referencia':
                 echo esc_html( get_post_meta( $post_id, self::META_PREFIX . 'referencia', true ) ?: '—' );
-                break;
-            case 'welow_tipo_venta':
-                $tv = get_post_meta( $post_id, self::META_PREFIX . 'tipo_venta', true );
-                $tvs = self::get_tipo_venta_options();
-                $color_map = array( 'ocasion' => '#3b82f6', 'km0' => '#10b981', 'nuevo' => '#f59e0b' );
-                $bg = isset( $color_map[ $tv ] ) ? $color_map[ $tv ] : '#64748b';
-                echo $tv ? '<span style="background:' . $bg . ';color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase;">' . esc_html( $tvs[ $tv ] ?? $tv ) . '</span>' : '—';
                 break;
             case 'welow_km':
                 $km = get_post_meta( $post_id, self::META_PREFIX . 'km', true );
