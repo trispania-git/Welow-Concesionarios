@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.2.1
+ * Version:     2.3.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,31 @@
  *
  * CHANGELOG
  * ---------
+ * 2.3.0 — Catálogo completo de marcas externas (99 marcas)
+ *   - Ampliada la lista de marcas pre-cargadas de 20 a 99 (catálogo
+ *     completo del mercado: Abarth, Acura, Aeolus, Aion, Aiways,
+ *     Alfa Romeo, Alpina, Alpine, Aston Martin, Audi, Aurus, BAIC,
+ *     Bentley, BMW, Bugatti, Buick, BYD, Cadillac, Caterham, Changan,
+ *     Chery, Chevrolet, Chrysler, Citroën, Cupra, Dacia, Daihatsu,
+ *     DFSK, Dodge, DS, Ferrari, Fiat, Ford, GAC, Genesis, GMC,
+ *     Great Wall, Haval, Honda, Hongqi, Hummer, Hyundai, Ineos,
+ *     Infiniti, Isuzu, Iveco, JAC, Jaguar, Jeep, Jetta, Kia,
+ *     Koenigsegg, Lada, Lamborghini, Lancia, Land Rover, Lexus,
+ *     Lincoln, Lotus, Lucid, Lynk & Co, Mahindra, Maserati, Mazda,
+ *     McLaren, Mercedes-Benz, MG, Mini, Mitsubishi, Morgan, Nio,
+ *     Nissan, Omoda, Opel, Pagani, Peugeot, Polestar, Porsche, RAM,
+ *     Renault, Rivian, Rolls-Royce, Saab, SEAT, Škoda, Smart,
+ *     SsangYong (KGM), Subaru, Suzuki, Tata, Tesla, Toyota, Vauxhall,
+ *     VinFast, Volkswagen, Volvo, Wuling, XPeng, Zeekr).
+ *   - Nuevo método público `Welow_Tax_Marca_Externa::get_marcas_catalogo()`
+ *     que devuelve el array completo de slug => nombre.
+ *   - `crear_terminos_defecto()` ahora devuelve resumen `[creadas, existentes]`.
+ *   - Nuevo botón en Configuraciones "Cargar las 99 marcas del catálogo":
+ *     idempotente (solo añade las que faltan, no toca las existentes).
+ *     Tras cargar muestra aviso con cuántas se crearon y cuántas ya estaban.
+ *   - El botón también ejecuta sincronización de marcas oficiales por si
+ *     alguna se desligó.
+ *
  * 2.2.1 — Mejora UX: enlace "Gestionar marcas externas" en Configuraciones
  *   - Añadido botón de acceso rápido a la taxonomía welow_marca_externa
  *     en la página Configuraciones del plugin (junto a etiquetas,
@@ -216,7 +241,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.2.1' );
+define( 'WELOW_CONC_VERSION', '2.3.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

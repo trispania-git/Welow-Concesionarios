@@ -55,36 +55,144 @@ class Welow_Tax_Marca_Externa {
     }
 
     /**
-     * Términos por defecto: marcas comunes en mercado de ocasión.
+     * Listado completo de marcas conocidas en el mercado.
+     *
+     * Idempotente: las que ya existen no se tocan.
+     *
+     * @since 2.1.0
+     * @version 2.3.0 — Ampliado a 99 marcas (catálogo completo).
+     * @return array Marcas pre-cargadas: ['slug' => 'Nombre', ...]
+     */
+    public static function get_marcas_catalogo() {
+        return array(
+            'abarth'            => 'Abarth',
+            'acura'             => 'Acura',
+            'aeolus'            => 'Aeolus',
+            'aion'              => 'Aion',
+            'aiways'            => 'Aiways',
+            'alfa-romeo'        => 'Alfa Romeo',
+            'alpina'            => 'Alpina',
+            'alpine'            => 'Alpine',
+            'aston-martin'      => 'Aston Martin',
+            'audi'              => 'Audi',
+            'aurus'             => 'Aurus',
+            'baic'              => 'BAIC',
+            'bentley'           => 'Bentley',
+            'bmw'               => 'BMW',
+            'bugatti'           => 'Bugatti',
+            'buick'             => 'Buick',
+            'byd'               => 'BYD',
+            'cadillac'          => 'Cadillac',
+            'caterham'          => 'Caterham',
+            'changan'           => 'Changan',
+            'chery'             => 'Chery',
+            'chevrolet'         => 'Chevrolet',
+            'chrysler'          => 'Chrysler',
+            'citroen'           => 'Citroën',
+            'cupra'             => 'Cupra',
+            'dacia'             => 'Dacia',
+            'daihatsu'          => 'Daihatsu',
+            'dfsk'              => 'DFSK',
+            'dodge'             => 'Dodge',
+            'ds'                => 'DS',
+            'ferrari'           => 'Ferrari',
+            'fiat'              => 'Fiat',
+            'ford'              => 'Ford',
+            'gac'               => 'GAC',
+            'genesis'           => 'Genesis',
+            'gmc'               => 'GMC',
+            'great-wall'        => 'Great Wall',
+            'haval'             => 'Haval',
+            'honda'             => 'Honda',
+            'hongqi'            => 'Hongqi',
+            'hummer'            => 'Hummer',
+            'hyundai'           => 'Hyundai',
+            'ineos'             => 'Ineos',
+            'infiniti'          => 'Infiniti',
+            'isuzu'             => 'Isuzu',
+            'iveco'             => 'Iveco',
+            'jac'               => 'JAC',
+            'jaguar'            => 'Jaguar',
+            'jeep'              => 'Jeep',
+            'jetta'             => 'Jetta',
+            'kia'               => 'Kia',
+            'koenigsegg'        => 'Koenigsegg',
+            'lada'              => 'Lada',
+            'lamborghini'       => 'Lamborghini',
+            'lancia'            => 'Lancia',
+            'land-rover'        => 'Land Rover',
+            'lexus'             => 'Lexus',
+            'lincoln'           => 'Lincoln',
+            'lotus'             => 'Lotus',
+            'lucid'             => 'Lucid',
+            'lynk-co'           => 'Lynk & Co',
+            'mahindra'          => 'Mahindra',
+            'maserati'          => 'Maserati',
+            'mazda'             => 'Mazda',
+            'mclaren'           => 'McLaren',
+            'mercedes-benz'     => 'Mercedes-Benz',
+            'mg'                => 'MG',
+            'mini'              => 'Mini',
+            'mitsubishi'        => 'Mitsubishi',
+            'morgan'            => 'Morgan',
+            'nio'               => 'Nio',
+            'nissan'            => 'Nissan',
+            'omoda'             => 'Omoda',
+            'opel'              => 'Opel',
+            'pagani'            => 'Pagani',
+            'peugeot'           => 'Peugeot',
+            'polestar'          => 'Polestar',
+            'porsche'           => 'Porsche',
+            'ram'               => 'RAM',
+            'renault'           => 'Renault',
+            'rivian'            => 'Rivian',
+            'rolls-royce'       => 'Rolls-Royce',
+            'saab'              => 'Saab',
+            'seat'              => 'SEAT',
+            'skoda'             => 'Škoda',
+            'smart'             => 'Smart',
+            'ssangyong-kgm'     => 'SsangYong (KGM)',
+            'subaru'            => 'Subaru',
+            'suzuki'            => 'Suzuki',
+            'tata'              => 'Tata',
+            'tesla'             => 'Tesla',
+            'toyota'            => 'Toyota',
+            'vauxhall'          => 'Vauxhall',
+            'vinfast'           => 'VinFast',
+            'volkswagen'        => 'Volkswagen',
+            'volvo'             => 'Volvo',
+            'wuling'            => 'Wuling',
+            'xpeng'             => 'XPeng',
+            'zeekr'             => 'Zeekr',
+        );
+    }
+
+    /**
+     * Términos por defecto: marcas conocidas en el mercado.
+     *
+     * Idempotente: solo añade las que NO existen. Las que ya están (creadas
+     * por el editor o sincronizadas con marcas oficiales) no se tocan.
+     *
+     * @since 2.1.0
+     * @version 2.3.0 — Refactor para usar get_marcas_catalogo().
+     * @return array Resumen: ['creadas' => int, 'existentes' => int]
      */
     public static function crear_terminos_defecto() {
-        $terminos_defecto = array(
-            'bmw'           => 'BMW',
-            'audi'          => 'Audi',
-            'mercedes-benz' => 'Mercedes-Benz',
-            'volkswagen'    => 'Volkswagen',
-            'seat'          => 'SEAT',
-            'renault'       => 'Renault',
-            'citroen'       => 'Citroën',
-            'peugeot'       => 'Peugeot',
-            'ford'          => 'Ford',
-            'opel'          => 'Opel',
-            'fiat'          => 'Fiat',
-            'skoda'         => 'Škoda',
-            'mini'          => 'MINI',
-            'kia'           => 'Kia',
-            'mazda'         => 'Mazda',
-            'honda'         => 'Honda',
-            'volvo'         => 'Volvo',
-            'dacia'         => 'Dacia',
-            'jeep'          => 'Jeep',
-            'land-rover'    => 'Land Rover',
-        );
+        $marcas = self::get_marcas_catalogo();
+        $creadas = 0;
+        $existentes = 0;
 
-        foreach ( $terminos_defecto as $slug => $nombre ) {
-            if ( ! term_exists( $slug, self::TAXONOMY ) ) {
-                wp_insert_term( $nombre, self::TAXONOMY, array( 'slug' => $slug ) );
+        foreach ( $marcas as $slug => $nombre ) {
+            if ( term_exists( $slug, self::TAXONOMY ) ) {
+                $existentes++;
+                continue;
+            }
+            $r = wp_insert_term( $nombre, self::TAXONOMY, array( 'slug' => $slug ) );
+            if ( ! is_wp_error( $r ) ) {
+                $creadas++;
             }
         }
+
+        return array( 'creadas' => $creadas, 'existentes' => $existentes );
     }
 }

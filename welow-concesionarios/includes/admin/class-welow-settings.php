@@ -19,6 +19,55 @@ class Welow_Settings {
     public static function init() {
         add_action( 'admin_menu', array( __CLASS__, 'registrar_pagina' ) );
         add_action( 'admin_init', array( __CLASS__, 'registrar_campos' ) );
+        add_action( 'admin_post_welow_cargar_marcas_externas', array( __CLASS__, 'cargar_marcas_externas' ) );
+        add_action( 'admin_notices', array( __CLASS__, 'mostrar_aviso_carga_marcas' ) );
+    }
+
+    /**
+     * Handler del botón "Cargar marcas externas por defecto".
+     * Carga las 99 marcas pre-cargadas del catálogo (idempotente).
+     *
+     * @since 2.3.0
+     */
+    public static function cargar_marcas_externas() {
+        if ( ! current_user_can( 'manage_options' ) ) wp_die( 'No autorizado' );
+        check_admin_referer( 'welow_cargar_marcas_externas' );
+
+        $resumen = array( 'creadas' => 0, 'existentes' => 0 );
+        if ( class_exists( 'Welow_Tax_Marca_Externa' ) ) {
+            $resumen = Welow_Tax_Marca_Externa::crear_terminos_defecto();
+        }
+
+        // También sincronizamos las marcas oficiales por si acaso
+        if ( class_exists( 'Welow_Marca_Sync' ) ) {
+            Welow_Marca_Sync::sincronizar_todas();
+        }
+
+        set_transient( 'welow_marcas_carga_resumen_' . get_current_user_id(), $resumen, 60 );
+
+        wp_safe_redirect( admin_url( 'admin.php?page=' . self::PAGE_SLUG ) );
+        exit;
+    }
+
+    /**
+     * Muestra el aviso del resultado tras cargar marcas.
+     */
+    public static function mostrar_aviso_carga_marcas() {
+        $screen = get_current_screen();
+        if ( ! $screen || false === strpos( $screen->id, 'welow_settings' ) ) return;
+
+        $key = 'welow_marcas_carga_resumen_' . get_current_user_id();
+        $resumen = get_transient( $key );
+        if ( ! $resumen ) return;
+
+        delete_transient( $key );
+
+        $msg = sprintf(
+            'Marcas externas cargadas: <strong>%d nuevas</strong>, %d ya existían (no se han tocado).',
+            intval( $resumen['creadas'] ?? 0 ),
+            intval( $resumen['existentes'] ?? 0 )
+        );
+        echo '<div class="notice notice-success is-dismissible"><p>' . wp_kses_post( $msg ) . '</p></div>';
     }
 
     public static function registrar_pagina() {
@@ -162,6 +211,39 @@ class Welow_Settings {
             </form>
 
             <hr>
+
+            <?php
+            // v2.3.0 — Bloque de carga masiva de marcas externas
+            $count_marcas_externas = 0;
+            if ( taxonomy_exists( 'welow_marca_externa' ) ) {
+                $terms_count = wp_count_terms( array( 'taxonomy' => 'welow_marca_externa', 'hide_empty' => false ) );
+                if ( ! is_wp_error( $terms_count ) ) {
+                    $count_marcas_externas = intval( $terms_count );
+                }
+            }
+            $total_catalogo = class_exists( 'Welow_Tax_Marca_Externa' ) ? count( Welow_Tax_Marca_Externa::get_marcas_catalogo() ) : 99;
+            ?>
+            <div style="background:#f0f9ff;border:1px solid #7dd3fc;border-radius:8px;padding:16px 20px;margin-bottom:20px;">
+                <h3 style="margin-top:0;">📋 Catálogo de marcas externas</h3>
+                <p style="margin-bottom:12px;">
+                    El plugin trae un catálogo de <strong><?php echo esc_html( $total_catalogo ); ?> marcas pre-cargadas</strong>
+                    (Abarth, BMW, Audi, Mercedes-Benz, Renault, etc.) listas para usar en coches de ocasión.
+                    Actualmente tienes <strong><?php echo esc_html( $count_marcas_externas ); ?> marcas externas</strong> en la base de datos.
+                </p>
+                <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline;">
+                    <?php wp_nonce_field( 'welow_cargar_marcas_externas' ); ?>
+                    <input type="hidden" name="action" value="welow_cargar_marcas_externas">
+                    <button type="submit" class="button button-primary">
+                        <span class="dashicons dashicons-download" style="margin-top:4px;"></span>
+                        Cargar las <?php echo esc_html( $total_catalogo ); ?> marcas del catálogo
+                    </button>
+                </form>
+                <p class="description" style="margin-top:10px;">
+                    <em>Es seguro pulsarlo varias veces: solo se añaden las marcas que <strong>no</strong> existan ya.
+                    No se modifica ninguna marca existente ni se borra nada.</em>
+                </p>
+            </div>
+
             <h2>Accesos rápidos</h2>
             <p>
                 <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=welow_etiqueta' ) ); ?>" class="button">
