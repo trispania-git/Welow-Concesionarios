@@ -636,8 +636,15 @@ abstract class Welow_CPT_Coche_Base {
     public static function contenido_columnas( $column, $post_id ) {
         switch ( $column ) {
             case 'welow_imagen':
-                $thumb = get_the_post_thumbnail( $post_id, array( 60, 45 ) );
-                echo $thumb ?: '<span style="color:#ccc;">—</span>';
+                // v2.3.3 — usa imagen destacada o primera de galería como fallback
+                $img_id = class_exists( 'Welow_Helpers' )
+                    ? Welow_Helpers::get_coche_imagen_principal_id( $post_id )
+                    : get_post_thumbnail_id( $post_id );
+                if ( $img_id ) {
+                    echo wp_get_attachment_image( $img_id, array( 60, 45 ), false, array( 'style' => 'border-radius:4px;object-fit:cover;width:60px;height:45px;' ) );
+                } else {
+                    echo '<span style="color:#ccc;">—</span>';
+                }
                 break;
             case 'welow_marca_modelo':
                 // Cada CPT decide cómo mostrar la marca/modelo

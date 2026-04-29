@@ -624,6 +624,45 @@ class Welow_Helpers {
     }
 
     /**
+     * Devuelve el ID de la imagen principal del coche.
+     *
+     * Prioridad:
+     *  1. Imagen destacada (post thumbnail)
+     *  2. Primera imagen de la galería (fallback)
+     *  3. 0 si no hay ninguna
+     *
+     * @since 2.3.3
+     * @param int $coche_id
+     * @return int Attachment ID o 0.
+     */
+    public static function get_coche_imagen_principal_id( $coche_id ) {
+        $thumb_id = get_post_thumbnail_id( $coche_id );
+        if ( $thumb_id ) return intval( $thumb_id );
+
+        $galeria = self::get_coche_galeria( $coche_id );
+        if ( ! empty( $galeria ) ) {
+            foreach ( $galeria as $id ) {
+                $id = intval( $id );
+                if ( $id ) return $id;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Devuelve la URL de la imagen principal del coche con fallback a galería.
+     *
+     * @since 2.3.3
+     * @param int    $coche_id
+     * @param string $size 'thumbnail', 'medium', 'large', 'full' o array.
+     * @return string URL o ''.
+     */
+    public static function get_coche_imagen_principal_url( $coche_id, $size = 'large' ) {
+        $id = self::get_coche_imagen_principal_id( $coche_id );
+        return $id ? wp_get_attachment_image_url( $id, $size ) : '';
+    }
+
+    /**
      * Disclaimer efectivo del coche (override o global).
      */
     public static function get_coche_disclaimer( $coche_id ) {

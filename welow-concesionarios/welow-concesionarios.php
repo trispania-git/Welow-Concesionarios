@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.3.2
+ * Version:     2.3.3
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,29 @@
  *
  * CHANGELOG
  * ---------
+ * 2.3.3 — Fix: imagen del coche en listados con fallback a galería
+ *
+ *   PROBLEMA:
+ *   En el listado admin de coches (Concesionarios → Coches de ocasión)
+ *   y en los grids del frontend, la columna/card "Imagen" solo usaba
+ *   la imagen destacada (Featured Image). Si el editor solo había
+ *   añadido fotos a la galería pero no había establecido una imagen
+ *   destacada, los coches aparecían sin foto.
+ *
+ *   SOLUCIÓN:
+ *   - Nuevos helpers `Welow_Helpers::get_coche_imagen_principal_id()`
+ *     y `get_coche_imagen_principal_url()` con prioridad:
+ *       1) Imagen destacada (post thumbnail)
+ *       2) Primera imagen de la galería (fallback)
+ *       3) Vacío (templates muestran placeholder)
+ *   - Aplicado en:
+ *       - Columna "Imagen" del listado admin de coches
+ *       - Card de coches-grid-nuevos.php
+ *       - Card de coches-grid-ocasion.php
+ *
+ *   La ficha individual (coche-galeria.php) ya combinaba featured +
+ *   galería automáticamente, no requiere cambios.
+ *
  * 2.3.2 — Fix: galería de coches no se guardaba al actualizar
  *
  *   PROBLEMA:
@@ -277,7 +300,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.3.2' );
+define( 'WELOW_CONC_VERSION', '2.3.3' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

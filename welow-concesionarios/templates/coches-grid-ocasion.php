@@ -34,7 +34,7 @@ $tipos_ocasion = array( 'ocasion' => 'Ocasión', 'km0' => 'KM0' );
         $combustibles = wp_get_post_terms( $coche->ID, 'welow_combustible' );
         $combustible_label = ! empty( $combustibles ) && ! is_wp_error( $combustibles ) ? $combustibles[0]->name : '';
 
-        $img       = get_the_post_thumbnail_url( $coche->ID, 'large' );
+        $img       = Welow_Helpers::get_coche_imagen_principal_url( $coche->ID, 'large' );
         $permalink = get_permalink( $coche->ID );
         $titulo    = trim( $marca_nom . ' ' . $modelo_nom );
 
