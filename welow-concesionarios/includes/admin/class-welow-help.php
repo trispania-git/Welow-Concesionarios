@@ -1,0 +1,575 @@
+<?php
+/**
+ * Página de ayuda y documentación: Concesionarios → Ayuda y shortcodes.
+ *
+ * Documentación completa de:
+ *   - Todos los shortcodes con sus parámetros y ejemplos
+ *   - Estructura del plugin (CPTs, taxonomías, relaciones)
+ *   - Importación CSV
+ *   - Endpoints REST API y shortcodes para chatbots
+ *
+ * @since 2.4.0
+ * @package Welow_Concesionarios
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+class Welow_Help {
+
+    const PAGE_SLUG = 'welow_help';
+
+    public static function init() {
+        add_action( 'admin_menu', array( __CLASS__, 'registrar_pagina' ), 100 );
+        add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
+    }
+
+    public static function registrar_pagina() {
+        add_submenu_page(
+            'welow_concesionarios',
+            'Ayuda y shortcodes',
+            'Ayuda y shortcodes',
+            'edit_posts',
+            self::PAGE_SLUG,
+            array( __CLASS__, 'render_pagina' )
+        );
+    }
+
+    public static function enqueue_scripts( $hook ) {
+        if ( strpos( $hook, self::PAGE_SLUG ) === false ) return;
+        wp_enqueue_style( 'dashicons' );
+    }
+
+    /* ========================================================================
+       DEFINICIÓN DE SHORTCODES (la fuente de verdad)
+       ======================================================================== */
+
+    public static function get_shortcodes_doc() {
+        return array(
+
+            'welow_marcas' => array(
+                'titulo' => 'Grid de logos de marcas oficiales',
+                'desc'   => 'Muestra las marcas oficiales del concesionario en grid de logos clicables que enlazan a la página individual de cada marca.',
+                'params' => array(
+                    'columnas'        => array( 'def' => '4', 'desc' => 'Columnas en desktop' ),
+                    'columnas_tablet' => array( 'def' => '3', 'desc' => 'Columnas en tablet' ),
+                    'columnas_movil'  => array( 'def' => '2', 'desc' => 'Columnas en móvil' ),
+                    'orden'           => array( 'def' => 'personalizado', 'desc' => 'personalizado | nombre' ),
+                    'max'             => array( 'def' => '-1', 'desc' => 'Número máximo de marcas' ),
+                    'variante_logo'   => array( 'def' => 'original', 'desc' => 'original | negro | blanco' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_marcas]',
+                    '[welow_marcas columnas="6" variante_logo="negro"]',
+                ),
+            ),
+
+            'welow_marcas_cards' => array(
+                'titulo' => 'Tarjetas de marcas con info',
+                'desc'   => 'Tarjetas más completas con logo, nombre, descripción corta y botón "Ver marca".',
+                'params' => array(
+                    'columnas'            => array( 'def' => '3', 'desc' => 'Columnas desktop' ),
+                    'columnas_tablet'     => array( 'def' => '2', 'desc' => 'Columnas tablet' ),
+                    'columnas_movil'      => array( 'def' => '1', 'desc' => 'Columnas móvil' ),
+                    'mostrar_descripcion' => array( 'def' => 'si', 'desc' => 'si | no' ),
+                    'texto_boton'         => array( 'def' => 'Ver marca', 'desc' => 'Texto del CTA' ),
+                    'variante_logo'       => array( 'def' => 'original', 'desc' => 'original | negro | blanco' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_marcas_cards]',
+                    '[welow_marcas_cards columnas="2" texto_boton="Descubrir"]',
+                ),
+            ),
+
+            'welow_marca_banner' => array(
+                'titulo' => 'Banner de marca (portada o zona media)',
+                'desc'   => 'Muestra el banner desktop/móvil de una marca. Auto-detecta la marca actual si no se especifica.',
+                'params' => array(
+                    'marca'  => array( 'def' => 'auto', 'desc' => 'slug | ID | "auto" (detecta del contexto)' ),
+                    'tipo'   => array( 'def' => 'portada', 'desc' => 'portada | media' ),
+                    'enlace' => array( 'def' => '', 'desc' => 'URL al hacer clic (opcional)' ),
+                    'altura' => array( 'def' => '', 'desc' => 'Altura CSS (ej: 500px)' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_marca_banner tipo="portada"]',
+                    '[welow_marca_banner marca="toyota" tipo="media"]',
+                ),
+            ),
+
+            'welow_modelos' => array(
+                'titulo' => 'Grid de modelos de una marca',
+                'desc'   => 'Muestra los modelos del catálogo de una marca con etiquetas, precio, disclaimer y combustible.',
+                'params' => array(
+                    'marca'           => array( 'def' => 'auto', 'desc' => 'slug | ID | "auto"' ),
+                    'columnas'        => array( 'def' => '3', 'desc' => '' ),
+                    'columnas_tablet' => array( 'def' => '2', 'desc' => '' ),
+                    'columnas_movil'  => array( 'def' => '1', 'desc' => '' ),
+                    'max'             => array( 'def' => '-1', 'desc' => 'Máximo de modelos' ),
+                    'texto_boton'     => array( 'def' => 'Ver modelo', 'desc' => '' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_modelos columnas="4"]',
+                    '[welow_modelos marca="hyundai" columnas="3"]',
+                ),
+            ),
+
+            'welow_slider' => array(
+                'titulo' => 'Slider de imágenes fullwidth',
+                'desc'   => 'Slider de imágenes con responsive desktop/móvil. Soporta autoplay, flechas y dots. Acepta `grupo="auto"` para detectar el slug de la marca actual y buscar grupo "{slug}-home".',
+                'params' => array(
+                    'grupo'    => array( 'def' => '', 'desc' => 'Identificador del grupo de slides (ej: toyota-home). "auto" para detección.' ),
+                    'sufijo'   => array( 'def' => 'home', 'desc' => 'Sufijo cuando grupo="auto" (ej: home, ofertas)' ),
+                    'autoplay' => array( 'def' => 'si', 'desc' => 'si | no' ),
+                    'velocidad'=> array( 'def' => '5000', 'desc' => 'ms entre slides' ),
+                    'flechas'  => array( 'def' => 'si', 'desc' => 'si | no' ),
+                    'puntos'   => array( 'def' => 'si', 'desc' => 'si | no' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_slider grupo="toyota-home"]',
+                    '[welow_slider grupo="auto"]   <!-- en página de marca, busca {slug}-home -->',
+                    '[welow_slider grupo="{marca}-ofertas"]',
+                ),
+            ),
+
+            'welow_slider_cta' => array(
+                'titulo' => 'Hero/banner con imagen de fondo + texto + botón',
+                'desc'   => 'Sección hero con imagen fondo (responsive desktop/móvil), título, texto y CTA.',
+                'params' => array(
+                    'imagen'       => array( 'def' => '', 'desc' => 'ID imagen desktop' ),
+                    'imagen_movil' => array( 'def' => '', 'desc' => 'ID imagen móvil (fallback al desktop)' ),
+                    'titulo'       => array( 'def' => '', 'desc' => 'Título principal' ),
+                    'texto'        => array( 'def' => '', 'desc' => 'Texto descriptivo' ),
+                    'boton_texto'  => array( 'def' => '', 'desc' => 'Texto del botón' ),
+                    'boton_enlace' => array( 'def' => '', 'desc' => 'URL del botón' ),
+                    'overlay'      => array( 'def' => 'rgba(0,0,0,0.4)', 'desc' => 'Color overlay CSS' ),
+                    'alineacion'   => array( 'def' => 'centro', 'desc' => 'centro | izquierda | derecha' ),
+                    'altura'       => array( 'def' => '500px', 'desc' => 'Altura desktop' ),
+                    'altura_movil' => array( 'def' => '350px', 'desc' => 'Altura móvil' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_slider_cta imagen="123" titulo="Ofertas" boton_texto="Ver" boton_enlace="/ofertas"]',
+                ),
+            ),
+
+            'welow_contenido' => array(
+                'titulo' => 'Sección de contenido flexible',
+                'desc'   => 'Sección con título, texto, imagen y botón. 4 layouts. Soporta texto entre tags de apertura/cierre.',
+                'params' => array(
+                    'titulo'       => array( 'def' => '', 'desc' => 'Título' ),
+                    'imagen'       => array( 'def' => '', 'desc' => 'ID imagen' ),
+                    'imagen_movil' => array( 'def' => '', 'desc' => 'ID imagen móvil' ),
+                    'layout'       => array( 'def' => 'imagen-derecha', 'desc' => 'imagen-derecha | imagen-izquierda | imagen-arriba | solo-texto' ),
+                    'boton_texto'  => array( 'def' => '', 'desc' => '' ),
+                    'boton_enlace' => array( 'def' => '', 'desc' => '' ),
+                    'fondo'        => array( 'def' => 'transparente', 'desc' => 'Color fondo' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_contenido titulo="Sobre Toyota" imagen="456" layout="imagen-derecha"]Texto aquí[/welow_contenido]',
+                ),
+            ),
+
+            'welow_divi' => array(
+                'titulo' => 'Insertar layout de la Biblioteca Divi',
+                'desc'   => 'Inserta cualquier sección/fila/módulo guardado en la Biblioteca de Divi.',
+                'params' => array(
+                    'id'       => array( 'def' => '', 'desc' => 'ID del layout' ),
+                    'slug'     => array( 'def' => '', 'desc' => 'Slug del layout' ),
+                    'nombre'   => array( 'def' => '', 'desc' => 'Título del layout' ),
+                    'envolver' => array( 'def' => 'no', 'desc' => 'si | no — wrapper div con clase' ),
+                    'clase'    => array( 'def' => '', 'desc' => 'Clase CSS adicional' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_divi id="123"]',
+                    '[welow_divi slug="hero-marca" envolver="si"]',
+                ),
+            ),
+
+            'welow_coches_nuevos' => array(
+                'titulo' => 'Grid de coches NUEVOS',
+                'desc'   => 'Listado de coches nuevos del catálogo oficial. Auto-detecta marca si está en página de marca.',
+                'params' => array(
+                    'marca'         => array( 'def' => 'auto', 'desc' => 'slug | ID | "auto"' ),
+                    'modelo'        => array( 'def' => '', 'desc' => 'slug del modelo' ),
+                    'combustible'   => array( 'def' => '', 'desc' => 'slug taxonomía' ),
+                    'carroceria'    => array( 'def' => '', 'desc' => 'slug taxonomía' ),
+                    'concesionario' => array( 'def' => '', 'desc' => 'slug del concesionario' ),
+                    'precio_min'    => array( 'def' => '', 'desc' => 'Precio mínimo' ),
+                    'precio_max'    => array( 'def' => '', 'desc' => 'Precio máximo' ),
+                    'estado'        => array( 'def' => 'disponible', 'desc' => 'disponible | reservado | vendido | todos' ),
+                    'orden'         => array( 'def' => 'recientes', 'desc' => 'precio_asc | precio_desc | recientes' ),
+                    'columnas'      => array( 'def' => '3', 'desc' => '' ),
+                    'max'           => array( 'def' => '12', 'desc' => '' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_coches_nuevos columnas="4"]',
+                    '[welow_coches_nuevos marca="toyota" max="6"]',
+                ),
+            ),
+
+            'welow_coches_ocasion' => array(
+                'titulo' => 'Grid de coches OCASIÓN / KM0',
+                'desc'   => 'Listado de coches de ocasión y KM0 con filtros completos.',
+                'params' => array(
+                    'marca_externa' => array( 'def' => '', 'desc' => 'slug taxonomía welow_marca_externa' ),
+                    'tipo'          => array( 'def' => 'todos', 'desc' => 'ocasion | km0 | todos' ),
+                    'combustible'   => array( 'def' => '', 'desc' => '' ),
+                    'carroceria'    => array( 'def' => '', 'desc' => '' ),
+                    'precio_min'    => array( 'def' => '', 'desc' => '' ),
+                    'precio_max'    => array( 'def' => '', 'desc' => '' ),
+                    'km_max'        => array( 'def' => '', 'desc' => 'Km máximos' ),
+                    'anio_min'      => array( 'def' => '', 'desc' => 'Año mínimo' ),
+                    'estado'        => array( 'def' => 'disponible', 'desc' => '' ),
+                    'orden'         => array( 'def' => 'recientes', 'desc' => 'precio_asc | precio_desc | km_asc | anio_desc | recientes' ),
+                    'columnas'      => array( 'def' => '3', 'desc' => '' ),
+                    'max'           => array( 'def' => '12', 'desc' => '' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_coches_ocasion]',
+                    '[welow_coches_ocasion marca_externa="bmw" precio_max="20000" km_max="80000"]',
+                    '[welow_coches_ocasion tipo="km0" max="6"]',
+                ),
+            ),
+
+            'welow_coche_ficha' => array(
+                'titulo' => 'Ficha individual completa del coche',
+                'desc'   => 'Renderiza la ficha completa del coche actual o uno específico. Detecta automáticamente si es nuevo o de ocasión.',
+                'params' => array(
+                    'id'      => array( 'def' => 'auto', 'desc' => 'ID del coche o "auto" (single actual)' ),
+                    'mostrar' => array( 'def' => 'galeria,destacados,precio,equipamiento,garantias,concesionario', 'desc' => 'Bloques separados por coma' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_coche_ficha]',
+                    '[welow_coche_ficha id="123"]',
+                    '[welow_coche_ficha mostrar="galeria,precio,concesionario"]',
+                ),
+            ),
+
+            'welow_buscador_coches' => array(
+                'titulo' => 'Formulario buscador de coches',
+                'desc'   => 'Formulario de búsqueda con filtros adaptables al tipo. Envía via GET a la URL del listado.',
+                'params' => array(
+                    'tipo'   => array( 'def' => 'todos', 'desc' => 'nuevos | ocasion | todos' ),
+                    'accion' => array( 'def' => '', 'desc' => 'URL del listado destino' ),
+                    'campos' => array( 'def' => '', 'desc' => 'Filtros: marca,marca_externa,combustible,carroceria,precio,km,anio,tipo' ),
+                    'titulo' => array( 'def' => 'Buscar tu coche', 'desc' => '' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_buscador_coches tipo="ocasion"]',
+                    '[welow_buscador_coches tipo="nuevos" accion="/listado-nuevos/"]',
+                ),
+            ),
+
+            'welow_listado_completo' => array(
+                'titulo' => '🤖 Listado completo para chatbots',
+                'desc'   => 'Vuelca TODOS los datos en HTML estructurado para consumo de chatbots y crawlers. La página que lo contenga se marca automáticamente como noindex,nofollow.',
+                'params' => array(
+                    'tipo'     => array( 'def' => 'todos', 'desc' => 'nuevos | ocasion | todos | modelos | marcas' ),
+                    'max'      => array( 'def' => '-1', 'desc' => 'Máximo de elementos (-1 = todos)' ),
+                    'estado'   => array( 'def' => 'disponible', 'desc' => 'disponible | reservado | vendido | todos' ),
+                    'sin_html' => array( 'def' => 'no', 'desc' => 'si | no — formato texto plano' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_listado_completo tipo="ocasion"]',
+                    '[welow_listado_completo tipo="nuevos"]',
+                    '[welow_listado_completo tipo="modelos"]',
+                    '[welow_listado_completo tipo="marcas"]',
+                ),
+            ),
+
+        );
+    }
+
+    /* ========================================================================
+       UI
+       ======================================================================== */
+
+    public static function render_pagina() {
+        $shortcodes = self::get_shortcodes_doc();
+        $tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'shortcodes';
+        ?>
+        <div class="wrap welow-help">
+            <h1>📖 Ayuda y shortcodes <span style="font-size:14px;color:#666;font-weight:400;">v<?php echo esc_html( WELOW_CONC_VERSION ); ?></span></h1>
+
+            <h2 class="nav-tab-wrapper">
+                <a href="?page=<?php echo esc_attr( self::PAGE_SLUG ); ?>&tab=shortcodes" class="nav-tab <?php echo $tab === 'shortcodes' ? 'nav-tab-active' : ''; ?>">📋 Shortcodes</a>
+                <a href="?page=<?php echo esc_attr( self::PAGE_SLUG ); ?>&tab=estructura" class="nav-tab <?php echo $tab === 'estructura' ? 'nav-tab-active' : ''; ?>">🏗️ Estructura</a>
+                <a href="?page=<?php echo esc_attr( self::PAGE_SLUG ); ?>&tab=csv" class="nav-tab <?php echo $tab === 'csv' ? 'nav-tab-active' : ''; ?>">📥 Importación CSV</a>
+                <a href="?page=<?php echo esc_attr( self::PAGE_SLUG ); ?>&tab=chatbot" class="nav-tab <?php echo $tab === 'chatbot' ? 'nav-tab-active' : ''; ?>">🤖 Chatbots / API</a>
+            </h2>
+
+            <div class="welow-help-content">
+                <?php
+                if ( $tab === 'shortcodes' ) self::render_tab_shortcodes( $shortcodes );
+                elseif ( $tab === 'estructura' ) self::render_tab_estructura();
+                elseif ( $tab === 'csv' ) self::render_tab_csv();
+                elseif ( $tab === 'chatbot' ) self::render_tab_chatbot();
+                ?>
+            </div>
+        </div>
+
+        <style>
+            .welow-help { max-width: 1200px; }
+            .welow-help-content { background: #fff; padding: 24px; border: 1px solid #c3c4c7; margin-top: -1px; }
+            .welow-help h2.nav-tab-wrapper { margin-bottom: 0; }
+            .welow-shortcode-card {
+                background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+                padding: 16px 20px; margin-bottom: 18px;
+            }
+            .welow-shortcode-card h3 {
+                margin: 0 0 6px; font-size: 16px; display: flex; align-items: center; gap: 10px;
+            }
+            .welow-shortcode-card h3 code {
+                background: #2563eb; color: #fff; padding: 2px 10px; border-radius: 4px;
+                font-size: 13px; font-weight: 700;
+            }
+            .welow-shortcode-card .shortcode-desc { color: #475569; margin: 0 0 14px; font-size: 13px; }
+            .welow-shortcode-card table {
+                width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 13px;
+                background: #fff; border-radius: 4px; overflow: hidden;
+            }
+            .welow-shortcode-card table th, .welow-shortcode-card table td {
+                padding: 6px 10px; text-align: left; border-bottom: 1px solid #f1f5f9;
+            }
+            .welow-shortcode-card table th { background: #f1f5f9; font-weight: 600; }
+            .welow-shortcode-card table code { background: #fef3c7; padding: 1px 6px; border-radius: 3px; font-size: 12px; }
+            .welow-shortcode-card .ejemplos { margin-top: 12px; }
+            .welow-shortcode-card .ejemplos pre {
+                background: #1e293b; color: #e2e8f0; padding: 8px 12px; border-radius: 4px;
+                font-size: 12px; margin: 4px 0; overflow-x: auto; cursor: pointer;
+                position: relative;
+            }
+            .welow-shortcode-card .ejemplos pre:hover { background: #334155; }
+            .welow-shortcode-card .ejemplos pre.copied::after {
+                content: '✓ Copiado'; position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+                background: #10b981; color: #fff; padding: 2px 8px; border-radius: 3px; font-size: 10px;
+            }
+            .welow-info-box {
+                background: #eff6ff; border-left: 4px solid #2563eb; padding: 12px 16px;
+                border-radius: 4px; margin: 16px 0;
+            }
+            .welow-tabla-cpts { width: 100%; border-collapse: collapse; }
+            .welow-tabla-cpts th, .welow-tabla-cpts td { padding: 10px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+            .welow-tabla-cpts th { background: #f1f5f9; }
+            .welow-tabla-cpts code { background: #fef3c7; padding: 1px 6px; border-radius: 3px; font-size: 12px; }
+            .welow-endpoint {
+                background: #f8fafc; border-left: 4px solid #10b981; padding: 12px 16px; margin: 10px 0;
+                border-radius: 4px; font-family: ui-monospace, monospace; font-size: 13px;
+            }
+            .welow-endpoint a { word-break: break-all; }
+        </style>
+
+        <script>
+        document.addEventListener('click', function(e) {
+            var pre = e.target.closest('.welow-shortcode-card .ejemplos pre');
+            if (!pre) return;
+            navigator.clipboard.writeText(pre.textContent).then(function() {
+                pre.classList.add('copied');
+                setTimeout(function() { pre.classList.remove('copied'); }, 1500);
+            });
+        });
+        </script>
+        <?php
+    }
+
+    private static function render_tab_shortcodes( $shortcodes ) {
+        ?>
+        <p>Documentación de los <strong><?php echo count( $shortcodes ); ?> shortcodes</strong> disponibles. Click en los ejemplos para copiarlos.</p>
+
+        <div class="welow-info-box">
+            <strong>Auto-detección:</strong> los shortcodes <code>welow_marca_banner</code>, <code>welow_modelos</code>, <code>welow_slider</code>, <code>welow_coches_nuevos</code> y <code>welow_coche_ficha</code> detectan automáticamente la marca/coche del contexto cuando los usas en plantillas del Theme Builder.
+        </div>
+
+        <?php foreach ( $shortcodes as $tag => $info ) : ?>
+            <div class="welow-shortcode-card">
+                <h3><code>[<?php echo esc_html( $tag ); ?>]</code> <?php echo esc_html( $info['titulo'] ); ?></h3>
+                <p class="shortcode-desc"><?php echo wp_kses_post( $info['desc'] ); ?></p>
+
+                <?php if ( ! empty( $info['params'] ) ) : ?>
+                    <table>
+                        <thead><tr><th>Parámetro</th><th>Valor por defecto</th><th>Descripción</th></tr></thead>
+                        <tbody>
+                            <?php foreach ( $info['params'] as $name => $p ) : ?>
+                                <tr>
+                                    <td><code><?php echo esc_html( $name ); ?></code></td>
+                                    <td><code><?php echo esc_html( $p['def'] ); ?></code></td>
+                                    <td><?php echo esc_html( $p['desc'] ); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php endif; ?>
+
+                <?php if ( ! empty( $info['ejemplos'] ) ) : ?>
+                    <div class="ejemplos">
+                        <strong>Ejemplos (click para copiar):</strong>
+                        <?php foreach ( $info['ejemplos'] as $ej ) : ?>
+                            <pre><?php echo esc_html( $ej ); ?></pre>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
+        <?php
+    }
+
+    private static function render_tab_estructura() {
+        ?>
+        <h2>Tipos de contenido (CPTs)</h2>
+        <table class="welow-tabla-cpts">
+            <thead><tr><th>CPT</th><th>Slug</th><th>Función</th></tr></thead>
+            <tbody>
+                <tr><td>Marcas oficiales</td><td><code>welow_marca</code></td><td>Catálogo de marcas que vende el concesionario (Toyota, Hyundai, JAECOO...)</td></tr>
+                <tr><td>Modelos</td><td><code>welow_modelo</code></td><td>Modelos genéricos del catálogo, vinculados a una marca oficial</td></tr>
+                <tr><td>Coches nuevos</td><td><code>welow_coche_nuevo</code></td><td>Unidades concretas del catálogo en venta (con relación a un modelo)</td></tr>
+                <tr><td>Coches de ocasión</td><td><code>welow_coche_ocasion</code></td><td>Coches de segunda mano y KM0 (cualquier marca)</td></tr>
+                <tr><td>Concesionarios</td><td><code>welow_concesionario</code></td><td>Ubicaciones físicas con dirección, contacto y horario</td></tr>
+                <tr><td>Etiquetas</td><td><code>welow_etiqueta</code></td><td>Etiquetas visuales para superponer en cards de modelos</td></tr>
+                <tr><td>Slides</td><td><code>welow_slide</code></td><td>Slides reutilizables agrupables para sliders</td></tr>
+            </tbody>
+        </table>
+
+        <h2 style="margin-top:30px;">Taxonomías</h2>
+        <table class="welow-tabla-cpts">
+            <thead><tr><th>Taxonomía</th><th>Slug</th><th>Aplica a</th><th>Función</th></tr></thead>
+            <tbody>
+                <tr><td>Combustibles</td><td><code>welow_combustible</code></td><td>Modelos, coches</td><td>Tipo de motorización (gasolina, gasoil, híbrido, eléctrico...)</td></tr>
+                <tr><td>Carrocerías</td><td><code>welow_categoria_modelo</code></td><td>Modelos, coches</td><td>Tipo de carrocería (berlina, SUV, monovolumen, coupé...)</td></tr>
+                <tr><td>Marcas externas</td><td><code>welow_marca_externa</code></td><td>Coches de ocasión</td><td>99 marcas pre-cargadas para ocasión. Sincronizadas con marcas oficiales.</td></tr>
+            </tbody>
+        </table>
+
+        <h2 style="margin-top:30px;">Relación coches ↔ marcas/modelos</h2>
+        <div class="welow-info-box">
+            <p><strong>Coches nuevos (welow_coche_nuevo)</strong>: requieren seleccionar un <code>welow_modelo</code> del catálogo. La marca se hereda del modelo.</p>
+            <p><strong>Coches de ocasión (welow_coche_ocasion)</strong>: la marca se elige de la taxonomía <code>welow_marca_externa</code> (99 marcas pre-cargadas + las oficiales sincronizadas). El modelo es texto libre.</p>
+            <p>Esto permite vender un Peugeot nuevo (vía catálogo) Y al mismo tiempo recibir un Peugeot de ocasión sin duplicar. Ambos comparten la misma marca externa "Peugeot" gracias a la sincronización automática.</p>
+        </div>
+
+        <h2 style="margin-top:30px;">Sistema de iconos</h2>
+        <p>Los datos clave del coche (km, año, combustible, cambio, plazas, etc.) pueden tener un icono personalizado configurable desde <a href="<?php echo esc_url( admin_url( 'admin.php?page=welow_settings' ) ); ?>">Configuraciones</a>. También se pueden asignar iconos por valor de select (manual/automático, etiquetas DGT) y por término de taxonomía (cada combustible/carrocería con su icono).</p>
+        <?php
+    }
+
+    private static function render_tab_csv() {
+        ?>
+        <h2>Importación / Exportación CSV</h2>
+        <p>Desde <a href="<?php echo esc_url( admin_url( 'admin.php?page=welow_importer' ) ); ?>">Concesionarios → Importar / Exportar</a> puedes importar y exportar 4 tipos de datos en CSV:</p>
+
+        <table class="welow-tabla-cpts">
+            <thead><tr><th>Tipo</th><th>Columnas clave</th><th>Notas</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><strong>Marcas oficiales</strong></td>
+                    <td><code>nombre, slug, desc_corta, slogan, web, logo_url, banner_*_url</code></td>
+                    <td>Las URLs de logos/banners se descargan automáticamente a la mediateca si activas la opción.</td>
+                </tr>
+                <tr>
+                    <td><strong>Modelos del catálogo</strong></td>
+                    <td><code>nombre, slug, marca_slug, descripcion, precio_desde, combustible, categoria_modelo, plazas, etiquetas, imagen_url</code></td>
+                    <td><code>marca_slug</code> debe coincidir con el slug de una marca oficial existente.</td>
+                </tr>
+                <tr>
+                    <td><strong>Coches NUEVOS</strong></td>
+                    <td><code>titulo, slug, referencia, modelo_slug, version, precio_contado, ...</code></td>
+                    <td>Requiere <code>modelo_slug</code> de un modelo del catálogo. Sin km/año (son nuevos).</td>
+                </tr>
+                <tr>
+                    <td><strong>Coches OCASIÓN/KM0</strong></td>
+                    <td><code>titulo, slug, referencia, marca_externa, modelo_texto, version, tipo, mes_matricula, anio_matricula, km, precio_contado, ...</code></td>
+                    <td>Marca como slug de taxonomía <code>welow_marca_externa</code>. Modelo en texto libre.</td>
+                </tr>
+                <tr>
+                    <td><strong>Concesionarios</strong></td>
+                    <td><code>nombre, slug, direccion, cp, ciudad, telefono, email, marcas, lat, lng, logo_url</code></td>
+                    <td><code>marcas</code> es lista de slugs separada por <code>|</code> de marcas oficiales.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="welow-info-box" style="margin-top:20px;">
+            <strong>💡 Tips:</strong>
+            <ul style="margin: 8px 0 0 20px; list-style: disc;">
+                <li>Codificación: <strong>UTF-8</strong> con BOM (compatible con Excel)</li>
+                <li>Separador: <strong>coma (,)</strong></li>
+                <li>Múltiples valores en un campo: <strong>barra vertical (|)</strong> — ej: <code>turismos|suv|hibridos</code></li>
+                <li>Para evitar duplicados: marca <strong>"Actualizar existentes"</strong> al importar (busca por slug o referencia)</li>
+                <li>Las imágenes desde URL se descargan a la mediateca automáticamente</li>
+                <li>Descarga la plantilla CSV de cada tipo desde la página de importación</li>
+            </ul>
+        </div>
+        <?php
+    }
+
+    private static function render_tab_chatbot() {
+        ?>
+        <h2>🤖 Datos para chatbots y crawlers externos</h2>
+        <p>El plugin ofrece <strong>dos formas</strong> de exponer todos los datos del concesionario para que un chatbot, asistente IA o crawler externo pueda consultarlos:</p>
+
+        <h3>1️⃣ Páginas WP "ocultas" con shortcode</h3>
+        <p>Crea páginas WordPress y pega el shortcode dentro. La página queda accesible vía URL pero <strong>NO se indexa</strong> (auto-noindex,nofollow,noarchive,nosnippet) y se excluye del sitemap automáticamente. Compatible con Yoast SEO y Rank Math.</p>
+
+        <p><strong>Ejemplo de configuración recomendada</strong> (Opción B: páginas separadas):</p>
+
+        <table class="welow-tabla-cpts">
+            <thead><tr><th>URL sugerida</th><th>Shortcode</th><th>Contenido</th></tr></thead>
+            <tbody>
+                <tr><td><code>/datos-bot/coches-nuevos/</code></td><td><code>[welow_listado_completo tipo="nuevos"]</code></td><td>Solo coches nuevos</td></tr>
+                <tr><td><code>/datos-bot/coches-ocasion/</code></td><td><code>[welow_listado_completo tipo="ocasion"]</code></td><td>Ocasión y KM0</td></tr>
+                <tr><td><code>/datos-bot/marcas/</code></td><td><code>[welow_listado_completo tipo="marcas"]</code></td><td>Marcas oficiales</td></tr>
+                <tr><td><code>/datos-bot/modelos/</code></td><td><code>[welow_listado_completo tipo="modelos"]</code></td><td>Catálogo de modelos</td></tr>
+            </tbody>
+        </table>
+
+        <div class="welow-info-box">
+            <strong>Importante:</strong> NO enlaces estas páginas desde el menú principal ni desde otras páginas. Solo el chatbot necesita conocer las URLs.
+        </div>
+
+        <h3 style="margin-top:30px;">2️⃣ Endpoints REST API (JSON)</h3>
+        <p>Si tu chatbot prefiere consumir JSON estructurado en vez de scrapear HTML, usa estos endpoints públicos:</p>
+
+        <?php
+        $base = rest_url( 'welow/v1' );
+        $endpoints = array(
+            array( '/info',                   'Resumen del sitio + estadísticas + lista de endpoints' ),
+            array( '/coches/nuevos',          'Listado completo de coches nuevos' ),
+            array( '/coches/ocasion',         'Listado completo de coches de ocasión + KM0' ),
+            array( '/coches/todos',           'Todos los coches en un solo endpoint' ),
+            array( '/coches/{id}',            'Datos de un coche concreto por ID' ),
+            array( '/modelos',                'Catálogo de modelos del concesionario' ),
+            array( '/marcas',                 'Marcas oficiales con sus modelos' ),
+        );
+        foreach ( $endpoints as $ep ) :
+            $url = rtrim( $base, '/' ) . $ep[0];
+            $is_param = strpos( $ep[0], '{' ) !== false;
+        ?>
+            <div class="welow-endpoint">
+                <strong>GET</strong> <?php if ( $is_param ) : ?>
+                    <?php echo esc_html( $url ); ?>
+                <?php else : ?>
+                    <a href="<?php echo esc_url( $url ); ?>" target="_blank"><?php echo esc_html( $url ); ?></a>
+                <?php endif; ?>
+                <br><small style="color:#64748b;"><?php echo esc_html( $ep[1] ); ?></small>
+            </div>
+        <?php endforeach; ?>
+
+        <p><strong>Parámetros opcionales</strong> en endpoints de coches:</p>
+        <ul style="margin-left: 20px; list-style: disc;">
+            <li><code>?max=50</code> — limitar número de resultados (default: 100, -1 = todos)</li>
+            <li><code>?estado=disponible</code> — filtrar por estado (disponible, reservado, vendido, todos)</li>
+            <li><code>?tipo=km0</code> — solo en /coches/ocasion (ocasion, km0, todos)</li>
+        </ul>
+
+        <p><strong>Ejemplo combinado:</strong></p>
+        <div class="welow-endpoint">
+            <a href="<?php echo esc_url( $base . '/coches/ocasion?max=50&estado=disponible&tipo=ocasion' ); ?>" target="_blank">
+                <?php echo esc_html( $base . '/coches/ocasion?max=50&estado=disponible&tipo=ocasion' ); ?>
+            </a>
+        </div>
+
+        <div class="welow-info-box" style="margin-top:30px;">
+            <strong>🔓 Sin autenticación:</strong> los endpoints son públicos por defecto. Si necesitas restringirlos en el futuro, podemos añadir un <code>?api_key=</code> configurable.
+        </div>
+        <?php
+    }
+}

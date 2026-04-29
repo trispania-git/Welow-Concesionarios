@@ -663,6 +663,220 @@ class Welow_Helpers {
     }
 
     /**
+     * Devuelve TODOS los datos de un coche en un array plano para
+     * consumo de chatbots y APIs. Incluye datos del concesionario.
+     *
+     * @since 2.4.0
+     * @param int $coche_id
+     * @return array|null
+     */
+    public static function get_coche_completo_data( $coche_id ) {
+        $coche = get_post( $coche_id );
+        if ( ! $coche ) return null;
+
+        $es_nuevo = self::es_coche_nuevo( $coche_id );
+        if ( null === $es_nuevo ) return null;
+
+        $marca_nom  = self::get_coche_marca_nombre( $coche_id );
+        $modelo_nom = self::get_coche_modelo_nombre( $coche_id );
+
+        $combustibles = wp_get_post_terms( $coche_id, 'welow_combustible' );
+        $carrocerias  = wp_get_post_terms( $coche_id, 'welow_categoria_modelo' );
+        $combustible_label = ( ! empty( $combustibles ) && ! is_wp_error( $combustibles ) ) ? $combustibles[0]->name : '';
+        $carroceria_label  = ( ! empty( $carrocerias ) && ! is_wp_error( $carrocerias ) ) ? $carrocerias[0]->name : '';
+
+        // Para nuevos: heredar combustible/carrocería del modelo si no las tiene
+        if ( $es_nuevo && ! $combustible_label ) {
+            $modelo_id = self::get_coche_meta( $coche_id, 'modelo' );
+            if ( $modelo_id ) {
+                $cs = wp_get_post_terms( $modelo_id, 'welow_combustible' );
+                if ( ! empty( $cs ) && ! is_wp_error( $cs ) ) $combustible_label = $cs[0]->name;
+            }
+        }
+        if ( $es_nuevo && ! $carroceria_label ) {
+            $modelo_id = self::get_coche_meta( $coche_id, 'modelo' );
+            if ( $modelo_id ) {
+                $cs = wp_get_post_terms( $modelo_id, 'welow_categoria_modelo' );
+                if ( ! empty( $cs ) && ! is_wp_error( $cs ) ) $carroceria_label = $cs[0]->name;
+            }
+        }
+
+        // Plazas
+        $plazas = self::get_coche_meta( $coche_id, 'plazas' );
+        if ( '' === $plazas && $es_nuevo ) {
+            $modelo_id = self::get_coche_meta( $coche_id, 'modelo' );
+            if ( $modelo_id ) {
+                $plazas = get_post_meta( $modelo_id, '_welow_modelo_plazas', true );
+            }
+        }
+
+        // Selects con labels legibles
+        $cambio = self::get_coche_meta( $coche_id, 'cambio' );
+        $cambios = class_exists( 'Welow_CPT_Coche_Base' ) ? Welow_CPT_Coche_Base::get_cambio_options() : array();
+        $cambio_label = $cambios[ $cambio ] ?? $cambio;
+
+        $tipo_pintura = self::get_coche_meta( $coche_id, 'tipo_pintura' );
+        $tipos_pintura = class_exists( 'Welow_CPT_Coche_Base' ) ? Welow_CPT_Coche_Base::get_tipo_pintura_options() : array();
+        $pintura_label = $tipos_pintura[ $tipo_pintura ] ?? $tipo_pintura;
+
+        $dgt = self::get_coche_meta( $coche_id, 'etiqueta_dgt' );
+        $dgts = class_exists( 'Welow_CPT_Coche_Base' ) ? Welow_CPT_Coche_Base::get_etiqueta_dgt_options() : array();
+        $dgt_label = $dgts[ $dgt ] ?? $dgt;
+
+        $tipo_venta = self::get_coche_meta( $coche_id, 'tipo_venta', $es_nuevo ? 'nuevo' : 'ocasion' );
+        $tipos_venta = array( 'nuevo' => 'Nuevo', 'km0' => 'KM0', 'ocasion' => 'Ocasión' );
+        $tipo_venta_label = $tipos_venta[ $tipo_venta ] ?? $tipo_venta;
+
+        // Mes/año matriculación
+        $mes  = self::get_coche_meta( $coche_id, 'mes_matricula' );
+        $anio = self::get_coche_meta( $coche_id, 'anio_matricula' );
+
+        // Concesionario completo
+        $concesionario = null;
+        $conc_id = self::get_coche_meta( $coche_id, 'concesionario' );
+        if ( $conc_id ) {
+            $concesionario = self::get_concesionario_data( $conc_id );
+        }
+
+        $imagen_principal_id = self::get_coche_imagen_principal_id( $coche_id );
+
+        return array(
+            'id'                => $coche_id,
+            'tipo'              => $tipo_venta,
+            'tipo_label'        => $tipo_venta_label,
+            'es_nuevo'          => $es_nuevo,
+            'cpt'               => $coche->post_type,
+            'titulo'            => $coche->post_title,
+            'url'               => get_permalink( $coche_id ),
+            'estado'            => self::get_coche_meta( $coche_id, 'estado', 'disponible' ),
+            'referencia'        => self::get_coche_meta( $coche_id, 'referencia' ),
+
+            // Marca/modelo (texto legible siempre, sea nuevo u ocasión)
+            'marca'             => $marca_nom,
+            'modelo'            => $modelo_nom,
+            'version'           => self::get_coche_meta( $coche_id, 'version' ),
+
+            // Datos básicos
+            'mes_matriculacion' => $mes ? intval( $mes ) : null,
+            'anio'              => $anio ? intval( $anio ) : null,
+            'matriculacion_str' => ( $mes && $anio ) ? str_pad( $mes, 2, '0', STR_PAD_LEFT ) . '/' . $anio : ( $anio ?: '' ),
+            'km'                => self::get_coche_meta( $coche_id, 'km' ) !== '' ? intval( self::get_coche_meta( $coche_id, 'km' ) ) : null,
+
+            // Precio
+            'precio_contado'    => self::get_coche_meta( $coche_id, 'precio_contado' ) !== '' ? floatval( self::get_coche_meta( $coche_id, 'precio_contado' ) ) : null,
+            'precio_financiado' => self::get_coche_meta( $coche_id, 'precio_financiado' ) !== '' ? floatval( self::get_coche_meta( $coche_id, 'precio_financiado' ) ) : null,
+            'precio_anterior'   => self::get_coche_meta( $coche_id, 'precio_anterior' ) !== '' ? floatval( self::get_coche_meta( $coche_id, 'precio_anterior' ) ) : null,
+            'cuota_mensual'     => self::get_coche_meta( $coche_id, 'cuota' ) !== '' ? floatval( self::get_coche_meta( $coche_id, 'cuota' ) ) : null,
+
+            // Datos técnicos
+            'cambio'            => $cambio,
+            'cambio_label'      => $cambio_label,
+            'marchas'           => self::get_coche_meta( $coche_id, 'marchas' ) !== '' ? intval( self::get_coche_meta( $coche_id, 'marchas' ) ) : null,
+            'cv'                => self::get_coche_meta( $coche_id, 'cv' ) !== '' ? floatval( self::get_coche_meta( $coche_id, 'cv' ) ) : null,
+            'kw'                => self::get_coche_meta( $coche_id, 'kw' ) !== '' ? floatval( self::get_coche_meta( $coche_id, 'kw' ) ) : null,
+            'cilindrada_cc'     => self::get_coche_meta( $coche_id, 'cilindrada' ) !== '' ? intval( self::get_coche_meta( $coche_id, 'cilindrada' ) ) : null,
+
+            'plazas'            => $plazas !== '' ? intval( $plazas ) : null,
+            'puertas'           => self::get_coche_meta( $coche_id, 'puertas' ) !== '' ? intval( self::get_coche_meta( $coche_id, 'puertas' ) ) : null,
+            'color'             => self::get_coche_meta( $coche_id, 'color' ),
+            'tipo_pintura'      => $tipo_pintura,
+            'tipo_pintura_label'=> $pintura_label,
+
+            'combustible'       => $combustible_label,
+            'carroceria'        => $carroceria_label,
+
+            'etiqueta_dgt'      => $dgt,
+            'etiqueta_dgt_label'=> $dgt_label,
+
+            // Programa especial
+            'programa'          => self::get_coche_meta( $coche_id, 'programa' ),
+
+            // Equipamiento y garantías (HTML stripado a texto plano)
+            'equipamiento_html' => self::get_coche_meta( $coche_id, 'equipamiento' ),
+            'equipamiento_texto'=> wp_strip_all_tags( self::get_coche_meta( $coche_id, 'equipamiento' ) ),
+            'garantias_html'    => self::get_coche_meta( $coche_id, 'garantias' ),
+            'garantias_texto'   => wp_strip_all_tags( self::get_coche_meta( $coche_id, 'garantias' ) ),
+
+            // Disclaimer
+            'disclaimer'        => self::get_coche_disclaimer( $coche_id ),
+
+            // Galería
+            'imagen_principal'  => $imagen_principal_id ? wp_get_attachment_image_url( $imagen_principal_id, 'large' ) : '',
+            'galeria_urls'      => array_filter( array_map( function( $id ) {
+                return wp_get_attachment_image_url( intval( $id ), 'large' );
+            }, self::get_coche_galeria( $coche_id ) ) ),
+
+            // Concesionario completo
+            'concesionario'     => $concesionario,
+        );
+    }
+
+    /**
+     * Devuelve los datos completos de un modelo del catálogo.
+     *
+     * @since 2.4.0
+     */
+    public static function get_modelo_completo_data( $modelo_id ) {
+        $modelo = get_post( $modelo_id );
+        if ( ! $modelo || 'welow_modelo' !== $modelo->post_type ) return null;
+
+        $marca_id = get_post_meta( $modelo_id, '_welow_modelo_marca', true );
+        $marca = $marca_id ? get_post( $marca_id ) : null;
+
+        $combustibles = wp_get_post_terms( $modelo_id, 'welow_combustible' );
+        $carrocerias  = wp_get_post_terms( $modelo_id, 'welow_categoria_modelo' );
+
+        return array(
+            'id'           => $modelo_id,
+            'titulo'       => $modelo->post_title,
+            'url'          => get_permalink( $modelo_id ),
+            'descripcion'  => wp_strip_all_tags( $modelo->post_content ),
+            'extracto'     => $modelo->post_excerpt,
+            'marca'        => $marca ? $marca->post_title : '',
+            'marca_id'     => $marca ? $marca->ID : 0,
+            'precio_desde' => get_post_meta( $modelo_id, '_welow_modelo_precio_desde', true ) !== '' ? floatval( get_post_meta( $modelo_id, '_welow_modelo_precio_desde', true ) ) : null,
+            'plazas'       => get_post_meta( $modelo_id, '_welow_modelo_plazas', true ) !== '' ? intval( get_post_meta( $modelo_id, '_welow_modelo_plazas', true ) ) : null,
+            'combustibles' => array_map( function( $t ) { return $t->name; }, is_wp_error( $combustibles ) ? array() : $combustibles ),
+            'carrocerias'  => array_map( function( $t ) { return $t->name; }, is_wp_error( $carrocerias ) ? array() : $carrocerias ),
+            'enlace'       => get_post_meta( $modelo_id, '_welow_modelo_enlace', true ),
+            'imagen'       => get_the_post_thumbnail_url( $modelo_id, 'large' ),
+        );
+    }
+
+    /**
+     * Devuelve los datos completos de una marca oficial.
+     *
+     * @since 2.4.0
+     */
+    public static function get_marca_completo_data( $marca_id ) {
+        $marca = get_post( $marca_id );
+        if ( ! $marca || 'welow_marca' !== $marca->post_type ) return null;
+
+        // Modelos de esta marca
+        $modelos = get_posts( array(
+            'post_type'      => 'welow_modelo',
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+            'meta_query'     => array(
+                array( 'key' => '_welow_modelo_marca', 'value' => $marca_id ),
+            ),
+        ) );
+
+        return array(
+            'id'           => $marca_id,
+            'titulo'       => $marca->post_title,
+            'url'          => get_permalink( $marca_id ),
+            'descripcion'  => wp_strip_all_tags( $marca->post_content ),
+            'desc_corta'   => self::get_marca_meta( $marca_id, 'desc_corta' ),
+            'slogan'       => self::get_marca_meta( $marca_id, 'slogan' ),
+            'web'          => self::get_marca_meta( $marca_id, 'web' ),
+            'logo'         => get_the_post_thumbnail_url( $marca_id, 'medium' ),
+            'modelos'      => array_map( function( $m ) { return $m->post_title; }, $modelos ),
+            'modelos_count' => count( $modelos ),
+        );
+    }
+
+    /**
      * Disclaimer efectivo del coche (override o global).
      */
     public static function get_coche_disclaimer( $coche_id ) {

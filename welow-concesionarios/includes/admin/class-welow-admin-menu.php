@@ -147,6 +147,12 @@ class Welow_Admin_Menu {
                     <p>Importar marcas y modelos desde CSV, o descargar plantillas.</p>
                 </a>
 
+                <a href="<?php echo esc_url( admin_url( 'admin.php?page=welow_help' ) ); ?>" class="welow-card welow-card-highlight">
+                    <span class="dashicons dashicons-book-alt"></span>
+                    <h3>Ayuda y shortcodes</h3>
+                    <p>Documentación de todos los shortcodes, estructura, CSV y datos para chatbots.</p>
+                </a>
+
                 <?php if ( post_type_exists( 'et_pb_layout' ) ) : ?>
                 <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=et_pb_layout' ) ); ?>" class="welow-card welow-card-highlight">
                     <span class="dashicons dashicons-layout"></span>

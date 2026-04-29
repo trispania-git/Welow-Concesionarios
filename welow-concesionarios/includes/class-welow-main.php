@@ -4,7 +4,7 @@
  *
  * @package Welow_Concesionarios
  * @since 1.0.0
- * @version 2.1.0
+ * @version 2.4.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -29,6 +29,8 @@ class Welow_Main {
         Welow_Importer::init();                // v1.1.0
         Welow_Divi_Library_Admin::init();      // v1.4.0
         Welow_Marca_Sync::init();              // v2.2.0
+        Welow_Help::init();                    // v2.4.0
+        Welow_Rest_API::init();                // v2.4.0
 
         // Taxonomías
         Welow_Tax_Combustible::init();         // v1.1.0
@@ -56,6 +58,7 @@ class Welow_Main {
         Welow_Shortcode_Coches_Ocasion::init();    // v2.1.0
         Welow_Shortcode_Coche_Ficha::init();       // v2.0.0
         Welow_Shortcode_Buscador_Coches::init();   // v2.0.0
+        Welow_Shortcode_Listado_Completo::init();  // v2.4.0
 
         // Enqueue assets
         add_action( 'wp_enqueue_scripts', array( $this, 'registrar_assets' ) );

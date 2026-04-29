@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.3.3
+ * Version:     2.4.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,53 @@
  *
  * CHANGELOG
  * ---------
+ * 2.4.0 — Página de ayuda + datos para chatbots (shortcode + REST API)
+ *
+ *   PÁGINA DE AYUDA EN ADMIN:
+ *   - Nuevo submenú "Concesionarios → Ayuda y shortcodes"
+ *   - 4 pestañas: Shortcodes (con ejemplos copiables), Estructura,
+ *     Importación CSV y Chatbots/API
+ *   - Documentación auto-generada de los 14 shortcodes del plugin con
+ *     parámetros, valores por defecto y ejemplos
+ *   - Tabla de CPTs y taxonomías con descripción de cada una
+ *
+ *   NUEVO SHORTCODE [welow_listado_completo]:
+ *   - Vuelca TODOS los datos del concesionario en HTML estructurado
+ *     (con <article>, <dl>/<dt>/<dd>, atributos data-*) para consumo
+ *     de chatbots y crawlers
+ *   - 5 tipos: nuevos | ocasion | todos | modelos | marcas
+ *   - Modo texto plano opcional con sin_html="si"
+ *   - Cada coche incluye TODOS sus datos + el concesionario asociado
+ *     (dirección, teléfono, email, horario, mapa)
+ *
+ *   AUTO-NOINDEX:
+ *   - Páginas que contengan [welow_listado_completo] se marcan
+ *     automáticamente como noindex,nofollow,noarchive,nosnippet
+ *   - Compatible con Yoast SEO y Rank Math (filtros específicos)
+ *   - Se excluyen del sitemap WP nativo (transient cache 1h)
+ *
+ *   REST API ENDPOINTS (namespace welow/v1):
+ *   - GET /wp-json/welow/v1/info           → resumen + estadísticas
+ *   - GET /wp-json/welow/v1/coches/nuevos  → coches nuevos
+ *   - GET /wp-json/welow/v1/coches/ocasion → ocasión + KM0
+ *   - GET /wp-json/welow/v1/coches/todos   → ambos
+ *   - GET /wp-json/welow/v1/coches/{id}    → coche individual
+ *   - GET /wp-json/welow/v1/modelos        → catálogo
+ *   - GET /wp-json/welow/v1/marcas         → marcas oficiales
+ *   - Parámetros: ?max, ?estado, ?tipo (en ocasión)
+ *   - Públicos sin autenticación
+ *
+ *   HELPERS NUEVOS:
+ *   - Welow_Helpers::get_coche_completo_data()  — datos planos para API
+ *   - Welow_Helpers::get_modelo_completo_data()
+ *   - Welow_Helpers::get_marca_completo_data()
+ *
+ *   ARCHIVOS NUEVOS:
+ *   - includes/admin/class-welow-help.php
+ *   - includes/api/class-welow-rest-api.php
+ *   - includes/shortcodes/class-welow-shortcode-listado-completo.php
+ *   - templates/listado-completo.php
+ *
  * 2.3.3 — Fix: imagen del coche en listados con fallback a galería
  *
  *   PROBLEMA:
@@ -300,7 +347,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.3.3' );
+define( 'WELOW_CONC_VERSION', '2.4.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
@@ -315,6 +362,10 @@ require_once WELOW_CONC_PATH . 'includes/admin/class-welow-importer.php';       
 require_once WELOW_CONC_PATH . 'includes/admin/class-welow-divi-library-admin.php';  // v1.4.0
 require_once WELOW_CONC_PATH . 'includes/admin/class-welow-icons.php';               // v2.0.0
 require_once WELOW_CONC_PATH . 'includes/admin/class-welow-marca-sync.php';          // v2.2.0
+require_once WELOW_CONC_PATH . 'includes/admin/class-welow-help.php';                // v2.4.0
+
+// API
+require_once WELOW_CONC_PATH . 'includes/api/class-welow-rest-api.php';              // v2.4.0
 
 // CPTs
 require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-marca.php';
@@ -341,10 +392,11 @@ require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-slider
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-contenido.php';
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-marca-banner.php';
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-divi.php';          // v1.4.0
-require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coches-nuevos.php';   // v2.1.0
-require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coches-ocasion.php';  // v2.1.0
-require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coche-ficha.php';     // v2.0.0
-require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-buscador-coches.php'; // v2.0.0
+require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coches-nuevos.php';      // v2.1.0
+require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coches-ocasion.php';     // v2.1.0
+require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coche-ficha.php';        // v2.0.0
+require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-buscador-coches.php';    // v2.0.0
+require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-listado-completo.php';   // v2.4.0
 
 // Principal
 require_once WELOW_CONC_PATH . 'includes/class-welow-main.php';
