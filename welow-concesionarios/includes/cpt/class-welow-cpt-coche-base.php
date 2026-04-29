@@ -296,16 +296,19 @@ abstract class Welow_CPT_Coche_Base {
             Aquí añade hasta <strong><?php echo self::GALERIA_MAX; ?> imágenes adicionales</strong>.
         </p>
 
-        <input type="hidden" id="welow_coche_galeria" name="welow_coche_galeria"
-               value="<?php echo esc_attr( implode( ',', $galeria ) ); ?>" />
+        <?php // Marcador para que el guardado sepa que el metabox se procesó (galería vacía es válida) ?>
+        <input type="hidden" name="welow_coche_galeria_present" value="1" />
 
         <div class="welow-galeria-coche">
             <div id="welow-galeria-thumbs" class="welow-galeria-thumbs">
                 <?php foreach ( $galeria as $img_id ) :
+                    $img_id = intval( $img_id );
+                    if ( ! $img_id ) continue;
                     $url = wp_get_attachment_image_url( $img_id, 'thumbnail' );
                     if ( ! $url ) continue;
                 ?>
                     <div class="welow-galeria-thumb" data-id="<?php echo esc_attr( $img_id ); ?>">
+                        <input type="hidden" name="welow_coche_galeria[]" value="<?php echo esc_attr( $img_id ); ?>" />
                         <img src="<?php echo esc_url( $url ); ?>" alt="" />
                         <button type="button" class="welow-galeria-remove" title="Quitar">×</button>
                     </div>
@@ -369,22 +372,24 @@ abstract class Welow_CPT_Coche_Base {
         <script>
         jQuery(function($){
             var maxImages = <?php echo self::GALERIA_MAX; ?>;
-            var $hidden   = $('#welow_coche_galeria');
             var $thumbs   = $('#welow-galeria-thumbs');
             var $count    = $('#welow-galeria-current');
 
-            function getIds() {
-                return $hidden.val() ? $hidden.val().split(',').filter(Boolean) : [];
+            function actualizarContador() {
+                $count.text( $thumbs.find('.welow-galeria-thumb').length );
             }
-            function setIds(ids) {
-                $hidden.val(ids.join(','));
-                $count.text(ids.length);
+            function existeId( id ) {
+                return $thumbs.find('.welow-galeria-thumb[data-id="' + id + '"]').length > 0;
             }
 
             $('#welow-galeria-add').on('click', function(e){
                 e.preventDefault();
-                var current = getIds();
-                if (current.length >= maxImages) {
+
+                if ( typeof wp === 'undefined' || ! wp.media ) {
+                    alert('Error: la API de medios de WordPress no está disponible. Recarga la página.');
+                    return;
+                }
+                if ( $thumbs.find('.welow-galeria-thumb').length >= maxImages ) {
                     alert('Máximo ' + maxImages + ' imágenes.');
                     return;
                 }
@@ -398,42 +403,41 @@ abstract class Welow_CPT_Coche_Base {
 
                 frame.on('select', function(){
                     var selection = frame.state().get('selection');
-                    var current = getIds();
                     selection.each(function(att){
-                        if (current.length >= maxImages) return;
+                        if ( $thumbs.find('.welow-galeria-thumb').length >= maxImages ) return;
                         var id = att.id.toString();
-                        if (current.indexOf(id) !== -1) return;
-                        current.push(id);
+                        if ( existeId( id ) ) return;
+
                         var thumbUrl = att.attributes.sizes && att.attributes.sizes.thumbnail
                             ? att.attributes.sizes.thumbnail.url : att.attributes.url;
+
+                        // Cada thumb lleva su propio input[] - así el orden DOM == orden POST
                         $thumbs.append(
                             '<div class="welow-galeria-thumb" data-id="' + id + '">' +
+                            '<input type="hidden" name="welow_coche_galeria[]" value="' + id + '" />' +
                             '<img src="' + thumbUrl + '" alt="" />' +
                             '<button type="button" class="welow-galeria-remove" title="Quitar">×</button>' +
                             '</div>'
                         );
                     });
-                    setIds(current);
+                    actualizarContador();
                 });
                 frame.open();
             });
 
-            $thumbs.on('click', '.welow-galeria-remove', function(){
-                var $thumb = $(this).closest('.welow-galeria-thumb');
-                var id = $thumb.data('id').toString();
-                $thumb.remove();
-                var current = getIds().filter(function(x){ return x !== id; });
-                setIds(current);
+            $thumbs.on('click', '.welow-galeria-remove', function(e){
+                e.preventDefault();
+                $(this).closest('.welow-galeria-thumb').remove();
+                actualizarContador();
             });
 
-            if ($.fn.sortable) {
+            // jQuery UI sortable: con inputs[] en cada thumb, el orden DOM = orden POST
+            // No hace falta mantener un array sincronizado.
+            if ( $.fn.sortable ) {
                 $thumbs.sortable({
-                    update: function(){
-                        var ids = $thumbs.find('.welow-galeria-thumb').map(function(){
-                            return $(this).data('id').toString();
-                        }).get();
-                        setIds(ids);
-                    }
+                    placeholder: 'welow-galeria-thumb',
+                    forcePlaceholderSize: true,
+                    tolerance: 'pointer'
                 });
             }
         });
@@ -574,11 +578,15 @@ abstract class Welow_CPT_Coche_Base {
             update_post_meta( $post_id, self::META_PREFIX . $f, $val );
         }
 
-        // D: Galería
-        $galeria_raw = isset( $_POST['welow_coche_galeria'] ) ? $_POST['welow_coche_galeria'] : '';
-        $galeria_ids = array_filter( array_map( 'absint', explode( ',', $galeria_raw ) ) );
-        $galeria_ids = array_slice( $galeria_ids, 0, self::GALERIA_MAX );
-        update_post_meta( $post_id, self::META_PREFIX . 'galeria', $galeria_ids );
+        // D: Galería (v2.3.2 - lee array nativo de inputs[] en lugar de CSV string)
+        // Solo se procesa si el metabox estuvo presente en el form (evita borrar
+        // la galería si el metabox se oculta o si se guarda desde otro contexto).
+        if ( isset( $_POST['welow_coche_galeria_present'] ) ) {
+            $galeria_raw = isset( $_POST['welow_coche_galeria'] ) ? (array) $_POST['welow_coche_galeria'] : array();
+            $galeria_ids = array_values( array_filter( array_map( 'absint', $galeria_raw ) ) );
+            $galeria_ids = array_slice( $galeria_ids, 0, self::GALERIA_MAX );
+            update_post_meta( $post_id, self::META_PREFIX . 'galeria', $galeria_ids );
+        }
 
         $video = isset( $_POST['welow_coche_video'] ) ? esc_url_raw( $_POST['welow_coche_video'] ) : '';
         update_post_meta( $post_id, self::META_PREFIX . 'video', $video );

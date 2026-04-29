@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.3.1
+ * Version:     2.3.2
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,32 @@
  *
  * CHANGELOG
  * ---------
+ * 2.3.2 — Fix: galería de coches no se guardaba al actualizar
+ *
+ *   PROBLEMA:
+ *   Al añadir imágenes a la galería de un coche y pulsar "Actualizar",
+ *   las thumbnails desaparecían tras recargar — la meta no se persistía.
+ *   El metabox usaba un único <input hidden> con IDs separados por
+ *   comas, gestionado por JS. Si el JS fallaba, no se actualizaba bien
+ *   o el navegador interpretaba mal el value, el guardado quedaba vacío.
+ *
+ *   SOLUCIÓN — Refactor a inputs[] nativos:
+ *   - Cada thumb tiene ahora su propio <input name="welow_coche_galeria[]">
+ *     dentro de la card (en lugar de un único hidden con CSV)
+ *   - WordPress recibe un array PHP nativo en $_POST, sin parseo de strings
+ *   - El orden DOM = orden POST (jquery-ui-sortable mantiene el orden via
+ *     reordenar los elementos, no via mantener un array sincronizado)
+ *   - Marcador `welow_coche_galeria_present` para que el guardado solo
+ *     procese la galería cuando el metabox estuvo en el form (evita
+ *     borrar la galería accidentalmente desde otros contextos)
+ *
+ *   También:
+ *   - JS más defensivo: comprueba que wp.media existe antes de usarlo
+ *   - Validación tipográfica del ID al cargar las thumbs existentes
+ *   - jquery-ui-sortable simplificado (sin callbacks de update)
+ *
+ *   Archivo: includes/cpt/class-welow-cpt-coche-base.php
+ *
  * 2.3.1 — Fix: campos CV/kW aceptan decimales
  *   - Los campos `Potencia (CV)` y `Potencia (kW)` en el metabox de
  *     datos técnicos del coche tenían `step="1"` (solo enteros), lo
@@ -251,7 +277,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.3.1' );
+define( 'WELOW_CONC_VERSION', '2.3.2' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
