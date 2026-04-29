@@ -173,6 +173,9 @@ class Welow_Settings {
                 <a href="<?php echo esc_url( admin_url( 'edit-tags.php?taxonomy=welow_categoria_modelo&post_type=welow_modelo' ) ); ?>" class="button">
                     <span class="dashicons dashicons-car" style="margin-top:4px;"></span> Gestionar carrocerías
                 </a>
+                <a href="<?php echo esc_url( admin_url( 'edit-tags.php?taxonomy=welow_marca_externa&post_type=welow_coche_ocasion' ) ); ?>" class="button">
+                    <span class="dashicons dashicons-awards" style="margin-top:4px;"></span> Gestionar marcas externas
+                </a>
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=welow_importer' ) ); ?>" class="button">
                     <span class="dashicons dashicons-upload" style="margin-top:4px;"></span> Importar / Exportar
                 </a>
