@@ -222,3 +222,72 @@
     color: #991b1b;
     border-left: 4px solid #ef4444;
 }
+
+/* ==========================================================================
+   v2.5.1 — Formulario compacto cuando va dentro del aside de la ficha
+   (debajo del precio)
+   ========================================================================== */
+.welow-coche-ficha__formulario-wrap {
+    margin-bottom: 20px;
+}
+
+.welow-coche-ficha__formulario-wrap .welow-coche-formulario {
+    padding: 18px 18px 16px;
+    margin: 0;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+    border: 1px solid #e2e8f0;
+}
+
+.welow-coche-ficha__formulario-wrap .welow-coche-formulario__titulo {
+    font-size: 16px;
+    margin: 0 0 12px;
+    color: #0f172a;
+}
+
+.welow-coche-ficha__formulario-wrap .welow-coche-formulario__ref {
+    font-size: 12px;
+    padding: 6px 10px;
+    margin: 0 0 14px;
+}
+
+/* Cuando está en aside, los campos tel/email apilan en lugar de ir en 2 columnas */
+.welow-coche-ficha__formulario-wrap .welow-formulario__row--two {
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.welow-coche-ficha__formulario-wrap .welow-formulario__row {
+    margin-bottom: 12px;
+}
+
+.welow-coche-ficha__formulario-wrap .welow-formulario label {
+    font-size: 12px;
+    margin-bottom: 2px;
+}
+
+.welow-coche-ficha__formulario-wrap .welow-formulario input,
+.welow-coche-ficha__formulario-wrap .welow-formulario textarea {
+    padding: 9px 12px;
+    font-size: 13px;
+}
+
+.welow-coche-ficha__formulario-wrap .welow-formulario textarea {
+    min-height: 70px;
+}
+
+.welow-coche-ficha__formulario-wrap .welow-formulario__check {
+    font-size: 11px !important;
+    line-height: 1.4;
+}
+
+.welow-coche-ficha__formulario-wrap .welow-btn-grande {
+    padding: 12px 16px !important;
+    font-size: 14px !important;
+}
+
+.welow-coche-ficha__formulario-wrap .welow-form-msg {
+    font-size: 13px;
+    padding: 10px 12px;
+    margin-top: 10px;
+}

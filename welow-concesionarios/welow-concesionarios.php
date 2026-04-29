@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.5.0
+ * Version:     2.5.1
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,34 @@
  *
  * CHANGELOG
  * ---------
+ * 2.5.1 — Fix UI ficha: badge "OCASIÓN" + formulario integrado
+ *
+ *   FIX BADGE TIPO en header de la ficha:
+ *   La regla `.welow-coche-tipo` tenía `position: absolute` (necesaria
+ *   para las cards del grid donde flota sobre la imagen) pero también
+ *   se aplicaba en el header de la ficha individual, causando que el
+ *   badge "OCASIÓN/NUEVO" se solapara con la URL del navegador o la
+ *   admin bar de WP. Override añadido: `position: static` cuando está
+ *   dentro de `.welow-coche-ficha__header`.
+ *
+ *   FORMULARIO INTEGRADO EN ASIDE:
+ *   El formulario de contacto ahora va dentro del shortcode
+ *   `[welow_coche_ficha]` por defecto, justo debajo del precio en
+ *   la columna derecha (sidebar), con estilo más compacto:
+ *     - Padding reducido
+ *     - Tipografía más pequeña (12-13px)
+ *     - Campos tel/email apilados (no en 2 columnas)
+ *     - Título cambiado a "¿Te interesa?" (más conciso)
+ *     - Sin mostrar la referencia (ya está en el precio arriba)
+ *
+ *   Esto reduce el formulario a un tamaño apropiado para el sidebar.
+ *   Si se quiere el formulario ancho aparte, se puede excluir del
+ *   shortcode y añadir [welow_coche_formulario] por separado.
+ *
+ *   El nuevo bloque "formulario" se añade al default de `mostrar` del
+ *   shortcode `[welow_coche_ficha]`. Documentación actualizada en la
+ *   pestaña "Ficha del coche" de Ayuda.
+ *
  * 2.5.0 — Ficha del coche: URLs personalizadas + 4 shortcodes nuevos
  *
  *   URLs PERSONALIZADAS:
@@ -377,7 +405,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.5.0' );
+define( 'WELOW_CONC_VERSION', '2.5.1' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

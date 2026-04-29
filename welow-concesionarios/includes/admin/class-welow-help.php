@@ -498,18 +498,22 @@ class Welow_Help {
 <span style="color:#94a3b8;">// 1. Breadcrumb arriba del todo</span>
 [welow_coche_breadcrumb]
 
-<span style="color:#94a3b8;">// 2. Ficha completa (galería + destacados + precio + concesionario + equipamiento + garantías)</span>
+<span style="color:#94a3b8;">// 2. Ficha completa (galería + destacados + precio + FORMULARIO + concesionario + equipamiento + garantías)
+//    El formulario ya viene integrado en la columna derecha desde v2.5.1</span>
 [welow_coche_ficha id="auto"]
 
 <span style="color:#94a3b8;">// 3. Compartir en redes sociales</span>
 [welow_coche_compartir]
 
-<span style="color:#94a3b8;">// 4. Formulario de contacto pre-rellenado</span>
-[welow_coche_formulario]
-
-<span style="color:#94a3b8;">// 5. Coches similares al final</span>
+<span style="color:#94a3b8;">// 4. Coches similares al final</span>
 [welow_coches_similares max="4" columnas="4"]
 </pre>
+
+<div class="welow-info-box">
+    <strong>💡 Nota:</strong> desde v2.5.1, el formulario de contacto va <strong>integrado en la columna derecha</strong> (debajo del precio) por defecto en el shortcode <code>[welow_coche_ficha]</code>. Si quisieras quitarlo del aside y ponerlo aparte ancho, usa:
+    <pre style="background:#1e293b;color:#e2e8f0;padding:8px 12px;border-radius:4px;font-size:12px;margin:8px 0 0;">[welow_coche_ficha mostrar="galeria,destacados,precio,equipamiento,garantias,concesionario"]
+[welow_coche_formulario]</pre>
+</div>
 
         <h3>Paso 3: Personalizar (opcional)</h3>
         <p>Puedes envolver cada shortcode en su propia <strong>sección</strong>/<strong>fila</strong> de Divi para aplicar fondos, márgenes, animaciones, etc. También puedes intercalarlos con módulos de Divi (ej: un banner publicitario entre el formulario y los similares).</p>

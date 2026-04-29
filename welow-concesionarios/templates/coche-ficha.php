@@ -69,6 +69,13 @@ if ( $es_nuevo ) {
                 <?php Welow_Helpers::get_template( 'coche-precio.php', array( 'data' => $data ) ); ?>
             <?php endif; ?>
 
+            <?php // v2.5.1 — Formulario integrado justo debajo del precio (en el aside, más compacto) ?>
+            <?php if ( in_array( 'formulario', $bloques ) && class_exists( 'Welow_Shortcode_Coche_Extras' ) ) : ?>
+                <div class="welow-coche-ficha__formulario-wrap">
+                    <?php echo Welow_Shortcode_Coche_Extras::render_formulario( array( 'titulo' => '¿Te interesa?', 'mostrar_ref' => 'no' ) ); ?>
+                </div>
+            <?php endif; ?>
+
             <?php if ( in_array( 'concesionario', $bloques ) && $data['concesionario_id'] ) : ?>
                 <?php Welow_Helpers::get_template( 'coche-concesionario.php', array( 'data' => $data ) ); ?>
             <?php endif; ?>

@@ -19,7 +19,8 @@ class Welow_Shortcode_Coche_Ficha {
     public static function render( $atts ) {
         $atts = shortcode_atts( array(
             'id'      => 'auto',
-            'mostrar' => 'galeria,destacados,precio,equipamiento,garantias,concesionario',
+            // v2.5.1 — bloque "formulario" añadido al default (en aside, compacto)
+            'mostrar' => 'galeria,destacados,precio,formulario,equipamiento,garantias,concesionario',
         ), $atts );
 
         // Resolver coche

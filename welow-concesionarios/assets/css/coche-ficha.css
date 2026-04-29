@@ -17,6 +17,7 @@
 
 /* Header */
 .welow-coche-ficha__header {
+    position: relative;             /* contiene el badge de tipo */
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -38,10 +39,21 @@
     color: #475569;
 }
 
+/* v2.5.1 — Override del badge en la ficha individual: NO debe ser absolute
+   (la regla por defecto sí lo es para las cards del grid sobre las imágenes) */
+.welow-coche-ficha__header .welow-coche-tipo {
+    position: static;
+    align-self: flex-start;
+    flex-shrink: 0;
+    padding: 6px 14px;
+    font-size: 12px;
+}
+
 @media (max-width: 767px) {
     .welow-coche-ficha__titulo { font-size: 22px; }
     .welow-coche-ficha__version { font-size: 14px; }
     .welow-coche-ficha__header { flex-direction: column; padding: 14px 0; }
+    .welow-coche-ficha__header .welow-coche-tipo { align-self: flex-start; }
 }
 
 /* Layout 2 columnas */
