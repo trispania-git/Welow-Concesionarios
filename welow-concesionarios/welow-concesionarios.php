@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.1.0
+ * Version:     2.2.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,46 @@
  *
  * CHANGELOG
  * ---------
+ * 2.2.0 — Sincronización Marcas oficiales ↔ Marcas externas
+ *
+ *   PROBLEMA RESUELTO:
+ *   Cada marca oficial del concesionario (welow_marca: Toyota, Hyundai...)
+ *   y cada marca externa (welow_marca_externa: BMW, Audi, Peugeot...) eran
+ *   dos sistemas independientes. Si el concesionario vendía Peugeot nuevo
+ *   Y entraba un Peugeot de ocasión, el editor podía:
+ *     - Crear "Peugeot" en marcas externas duplicando la oficial
+ *     - Cometer typos como "Peoget" o "PEUGEOT"
+ *     - Tener tres entradas distintas para la misma marca
+ *
+ *   SOLUCIÓN: SINCRONIZACIÓN AUTOMÁTICA
+ *   - Hook al guardar marca oficial → crea/actualiza término gemelo en
+ *     welow_marca_externa con el mismo slug y nombre
+ *   - El término sincronizado guarda meta `_welow_marca_oficial_id`
+ *     apuntando al post de la marca oficial
+ *   - Si renombras la marca oficial, se actualiza la externa en cascada
+ *   - Al borrar marca oficial: NO se borra el término externo (puede tener
+ *     coches de ocasión vinculados), solo se desliga
+ *
+ *   DETECCIÓN DE TYPOS:
+ *   - Al crear un término nuevo en marcas externas, comparación fuzzy
+ *     con todas las marcas (oficiales + externas) usando similar_text()
+ *     y normalización (sin tildes, minúsculas, sin caracteres especiales)
+ *   - Si la similitud > 75% con alguna existente, aviso visual al editor:
+ *     "⚠️ 'Peoget' se parece a 'Peugeot' (oficial, 88% similar)..."
+ *
+ *   UI MEJORADA:
+ *   - Columna "Tipo" en listado de marcas externas:
+ *     · Badge verde "OFICIAL" + link a editar marca oficial
+ *     · Badge gris "Externa" para las que no son del catálogo
+ *   - Las marcas oficiales sincronizadas NO se pueden borrar desde
+ *     marcas externas (deshabilitada la acción)
+ *   - En el formulario "Añadir nueva marca externa", aviso con la lista
+ *     de marcas oficiales del concesionario para evitar duplicados
+ *
+ *   SINCRONIZACIÓN INICIAL:
+ *   - Al activar el plugin v2.2.0, todas las marcas oficiales existentes
+ *     se sincronizan automáticamente con sus gemelas externas
+ *
  * 2.1.0 — Separación clara: Coches NUEVOS vs Coches de OCASIÓN
  *
  *   CAMBIO ARQUITECTÓNICO:
@@ -170,7 +210,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.1.0' );
+define( 'WELOW_CONC_VERSION', '2.2.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
@@ -184,6 +224,7 @@ require_once WELOW_CONC_PATH . 'includes/admin/class-welow-settings.php';       
 require_once WELOW_CONC_PATH . 'includes/admin/class-welow-importer.php';            // v1.1.0
 require_once WELOW_CONC_PATH . 'includes/admin/class-welow-divi-library-admin.php';  // v1.4.0
 require_once WELOW_CONC_PATH . 'includes/admin/class-welow-icons.php';               // v2.0.0
+require_once WELOW_CONC_PATH . 'includes/admin/class-welow-marca-sync.php';          // v2.2.0
 
 // CPTs
 require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-marca.php';
@@ -239,6 +280,13 @@ register_activation_hook( __FILE__, function() {
     Welow_Tax_Categoria_Modelo::crear_terminos_defecto();
     Welow_Tax_Marca_Externa::registrar_taxonomia();      // v2.1.0
     Welow_Tax_Marca_Externa::crear_terminos_defecto();   // v2.1.0
+
+    // v2.2.0 — Sincronización inicial: cada marca oficial debe tener
+    // su gemela en la taxonomía de marcas externas.
+    if ( class_exists( 'Welow_Marca_Sync' ) ) {
+        Welow_Marca_Sync::sincronizar_todas();
+    }
+
     flush_rewrite_rules();
 });
 

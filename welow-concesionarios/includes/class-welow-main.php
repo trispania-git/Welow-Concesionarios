@@ -28,6 +28,7 @@ class Welow_Main {
         Welow_Settings::init();                // v1.1.0
         Welow_Importer::init();                // v1.1.0
         Welow_Divi_Library_Admin::init();      // v1.4.0
+        Welow_Marca_Sync::init();              // v2.2.0
 
         // Taxonomías
         Welow_Tax_Combustible::init();         // v1.1.0
