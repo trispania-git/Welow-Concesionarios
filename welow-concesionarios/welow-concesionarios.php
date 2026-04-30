@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.6.1
+ * Version:     2.6.2
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,27 @@
  *
  * CHANGELOG
  * ---------
+ * 2.6.2 — Fix sticky header: position fixed + spacer dinámico
+ *
+ *   PROBLEMA:
+ *   `position: sticky` no funcionaba en muchos contextos de Divi
+ *   porque las secciones/filas pueden tener overflow, transform o
+ *   filter que rompen el contexto de stacking de sticky. El header
+ *   marcado como sticky no se quedaba arriba al hacer scroll.
+ *
+ *   SOLUCIÓN:
+ *   Cambiado a `position: fixed` (robusto, no afectado por contexto).
+ *   El JS crea automáticamente un elemento spacer justo después del
+ *   header con la misma altura, para que el contenido siguiente no
+ *   quede oculto debajo del header fixed.
+ *
+ *   - Recalcula la altura al resize del viewport
+ *   - Recalcula tras cargar la imagen del logo
+ *   - Recalcula al window 'load' (assets diferidos)
+ *   - Funciona con admin bar de WP (top: 32px / 46px)
+ *
+ *   Archivos: assets/css/header.css, assets/js/header.js
+ *
  * 2.6.1 — Fix UI header: logo pegado a la izquierda + sin bullets en menú
  *
  *   LOGO PEGADO A LA IZQUIERDA:
@@ -471,7 +492,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.6.1' );
+define( 'WELOW_CONC_VERSION', '2.6.2' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

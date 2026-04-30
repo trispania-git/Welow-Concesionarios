@@ -67,8 +67,54 @@
         else if (mq.addListener) mq.addListener(onMq); // Safari < 14
     }
 
+    /**
+     * v2.6.2 — Maneja el spacer del header sticky.
+     * Como cambiamos position: sticky → position: fixed, necesitamos
+     * un elemento "spacer" que ocupe el hueco que el header dejaría
+     * vacío arriba (porque fixed se sale del flujo normal del DOM).
+     */
+    function setupStickySpacer(header) {
+        if (!header.classList.contains('welow-header--sticky')) return;
+
+        var spacer = header.nextElementSibling;
+        if (!spacer || !spacer.classList || !spacer.classList.contains('welow-header-spacer')) {
+            spacer = document.createElement('div');
+            spacer.className = 'welow-header-spacer';
+            spacer.setAttribute('aria-hidden', 'true');
+            header.parentNode.insertBefore(spacer, header.nextSibling);
+        }
+
+        function actualizar() {
+            // offsetHeight incluye padding y border. Para sticky con admin bar,
+            // sumamos el offset top porque el header fixed empieza en top:32px (o 46px móvil)
+            var h = header.offsetHeight;
+            spacer.style.height = h + 'px';
+        }
+
+        actualizar();
+
+        // Recalcular en resize y tras cargar imágenes (cambia altura del logo)
+        var resizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(actualizar, 100);
+        });
+
+        // Recalcular tras cargar el logo (si la imagen aún no había cargado)
+        var img = header.querySelector('.welow-header__logo-img');
+        if (img && !img.complete) {
+            img.addEventListener('load', actualizar);
+        }
+
+        // Recalcular tras carga completa de la página
+        window.addEventListener('load', actualizar);
+    }
+
     function init() {
-        document.querySelectorAll('.welow-header').forEach(initHeader);
+        document.querySelectorAll('.welow-header').forEach(function(header) {
+            initHeader(header);
+            setupStickySpacer(header);
+        });
     }
 
     if (document.readyState === 'loading') {

@@ -34,16 +34,32 @@
 .welow-header *::before,
 .welow-header *::after { box-sizing: border-box; }
 
+/* v2.6.2 — Sticky cambiado de position: sticky a position: fixed.
+   sticky falla con frecuencia en Divi porque algunas secciones tienen
+   overflow o transform que rompen el contexto. fixed es robusto.
+   El JS añade un spacer dinámico justo después del header para que
+   el contenido siguiente no quede oculto debajo. */
 .welow-header--sticky {
-    position: sticky;
+    position: fixed;
     top: 0;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 /* Compatibilidad con admin bar de WP */
 body.admin-bar .welow-header--sticky { top: 32px; }
 @media (max-width: 782px) {
     body.admin-bar .welow-header--sticky { top: 46px; }
+}
+
+/* Spacer que reserva el hueco del header fixed (lo crea/dimensiona el JS) */
+.welow-header-spacer {
+    display: block;
+    width: 100%;
+    flex-shrink: 0;
 }
 
 .welow-header__inner {
