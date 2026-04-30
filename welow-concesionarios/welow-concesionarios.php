@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.5.1
+ * Version:     2.6.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,55 @@
  *
  * CHANGELOG
  * ---------
+ * 2.6.0 — Cabecera responsive del sitio [welow_header]
+ *
+ *   NUEVO SHORTCODE [welow_header]:
+ *   Construye la cabecera del sitio con 3 zonas en desktop (logo +
+ *   menú + CTAs) y se convierte automáticamente en hamburger con
+ *   overlay fullscreen en móvil. Toda la lógica responsive incluida.
+ *
+ *   ZONAS:
+ *   - Logo (desktop + opcional logo móvil compacto)
+ *   - Menú de navegación (cualquier menú nativo de WP, con dropdowns)
+ *   - Teléfono click-to-call + Botón principal + Botón secundario
+ *
+ *   COMPORTAMIENTO MÓVIL:
+ *   - Hamburger animado (3 líneas → X)
+ *   - Overlay fullscreen con menú expandido (incluye submenús)
+ *   - Teléfono y botones CTA fullwidth en el overlay
+ *   - Cierre con Escape, click en enlaces, o resize a desktop
+ *   - Body lock para evitar scroll mientras está abierto
+ *
+ *   CONFIGURACIÓN:
+ *   Nueva sección "🧭 Cabecera" en Configuraciones con defaults globales:
+ *     - Logo (escritorio + móvil opcional)
+ *     - Altura del logo
+ *     - Menú de navegación
+ *     - Teléfono
+ *     - Botón principal y secundario (texto + URL)
+ *     - Colores (fondo, texto, botón, texto botón)
+ *     - Sticky on/off
+ *
+ *   Cualquier param se puede sobrescribir en el shortcode por página.
+ *
+ *   ACCESIBILIDAD:
+ *   - role="banner"
+ *   - aria-expanded en hamburger
+ *   - aria-controls al overlay
+ *   - aria-label en logo y botones
+ *   - Compatible con admin bar de WP (ajusta sticky offset)
+ *
+ *   PÁGINA DE AYUDA:
+ *   Nueva pestaña "🧭 Cabecera" con guía paso a paso para configurar
+ *   defaults, crear plantilla en Divi Theme Builder y ejemplos de
+ *   personalización.
+ *
+ *   ARCHIVOS NUEVOS:
+ *   - includes/shortcodes/class-welow-shortcode-header.php
+ *   - templates/header.php
+ *   - assets/css/header.css
+ *   - assets/js/header.js
+ *
  * 2.5.1 — Fix UI ficha: badge "OCASIÓN" + formulario integrado
  *
  *   FIX BADGE TIPO en header de la ficha:
@@ -405,7 +454,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.5.1' );
+define( 'WELOW_CONC_VERSION', '2.6.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
@@ -456,6 +505,7 @@ require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coche-
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-buscador-coches.php';    // v2.0.0
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-listado-completo.php';   // v2.4.0
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coche-extras.php';      // v2.5.0
+require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-header.php';            // v2.6.0
 
 // Permalinks de coches
 require_once WELOW_CONC_PATH . 'includes/class-welow-coche-permalinks.php';                       // v2.5.0

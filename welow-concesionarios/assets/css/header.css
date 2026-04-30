@@ -1,0 +1,375 @@
+/**
+ * Cabecera del sitio (welow_header).
+ *
+ * Breakpoints:
+ *   Desktop:  > 980px  → 3 zonas: logo + menú + CTAs
+ *   Móvil:    ≤ 980px  → logo + hamburger → overlay
+ *
+ * @since 2.6.0
+ */
+
+/* ==========================================================================
+   VARIABLES (overridables vía inline style en .welow-header)
+   ========================================================================== */
+.welow-header {
+    --welow-h-bg: #ffffff;
+    --welow-h-color: #1f2937;
+    --welow-h-btn-bg: #2563eb;
+    --welow-h-btn-color: #ffffff;
+    --welow-h-btn-bg-hover: #1d4ed8;
+    --welow-h-border: #e2e8f0;
+    --welow-h-logo-h: 50px;
+    --welow-h-padding-y: 12px;
+    --welow-h-gap: 24px;
+
+    background: var(--welow-h-bg);
+    color: var(--welow-h-color);
+    border-bottom: 1px solid var(--welow-h-border);
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 100;
+}
+
+.welow-header *,
+.welow-header *::before,
+.welow-header *::after { box-sizing: border-box; }
+
+.welow-header--sticky {
+    position: sticky;
+    top: 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+/* Compatibilidad con admin bar de WP */
+body.admin-bar .welow-header--sticky { top: 32px; }
+@media (max-width: 782px) {
+    body.admin-bar .welow-header--sticky { top: 46px; }
+}
+
+.welow-header__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--welow-h-gap);
+    padding: var(--welow-h-padding-y) 24px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* ==========================================================================
+   LOGO
+   ========================================================================== */
+.welow-header__logo {
+    flex-shrink: 0;
+}
+.welow-header__logo a {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+}
+.welow-header__logo-img {
+    display: block;
+    width: auto;
+    max-height: var(--welow-h-logo-h);
+    height: auto;
+}
+.welow-header__logo-img--movil { display: none; }
+.welow-header__logo-texto {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--welow-h-color);
+    letter-spacing: -0.3px;
+}
+
+/* ==========================================================================
+   MENÚ DESKTOP
+   ========================================================================== */
+.welow-header__menu--desktop {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+.welow-header__menu-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.welow-header__menu-list li { position: relative; }
+.welow-header__menu-list a {
+    display: block;
+    padding: 8px 14px;
+    color: var(--welow-h-color);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: background 0.15s, color 0.15s;
+    line-height: 1.4;
+}
+.welow-header__menu-list a:hover,
+.welow-header__menu-list .current-menu-item > a,
+.welow-header__menu-list .current-menu-parent > a,
+.welow-header__menu-list .current-menu-ancestor > a {
+    background: rgba(37, 99, 235, 0.08);
+    color: var(--welow-h-btn-bg);
+}
+
+/* Submenú dropdown */
+.welow-header__menu-list .sub-menu {
+    list-style: none;
+    margin: 0;
+    padding: 6px 0;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 220px;
+    background: #fff;
+    border: 1px solid var(--welow-h-border);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+    z-index: 110;
+}
+.welow-header__menu-list li:hover > .sub-menu,
+.welow-header__menu-list li:focus-within > .sub-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.welow-header__menu-list .sub-menu a {
+    padding: 8px 16px;
+    border-radius: 0;
+    font-weight: 500;
+}
+.welow-header__menu-list .sub-menu a:hover { background: #f1f5f9; }
+
+/* ==========================================================================
+   CTAs (teléfono + botones)
+   ========================================================================== */
+.welow-header__ctas {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.welow-header__telefono {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--welow-h-color);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background 0.15s;
+}
+.welow-header__telefono:hover { background: rgba(0,0,0,0.04); }
+.welow-header__telefono svg { color: var(--welow-h-btn-bg); }
+
+.welow-header__boton {
+    display: inline-block;
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.2;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.welow-header__boton--primario {
+    background: var(--welow-h-btn-bg);
+    color: var(--welow-h-btn-color);
+}
+.welow-header__boton--primario:hover {
+    background: var(--welow-h-btn-bg-hover);
+    color: var(--welow-h-btn-color);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+.welow-header__boton--secundario {
+    background: transparent;
+    color: var(--welow-h-btn-bg);
+    border: 1.5px solid var(--welow-h-btn-bg);
+}
+.welow-header__boton--secundario:hover {
+    background: var(--welow-h-btn-bg);
+    color: var(--welow-h-btn-color);
+}
+.welow-header__boton--full {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 14px 18px;
+}
+
+/* ==========================================================================
+   HAMBURGER (móvil)
+   ========================================================================== */
+.welow-header__hamburger {
+    display: none;
+    background: transparent;
+    border: none;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+.welow-header__hamburger span {
+    display: block;
+    position: absolute;
+    height: 2.5px;
+    width: 22px;
+    background: var(--welow-h-color);
+    border-radius: 2px;
+    left: 9px;
+    transition: all 0.25s ease;
+}
+.welow-header__hamburger span:nth-child(1) { top: 13px; }
+.welow-header__hamburger span:nth-child(2) { top: 19px; }
+.welow-header__hamburger span:nth-child(3) { top: 25px; }
+
+.welow-header__hamburger[aria-expanded="true"] span:nth-child(1) {
+    top: 19px;
+    transform: rotate(45deg);
+}
+.welow-header__hamburger[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+}
+.welow-header__hamburger[aria-expanded="true"] span:nth-child(3) {
+    top: 19px;
+    transform: rotate(-45deg);
+}
+
+/* ==========================================================================
+   OVERLAY MÓVIL
+   ========================================================================== */
+.welow-header__overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.98);
+    z-index: 99999;
+    overflow-y: auto;
+    padding: 80px 24px 40px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+.welow-header__overlay.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+.welow-header__overlay[hidden] { display: none; }
+.welow-header__overlay:not([hidden]) { display: block; }
+
+.welow-header__overlay-inner {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.welow-header__overlay-menu {
+    list-style: none;
+    margin: 0 0 30px;
+    padding: 0;
+}
+.welow-header__overlay-menu li {
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.welow-header__overlay-menu a {
+    display: block;
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 16px 0;
+    transition: color 0.15s, padding 0.15s;
+}
+.welow-header__overlay-menu a:hover {
+    color: var(--welow-h-btn-bg);
+    padding-left: 8px;
+}
+.welow-header__overlay-menu .sub-menu {
+    list-style: none;
+    margin: 0 0 0 16px;
+    padding: 0 0 8px;
+}
+.welow-header__overlay-menu .sub-menu li {
+    border: none;
+}
+.welow-header__overlay-menu .sub-menu a {
+    font-size: 15px;
+    font-weight: 500;
+    padding: 8px 0;
+    color: rgba(255,255,255,0.8);
+}
+
+.welow-header__overlay-ctas {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+}
+.welow-header__overlay-tel {
+    color: #fff;
+    text-decoration: none;
+    font-size: 17px;
+    font-weight: 700;
+    padding: 14px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+}
+.welow-header__overlay-tel .dashicons {
+    color: var(--welow-h-btn-bg);
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+}
+
+/* ==========================================================================
+   RESPONSIVE — Móvil/Tablet
+   ========================================================================== */
+@media (max-width: 980px) {
+    .welow-header__inner {
+        gap: 12px;
+        padding: 10px 16px;
+    }
+
+    /* Mostrar logo móvil si existe */
+    .welow-header__logo-img--desktop { display: none; }
+    .welow-header__logo-img--movil   { display: block; }
+    /* Si no hay logo móvil, el desktop sigue mostrándose (sin oclusión) */
+    .welow-header__logo-img--desktop:only-child { display: block; }
+
+    /* Ocultar menú y CTAs desktop, mostrar hamburger */
+    .welow-header__menu--desktop { display: none; }
+    .welow-header__ctas { display: none; }
+    .welow-header__hamburger { display: block; }
+}
+
+/* En desktop, ocultar la versión móvil del logo */
+@media (min-width: 981px) {
+    .welow-header__logo-img--movil { display: none; }
+}
+
+/* Body lock cuando overlay está abierto */
+body.welow-header-open {
+    overflow: hidden;
+}

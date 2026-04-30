@@ -60,6 +60,7 @@ class Welow_Main {
         Welow_Shortcode_Buscador_Coches::init();   // v2.0.0
         Welow_Shortcode_Listado_Completo::init();  // v2.4.0
         Welow_Shortcode_Coche_Extras::init();      // v2.5.0
+        Welow_Shortcode_Header::init();            // v2.6.0
 
         // Permalinks personalizados de coches
         Welow_Coche_Permalinks::init();            // v2.5.0
@@ -122,6 +123,14 @@ class Welow_Main {
             WELOW_CONC_VERSION
         );
 
+        // v2.6.0 — Header
+        wp_register_style(
+            'welow-header',
+            WELOW_CONC_URL . 'assets/css/header.css',
+            array(),
+            WELOW_CONC_VERSION
+        );
+
         // JS
         wp_register_script(
             'welow-slider',
@@ -133,6 +142,15 @@ class Welow_Main {
         wp_register_script(
             'welow-coche-galeria',
             WELOW_CONC_URL . 'assets/js/coche-galeria.js',
+            array(),
+            WELOW_CONC_VERSION,
+            true
+        );
+
+        // v2.6.0 — Header (toggle hamburger)
+        wp_register_script(
+            'welow-header',
+            WELOW_CONC_URL . 'assets/js/header.js',
             array(),
             WELOW_CONC_VERSION,
             true

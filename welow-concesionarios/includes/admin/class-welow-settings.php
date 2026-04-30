@@ -109,6 +109,27 @@ class Welow_Settings {
             $output['iconos'] = Welow_Icons::sanitize( $input['iconos'] );
         }
 
+        // v2.6.0 — Cabecera (header)
+        if ( isset( $input['header'] ) && is_array( $input['header'] ) ) {
+            $h = $input['header'];
+            $output['header'] = array(
+                'logo_id'           => isset( $h['logo_id'] ) ? absint( $h['logo_id'] ) : 0,
+                'logo_movil_id'     => isset( $h['logo_movil_id'] ) ? absint( $h['logo_movil_id'] ) : 0,
+                'logo_altura'       => isset( $h['logo_altura'] ) ? absint( $h['logo_altura'] ) : 50,
+                'menu_id'           => isset( $h['menu_id'] ) ? absint( $h['menu_id'] ) : 0,
+                'telefono'          => isset( $h['telefono'] ) ? sanitize_text_field( $h['telefono'] ) : '',
+                'boton_texto'       => isset( $h['boton_texto'] ) ? sanitize_text_field( $h['boton_texto'] ) : '',
+                'boton_enlace'      => isset( $h['boton_enlace'] ) ? esc_url_raw( $h['boton_enlace'] ) : '',
+                'boton2_texto'      => isset( $h['boton2_texto'] ) ? sanitize_text_field( $h['boton2_texto'] ) : '',
+                'boton2_enlace'     => isset( $h['boton2_enlace'] ) ? esc_url_raw( $h['boton2_enlace'] ) : '',
+                'color_fondo'       => isset( $h['color_fondo'] ) ? sanitize_hex_color( $h['color_fondo'] ) : '',
+                'color_texto'       => isset( $h['color_texto'] ) ? sanitize_hex_color( $h['color_texto'] ) : '',
+                'color_boton'       => isset( $h['color_boton'] ) ? sanitize_hex_color( $h['color_boton'] ) : '',
+                'color_boton_texto' => isset( $h['color_boton_texto'] ) ? sanitize_hex_color( $h['color_boton_texto'] ) : '',
+                'sticky'            => ! empty( $h['sticky'] ),
+            );
+        }
+
         return $output;
     }
 
@@ -200,6 +221,9 @@ class Welow_Settings {
                     </tr>
                 </table>
 
+                <?php // v2.6.0 — Sección de Cabecera ?>
+                <?php self::render_section_header( $options ); ?>
+
                 <?php
                 // v2.0.0 — Sección de iconos
                 if ( class_exists( 'Welow_Icons' ) ) {
@@ -272,5 +296,154 @@ class Welow_Settings {
             });
         </script>
         <?php
+    }
+
+    /**
+     * v2.6.0 — Sección de configuración de la Cabecera (header).
+     */
+    public static function render_section_header( $options ) {
+        $h = isset( $options['header'] ) && is_array( $options['header'] ) ? $options['header'] : array();
+        $logo_id = isset( $h['logo_id'] ) ? intval( $h['logo_id'] ) : 0;
+        $logo_movil_id = isset( $h['logo_movil_id'] ) ? intval( $h['logo_movil_id'] ) : 0;
+        $logo_url = $logo_id ? wp_get_attachment_image_url( $logo_id, 'medium' ) : '';
+        $logo_movil_url = $logo_movil_id ? wp_get_attachment_image_url( $logo_movil_id, 'thumbnail' ) : '';
+        $name = self::OPTION_KEY . '[header]';
+
+        // Menús de WP
+        $menus = wp_get_nav_menus();
+        $menu_id = isset( $h['menu_id'] ) ? intval( $h['menu_id'] ) : 0;
+        ?>
+        <h2 class="title">🧭 Cabecera (Header)</h2>
+        <p>Defaults de la cabecera del sitio. Se usan automáticamente en el shortcode <code>[welow_header]</code> si no especificas parámetros propios.</p>
+
+        <table class="form-table">
+            <tr>
+                <th scope="row"><label>Logo (escritorio)</label></th>
+                <td>
+                    <div class="welow-media-field">
+                        <input type="hidden" id="welow_header_logo" name="<?php echo esc_attr( $name ); ?>[logo_id]" value="<?php echo esc_attr( $logo_id ); ?>" />
+                        <div id="welow-header-logo-preview" class="welow-image-preview" style="max-width:200px;background:#f5f5f5;padding:8px;">
+                            <?php if ( $logo_url ) : ?><img src="<?php echo esc_url( $logo_url ); ?>" alt="" style="max-height:60px;" /><?php endif; ?>
+                        </div>
+                        <button type="button" class="button welow-upload-btn" data-target="welow_header_logo" data-preview="welow-header-logo-preview">
+                            <?php echo $logo_id ? 'Cambiar' : 'Seleccionar'; ?>
+                        </button>
+                        <?php if ( $logo_id ) : ?>
+                            <button type="button" class="button welow-remove-btn" data-target="welow_header_logo" data-preview="welow-header-logo-preview">Quitar</button>
+                        <?php endif; ?>
+                    </div>
+                    <p class="description">Logo principal. PNG/SVG, recomendado altura 50-60px.</p>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><label>Logo móvil (opcional)</label></th>
+                <td>
+                    <div class="welow-media-field">
+                        <input type="hidden" id="welow_header_logo_movil" name="<?php echo esc_attr( $name ); ?>[logo_movil_id]" value="<?php echo esc_attr( $logo_movil_id ); ?>" />
+                        <div id="welow-header-logo-movil-preview" class="welow-image-preview" style="max-width:120px;background:#f5f5f5;padding:8px;">
+                            <?php if ( $logo_movil_url ) : ?><img src="<?php echo esc_url( $logo_movil_url ); ?>" alt="" style="max-height:40px;" /><?php endif; ?>
+                        </div>
+                        <button type="button" class="button welow-upload-btn" data-target="welow_header_logo_movil" data-preview="welow-header-logo-movil-preview">
+                            <?php echo $logo_movil_id ? 'Cambiar' : 'Seleccionar'; ?>
+                        </button>
+                        <?php if ( $logo_movil_id ) : ?>
+                            <button type="button" class="button welow-remove-btn" data-target="welow_header_logo_movil" data-preview="welow-header-logo-movil-preview">Quitar</button>
+                        <?php endif; ?>
+                    </div>
+                    <p class="description">Si se deja vacío, se usa el logo principal en móvil. Útil para isotipo compacto.</p>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><label>Altura del logo</label></th>
+                <td>
+                    <input type="number" name="<?php echo esc_attr( $name ); ?>[logo_altura]" value="<?php echo esc_attr( $h['logo_altura'] ?? 50 ); ?>" min="20" max="120" step="1" /> px
+                    <p class="description">Altura máxima del logo (entre 20 y 120px). Default: 50px.</p>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="welow_header_menu">Menú de navegación</label></th>
+                <td>
+                    <select id="welow_header_menu" name="<?php echo esc_attr( $name ); ?>[menu_id]">
+                        <option value="0">— No usar menú —</option>
+                        <?php foreach ( $menus as $menu ) : ?>
+                            <option value="<?php echo esc_attr( $menu->term_id ); ?>" <?php selected( $menu_id, $menu->term_id ); ?>>
+                                <?php echo esc_html( $menu->name ); ?> (<?php echo intval( $menu->count ); ?> elementos)
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <p class="description">Crea o edita menús en <a href="<?php echo esc_url( admin_url( 'nav-menus.php' ) ); ?>">Apariencia → Menús</a>.</p>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><label>Teléfono (opcional)</label></th>
+                <td>
+                    <input type="text" name="<?php echo esc_attr( $name ); ?>[telefono]" value="<?php echo esc_attr( $h['telefono'] ?? '' ); ?>" class="regular-text" placeholder="ej: 919 496 619" />
+                    <p class="description">Click-to-call en móvil. Deja vacío para no mostrar.</p>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><label>Botón principal</label></th>
+                <td>
+                    <input type="text" name="<?php echo esc_attr( $name ); ?>[boton_texto]" value="<?php echo esc_attr( $h['boton_texto'] ?? '' ); ?>" placeholder="Cita taller" style="width:200px;" />
+                    <input type="url" name="<?php echo esc_attr( $name ); ?>[boton_enlace]" value="<?php echo esc_url( $h['boton_enlace'] ?? '' ); ?>" placeholder="https://..." style="width:300px;" />
+                    <p class="description">Texto + URL del CTA principal.</p>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><label>Botón secundario (opcional)</label></th>
+                <td>
+                    <input type="text" name="<?php echo esc_attr( $name ); ?>[boton2_texto]" value="<?php echo esc_attr( $h['boton2_texto'] ?? '' ); ?>" placeholder="Cita concesionario" style="width:200px;" />
+                    <input type="url" name="<?php echo esc_attr( $name ); ?>[boton2_enlace]" value="<?php echo esc_url( $h['boton2_enlace'] ?? '' ); ?>" placeholder="https://..." style="width:300px;" />
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><label>Colores</label></th>
+                <td>
+                    <label style="display:inline-block;margin-right:18px;">Fondo:<br>
+                        <input type="text" name="<?php echo esc_attr( $name ); ?>[color_fondo]" value="<?php echo esc_attr( $h['color_fondo'] ?? '' ); ?>" placeholder="#ffffff" style="width:100px;" />
+                    </label>
+                    <label style="display:inline-block;margin-right:18px;">Texto/menú:<br>
+                        <input type="text" name="<?php echo esc_attr( $name ); ?>[color_texto]" value="<?php echo esc_attr( $h['color_texto'] ?? '' ); ?>" placeholder="#1f2937" style="width:100px;" />
+                    </label>
+                    <label style="display:inline-block;margin-right:18px;">Botón:<br>
+                        <input type="text" name="<?php echo esc_attr( $name ); ?>[color_boton]" value="<?php echo esc_attr( $h['color_boton'] ?? '' ); ?>" placeholder="#2563eb" style="width:100px;" />
+                    </label>
+                    <label style="display:inline-block;">Texto botón:<br>
+                        <input type="text" name="<?php echo esc_attr( $name ); ?>[color_boton_texto]" value="<?php echo esc_attr( $h['color_boton_texto'] ?? '' ); ?>" placeholder="#ffffff" style="width:100px;" />
+                    </label>
+                    <p class="description">Hex (#rrggbb). Vacío = colores por defecto.</p>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><label>Comportamiento</label></th>
+                <td>
+                    <label>
+                        <input type="checkbox" name="<?php echo esc_attr( $name ); ?>[sticky]" value="1" <?php checked( ! empty( $h['sticky'] ) ); ?> />
+                        <strong>Header pegado al hacer scroll</strong> (sticky)
+                    </label>
+                </td>
+            </tr>
+        </table>
+        <?php
+    }
+
+    /**
+     * Helper público: devuelve los defaults de cabecera.
+     *
+     * @since 2.6.0
+     */
+    public static function get_header_defaults() {
+        $opts = get_option( self::OPTION_KEY, array() );
+        $defaults = array(
+            'logo_id' => 0, 'logo_movil_id' => 0, 'logo_altura' => 50,
+            'menu_id' => 0, 'telefono' => '',
+            'boton_texto' => '', 'boton_enlace' => '',
+            'boton2_texto' => '', 'boton2_enlace' => '',
+            'color_fondo' => '', 'color_texto' => '',
+            'color_boton' => '', 'color_boton_texto' => '',
+            'sticky' => false,
+        );
+        $h = isset( $opts['header'] ) && is_array( $opts['header'] ) ? $opts['header'] : array();
+        return wp_parse_args( $h, $defaults );
     }
 }

@@ -260,6 +260,34 @@ class Welow_Help {
                 ),
             ),
 
+            'welow_header' => array(
+                'titulo' => '🧭 Cabecera del sitio (responsive)',
+                'desc'   => 'Header completo con 3 zonas: logo + menú + CTAs. En móvil se convierte automáticamente en hamburger con overlay. Toma defaults de Configuraciones → Cabecera; los params del shortcode los sobrescriben.',
+                'params' => array(
+                    'logo'              => array( 'def' => '(default global)', 'desc' => 'ID o URL del logo principal' ),
+                    'logo_movil'        => array( 'def' => '(default global)', 'desc' => 'ID/URL del logo móvil (opcional, fallback al desktop)' ),
+                    'logo_altura'       => array( 'def' => '50', 'desc' => 'Altura del logo en px' ),
+                    'logo_url'          => array( 'def' => 'home', 'desc' => 'URL al hacer clic en el logo' ),
+                    'menu'              => array( 'def' => '(default global)', 'desc' => 'ID, slug o nombre del menú de WP' ),
+                    'telefono'          => array( 'def' => '(default global)', 'desc' => 'Número de teléfono (click-to-call)' ),
+                    'boton_texto'       => array( 'def' => '(default global)', 'desc' => 'Texto del botón principal' ),
+                    'boton_enlace'      => array( 'def' => '(default global)', 'desc' => 'URL del botón principal' ),
+                    'boton2_texto'      => array( 'def' => '(default global)', 'desc' => 'Texto del botón secundario (opcional)' ),
+                    'boton2_enlace'     => array( 'def' => '(default global)', 'desc' => 'URL del botón secundario' ),
+                    'color_fondo'       => array( 'def' => '#ffffff', 'desc' => 'Color de fondo del header' ),
+                    'color_texto'       => array( 'def' => '#1f2937', 'desc' => 'Color del texto/menú' ),
+                    'color_boton'       => array( 'def' => '#2563eb', 'desc' => 'Color del botón primario' ),
+                    'color_boton_texto' => array( 'def' => '#ffffff', 'desc' => 'Color del texto del botón' ),
+                    'sticky'            => array( 'def' => 'no', 'desc' => 'si | no — header pegado al hacer scroll' ),
+                    'ancho_max'         => array( 'def' => '1280px', 'desc' => 'Anchura máxima del contenedor interior' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_header]   <!-- usa todos los defaults de Configuraciones -->',
+                    '[welow_header sticky="si"]',
+                    '[welow_header menu="cabecera-coches" boton_texto="Cita taller" boton_enlace="/contacto/cita/"]',
+                ),
+            ),
+
             'welow_coche_breadcrumb' => array(
                 'titulo' => 'Breadcrumb de la ficha del coche',
                 'desc'   => 'Genera un breadcrumb dinámico: Inicio › Coches › [Segunda mano] › Marca › Modelo › Versión. Auto-detecta el coche del contexto.',
@@ -346,6 +374,7 @@ class Welow_Help {
 
             <h2 class="nav-tab-wrapper">
                 <a href="?page=<?php echo esc_attr( self::PAGE_SLUG ); ?>&tab=shortcodes" class="nav-tab <?php echo $tab === 'shortcodes' ? 'nav-tab-active' : ''; ?>">📋 Shortcodes</a>
+                <a href="?page=<?php echo esc_attr( self::PAGE_SLUG ); ?>&tab=header" class="nav-tab <?php echo $tab === 'header' ? 'nav-tab-active' : ''; ?>">🧭 Cabecera</a>
                 <a href="?page=<?php echo esc_attr( self::PAGE_SLUG ); ?>&tab=ficha" class="nav-tab <?php echo $tab === 'ficha' ? 'nav-tab-active' : ''; ?>">🚗 Ficha del coche</a>
                 <a href="?page=<?php echo esc_attr( self::PAGE_SLUG ); ?>&tab=estructura" class="nav-tab <?php echo $tab === 'estructura' ? 'nav-tab-active' : ''; ?>">🏗️ Estructura</a>
                 <a href="?page=<?php echo esc_attr( self::PAGE_SLUG ); ?>&tab=csv" class="nav-tab <?php echo $tab === 'csv' ? 'nav-tab-active' : ''; ?>">📥 Importación CSV</a>
@@ -355,6 +384,7 @@ class Welow_Help {
             <div class="welow-help-content">
                 <?php
                 if ( $tab === 'shortcodes' ) self::render_tab_shortcodes( $shortcodes );
+                elseif ( $tab === 'header' ) self::render_tab_header();
                 elseif ( $tab === 'ficha' ) self::render_tab_ficha();
                 elseif ( $tab === 'estructura' ) self::render_tab_estructura();
                 elseif ( $tab === 'csv' ) self::render_tab_csv();
@@ -465,6 +495,93 @@ class Welow_Help {
                 <?php endif; ?>
             </div>
         <?php endforeach; ?>
+        <?php
+    }
+
+    private static function render_tab_header() {
+        ?>
+        <h2>🧭 Cabecera del sitio (Header)</h2>
+        <p>Construye la cabecera del sitio con un único shortcode <strong><code>[welow_header]</code></strong> que se ocupa de todo: logo, menú, teléfono, botones CTA y el comportamiento responsive (hamburger en móvil).</p>
+
+        <div class="welow-info-box">
+            <strong>Configura los defaults una sola vez</strong> en <a href="<?php echo esc_url( admin_url( 'admin.php?page=welow_settings' ) ); ?>">Concesionarios → Configuraciones → 🧭 Cabecera</a>. Después solo necesitas <code>[welow_header]</code> en cualquier sitio (se renderiza con esos defaults).
+        </div>
+
+        <h3>Paso 1: Configurar defaults globales</h3>
+        <ol>
+            <li>Ve a <a href="<?php echo esc_url( admin_url( 'admin.php?page=welow_settings' ) ); ?>">Configuraciones</a></li>
+            <li>Sube tu <strong>logo</strong> principal y opcionalmente uno móvil (más compacto)</li>
+            <li>Selecciona el <strong>menú de navegación</strong> (créalos en Apariencia → Menús)</li>
+            <li>Rellena <strong>teléfono</strong> y <strong>botones CTA</strong> (ej: "Cita taller" / "Cita concesionario")</li>
+            <li>Personaliza <strong>colores</strong> (opcional)</li>
+            <li>Marca <strong>sticky</strong> si quieres header pegado al scroll</li>
+            <li>Guardar</li>
+        </ol>
+
+        <h3>Paso 2: Crear plantilla en Divi Theme Builder</h3>
+        <ol>
+            <li><strong>Divi → Theme Builder → Add New Template</strong></li>
+            <li>Marca <strong>"Build Custom Header"</strong></li>
+            <li>Asignar a <strong>"All Pages"</strong> (o las que quieras)</li>
+            <li>Dentro del header builder, añade <strong>UN módulo Texto</strong> a ancho completo</li>
+            <li>Pega: <code>[welow_header]</code></li>
+            <li>Guardar</li>
+        </ol>
+
+        <div class="welow-info-box">
+            <strong>💡 Truco:</strong> elimina el padding/margin de la sección y fila que envuelve el módulo en Divi para que el header quede bien al ras del top. En la fila, pon <strong>"Make This Row Fullwidth"</strong>.
+        </div>
+
+        <h3>Estructura del header</h3>
+
+        <p><strong>Desktop (>980px):</strong> 3 zonas en flexbox</p>
+        <pre style="background:#f8fafc;padding:14px;border-radius:6px;font-size:12px;line-height:1.6;border-left:3px solid #2563eb;">
++-----------------------------------------------------------------+
+| [LOGO]      Menú · de · navegación · centrado    📞 Tel  [BTN] |
++-----------------------------------------------------------------+</pre>
+
+        <p><strong>Móvil (≤980px):</strong> logo + hamburger</p>
+        <pre style="background:#f8fafc;padding:14px;border-radius:6px;font-size:12px;line-height:1.6;border-left:3px solid #f59e0b;">
++-----------------------------------------------+
+| [LOGO]                                   [☰]  |
++-----------------------------------------------+
+
+Tras pulsar [☰] (overlay fullscreen):
++-----------------------------------------------+
+|  Inicio                                       |
+|  Coches                                       |
+|    └─ Nuevos                                  |
+|    └─ Ocasión                                 |
+|  Marcas                                       |
+|  Posventa                                     |
+|  Contacto                                     |
+|  ───────────────────────────────────────      |
+|  📞 919 496 619                               |
+|  [Cita taller (botón fullwidth)]              |
+|  [Cita concesionario (secundario)]            |
++-----------------------------------------------+</pre>
+
+        <h3>Variantes y personalización</h3>
+
+        <p><strong>Override de defaults:</strong> puedes pasar params al shortcode para sobrescribir los defaults globales en una página concreta:</p>
+        <pre style="background:#1e293b;color:#e2e8f0;padding:12px;border-radius:4px;font-size:12px;">[welow_header menu="cabecera-coches-nuevos" boton_texto="Configurar mi coche" boton_enlace="/configurador/"]</pre>
+
+        <p><strong>Colores específicos para una página de marca:</strong></p>
+        <pre style="background:#1e293b;color:#e2e8f0;padding:12px;border-radius:4px;font-size:12px;">[welow_header color_fondo="#000000" color_texto="#ffffff" color_boton="#dc2626"]</pre>
+
+        <p><strong>Sticky activado por shortcode:</strong></p>
+        <pre style="background:#1e293b;color:#e2e8f0;padding:12px;border-radius:4px;font-size:12px;">[welow_header sticky="si"]</pre>
+
+        <h3>Preguntas frecuentes</h3>
+
+        <p><strong>¿Y los submenús (dropdowns)?</strong><br>
+        Funcionan automáticamente. Cualquier menú de WP con elementos hijos genera dropdowns en desktop y submenús expandidos en el overlay móvil.</p>
+
+        <p><strong>¿Es accesible?</strong><br>
+        Sí: roles ARIA (<code>role="banner"</code>, <code>aria-expanded</code>, <code>aria-controls</code>, <code>aria-label</code>), cierre con tecla <kbd>Esc</kbd>, foco gestionado, body lock al abrir overlay.</p>
+
+        <p><strong>¿Choca con la admin bar de WP cuando estoy logueado?</strong><br>
+        No. El CSS detecta la admin bar y ajusta el offset del sticky automáticamente.</p>
         <?php
     }
 
