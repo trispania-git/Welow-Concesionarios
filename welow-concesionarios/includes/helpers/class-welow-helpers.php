@@ -369,11 +369,16 @@ class Welow_Helpers {
             'tipo_venta'      => 'todos',
             'combustible'     => '',
             'carroceria'      => '',
+            'cambio'          => '',         // v2.8.0: filtro por tipo de cambio
             'concesionario'   => '',
             'precio_min'      => '',
             'precio_max'      => '',
+            'km_min'          => '',         // v2.8.0
             'km_max'          => '',
             'anio_min'        => '',
+            'anio_max'        => '',         // v2.8.0
+            'cv_min'          => '',         // v2.8.0
+            'cv_max'          => '',         // v2.8.0
             'estado'          => 'disponible',
             'orden'           => 'recientes',
             'max'             => -1,
@@ -435,10 +440,12 @@ class Welow_Helpers {
             }
         }
 
-        // Marca externa (taxonomía, solo aplica a ocasión)
-        if ( $args['marca_externa'] ) {
+        // Marca externa (taxonomía, solo aplica a ocasión) — admite string o array
+        if ( ! empty( $args['marca_externa'] ) ) {
             $query_args['tax_query'][] = array(
-                'taxonomy' => 'welow_marca_externa', 'field' => 'slug', 'terms' => $args['marca_externa'],
+                'taxonomy' => 'welow_marca_externa', 'field' => 'slug',
+                'terms' => is_array( $args['marca_externa'] ) ? $args['marca_externa'] : array( $args['marca_externa'] ),
+                'operator' => 'IN',
             );
         }
 
@@ -464,6 +471,12 @@ class Welow_Helpers {
                 'compare' => '<=', 'type' => 'NUMERIC',
             );
         }
+        if ( $args['km_min'] !== '' && $args['km_min'] > 0 ) {
+            $query_args['meta_query'][] = array(
+                'key' => '_welow_coche_km', 'value' => intval( $args['km_min'] ),
+                'compare' => '>=', 'type' => 'NUMERIC',
+            );
+        }
         if ( $args['km_max'] !== '' && $args['km_max'] > 0 ) {
             $query_args['meta_query'][] = array(
                 'key' => '_welow_coche_km', 'value' => intval( $args['km_max'] ),
@@ -476,15 +489,47 @@ class Welow_Helpers {
                 'compare' => '>=', 'type' => 'NUMERIC',
             );
         }
-
-        if ( $args['combustible'] ) {
-            $query_args['tax_query'][] = array(
-                'taxonomy' => 'welow_combustible', 'field' => 'slug', 'terms' => $args['combustible'],
+        if ( $args['anio_max'] !== '' && $args['anio_max'] > 0 ) {
+            $query_args['meta_query'][] = array(
+                'key' => '_welow_coche_anio_matricula', 'value' => intval( $args['anio_max'] ),
+                'compare' => '<=', 'type' => 'NUMERIC',
             );
         }
-        if ( $args['carroceria'] ) {
+        if ( $args['cv_min'] !== '' && $args['cv_min'] > 0 ) {
+            $query_args['meta_query'][] = array(
+                'key' => '_welow_coche_cv', 'value' => intval( $args['cv_min'] ),
+                'compare' => '>=', 'type' => 'NUMERIC',
+            );
+        }
+        if ( $args['cv_max'] !== '' && $args['cv_max'] > 0 ) {
+            $query_args['meta_query'][] = array(
+                'key' => '_welow_coche_cv', 'value' => intval( $args['cv_max'] ),
+                'compare' => '<=', 'type' => 'NUMERIC',
+            );
+        }
+
+        // Cambio (manual / automatico / semiautomatico) - admite array
+        if ( ! empty( $args['cambio'] ) ) {
+            $cambios = is_array( $args['cambio'] ) ? $args['cambio'] : array( $args['cambio'] );
+            $query_args['meta_query'][] = array(
+                'key' => '_welow_coche_cambio',
+                'value' => $cambios,
+                'compare' => 'IN',
+            );
+        }
+
+        if ( ! empty( $args['combustible'] ) ) {
             $query_args['tax_query'][] = array(
-                'taxonomy' => 'welow_categoria_modelo', 'field' => 'slug', 'terms' => $args['carroceria'],
+                'taxonomy' => 'welow_combustible', 'field' => 'slug',
+                'terms' => is_array( $args['combustible'] ) ? $args['combustible'] : array( $args['combustible'] ),
+                'operator' => 'IN',
+            );
+        }
+        if ( ! empty( $args['carroceria'] ) ) {
+            $query_args['tax_query'][] = array(
+                'taxonomy' => 'welow_categoria_modelo', 'field' => 'slug',
+                'terms' => is_array( $args['carroceria'] ) ? $args['carroceria'] : array( $args['carroceria'] ),
+                'operator' => 'IN',
             );
         }
 
@@ -516,6 +561,59 @@ class Welow_Helpers {
         }
 
         return get_posts( $query_args );
+    }
+
+    /**
+     * Como get_coches() pero devuelve un array con paginación.
+     *
+     * @since 2.8.0
+     * @param array $args Mismos args que get_coches() + 'por_pagina' y 'paged'
+     * @return array {
+     *   posts: WP_Post[]      ← coches de la página actual
+     *   total: int             ← total de coches que matchean (sin paginación)
+     *   paginas_total: int     ← número total de páginas
+     *   pagina_actual: int     ← página actual
+     * }
+     */
+    public static function get_coches_paginado( $args = array() ) {
+        $por_pagina = isset( $args['por_pagina'] ) ? max( 1, intval( $args['por_pagina'] ) ) : 12;
+        $paged      = isset( $args['paged'] ) ? max( 1, intval( $args['paged'] ) ) : 1;
+
+        // Construir el WP_Query directamente para tener acceso a total
+        $defaults = array(
+            'cpt'             => array( 'welow_coche_nuevo', 'welow_coche_ocasion' ),
+            'marca'           => '', 'modelo'          => '',
+            'marca_externa'   => '', 'tipo_venta'      => 'todos',
+            'combustible'     => '', 'carroceria'      => '',
+            'cambio'          => '', 'concesionario'   => '',
+            'precio_min'      => '', 'precio_max'      => '',
+            'km_min'          => '', 'km_max'          => '',
+            'anio_min'        => '', 'anio_max'        => '',
+            'cv_min'          => '', 'cv_max'          => '',
+            'estado'          => 'disponible',
+            'orden'           => 'recientes',
+        );
+        $args = wp_parse_args( $args, $defaults );
+
+        // Reutilizamos la lógica de get_coches() pasando max ilimitado y luego
+        // hacemos slice para la paginación. Si hay muchos coches, mejor usar
+        // WP_Query directamente, pero para volúmenes razonables esto va bien.
+        $todos = self::get_coches( array_merge( $args, array( 'max' => -1, 'paged' => 1 ) ) );
+
+        $total = count( $todos );
+        $paginas_total = max( 1, ceil( $total / $por_pagina ) );
+        $pagina_actual = min( $paged, $paginas_total );
+
+        $offset = ( $pagina_actual - 1 ) * $por_pagina;
+        $posts  = array_slice( $todos, $offset, $por_pagina );
+
+        return array(
+            'posts'         => $posts,
+            'total'         => $total,
+            'paginas_total' => $paginas_total,
+            'pagina_actual' => $pagina_actual,
+            'por_pagina'    => $por_pagina,
+        );
     }
 
     /**

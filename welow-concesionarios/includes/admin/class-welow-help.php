@@ -207,6 +207,27 @@ class Welow_Help {
                 ),
             ),
 
+            'welow_coches_filtro' => array(
+                'titulo' => '🔍 Página de filtros + listado',
+                'desc'   => 'Página completa con sidebar de filtros (izquierda) + grid de resultados (derecha) + paginación + ordenación. En móvil los filtros se convierten en drawer fullscreen. Inspirado en la página de ofertas de Grupo Gamboa.',
+                'params' => array(
+                    'tipo'             => array( 'def' => 'ocasion', 'desc' => 'ocasion | nuevos | todos' ),
+                    'titulo'           => array( 'def' => '', 'desc' => 'Título grande arriba (opcional)' ),
+                    'subtitulo'        => array( 'def' => '', 'desc' => 'Subtítulo descriptivo (opcional)' ),
+                    'por_pagina'       => array( 'def' => '12', 'desc' => 'Coches por página' ),
+                    'columnas'         => array( 'def' => '3', 'desc' => 'Columnas del grid de resultados (desktop)' ),
+                    'mostrar_filtros'  => array( 'def' => 'marca,carroceria,combustible,cambio,precio,anio,km,cv', 'desc' => 'Filtros separados por coma. Disponibles: marca, tipo, carroceria, combustible, cambio, precio, anio, km, cv' ),
+                    'marca_fija'       => array( 'def' => '', 'desc' => 'Slug de marca oficial fijada (oculta el filtro de marca). Útil en /toyota/ofertas-coches' ),
+                    'marca_externa_fija' => array( 'def' => '', 'desc' => 'Slug de marca externa fijada (para coches de ocasión)' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_coches_filtro]',
+                    '[welow_coches_filtro tipo="ocasion" titulo="Coches de ocasión"]',
+                    '[welow_coches_filtro tipo="nuevos" marca_fija="toyota" titulo="Ofertas Toyota"]',
+                    '[welow_coches_filtro mostrar_filtros="marca,combustible,precio,km" por_pagina="9"]',
+                ),
+            ),
+
             'welow_coches_ocasion' => array(
                 'titulo' => 'Grid de coches OCASIÓN / KM0',
                 'desc'   => 'Listado de coches de ocasión y KM0 con filtros completos.',

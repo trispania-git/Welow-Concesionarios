@@ -61,6 +61,7 @@ class Welow_Main {
         Welow_Shortcode_Listado_Completo::init();  // v2.4.0
         Welow_Shortcode_Coche_Extras::init();      // v2.5.0
         Welow_Shortcode_Header::init();            // v2.6.0
+        Welow_Shortcode_Coches_Filtro::init();     // v2.8.0
 
         // Permalinks personalizados de coches
         Welow_Coche_Permalinks::init();            // v2.5.0
@@ -131,6 +132,14 @@ class Welow_Main {
             WELOW_CONC_VERSION
         );
 
+        // v2.8.0 — Filtro de coches
+        wp_register_style(
+            'welow-coches-filtro',
+            WELOW_CONC_URL . 'assets/css/coches-filtro.css',
+            array(),
+            WELOW_CONC_VERSION
+        );
+
         // JS
         wp_register_script(
             'welow-slider',
@@ -151,6 +160,15 @@ class Welow_Main {
         wp_register_script(
             'welow-header',
             WELOW_CONC_URL . 'assets/js/header.js',
+            array(),
+            WELOW_CONC_VERSION,
+            true
+        );
+
+        // v2.8.0 — Filtro coches (drawer móvil + autosubmit orden)
+        wp_register_script(
+            'welow-coches-filtro',
+            WELOW_CONC_URL . 'assets/js/coches-filtro.js',
             array(),
             WELOW_CONC_VERSION,
             true

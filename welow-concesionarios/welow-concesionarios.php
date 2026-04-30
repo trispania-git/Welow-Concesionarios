@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.7.2
+ * Version:     2.8.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,60 @@
  *
  * CHANGELOG
  * ---------
+ * 2.8.0 — Página de filtros + listado [welow_coches_filtro]
+ *
+ *   NUEVO SHORTCODE [welow_coches_filtro]:
+ *   Página completa estilo "tienda" con sidebar de filtros (izq) +
+ *   grid de resultados (der) + paginación + ordenación. Inspirado
+ *   en grupogamboa.com/jaecoo/ofertas-coches.
+ *
+ *   FILTROS DISPONIBLES (configurables vía mostrar_filtros):
+ *   - Marca (oficial: select / externa: checkboxes con scroll)
+ *   - Tipo (ocasión/KM0) — solo en CPT ocasión
+ *   - Carrocería (checkboxes)
+ *   - Combustible (checkboxes)
+ *   - Cambio (manual / automático / semi)
+ *   - Precio (rango from-to en €)
+ *   - Año (rango from-to)
+ *   - Kilómetros (rango from-to)
+ *   - Potencia CV (rango from-to)
+ *
+ *   CABECERA RESULTADOS:
+ *   - Contador "X resultados" / "1 resultado"
+ *   - Selector de ordenación (recientes, precio asc/desc, km asc, año desc)
+ *     con autosubmit del form al cambiar
+ *
+ *   PAGINACIÓN:
+ *   Configurable por_pagina (default 12). Navegación con páginas
+ *   numeradas, "..." para saltos, prev/next. Mantiene los filtros
+ *   activos en cada página.
+ *
+ *   COMPORTAMIENTO MÓVIL:
+ *   En pantallas <= 980px, el sidebar se oculta y aparece un botón
+ *   "Filtros" con badge del nº de filtros activos. Al pulsarlo
+ *   se abre un drawer fullscreen con los filtros. Cierre con backdrop,
+ *   botón × o tecla Escape.
+ *
+ *   PÁGINAS DE MARCA:
+ *   Param `marca_fija="toyota"` permite crear páginas dedicadas tipo
+ *   /toyota/ofertas/ donde la marca está fija y solo se filtran las
+ *   demás opciones.
+ *
+ *   FILTROS VIA GET (URL params):
+ *   Sin AJAX. Submit del form recarga la página manteniendo los
+ *   parámetros en la URL (compartibles, indexables, accesibles).
+ *
+ *   HELPERS NUEVOS:
+ *   - get_coches_paginado() devuelve {posts, total, paginas_total, pagina_actual, por_pagina}
+ *   - get_coches() ampliado con: km_min, anio_max, cv_min, cv_max, cambio
+ *     y soporte de arrays en combustible/carrocería/marca_externa
+ *
+ *   ARCHIVOS NUEVOS:
+ *   - includes/shortcodes/class-welow-shortcode-coches-filtro.php
+ *   - templates/coches-filtro.php
+ *   - assets/css/coches-filtro.css
+ *   - assets/js/coches-filtro.js
+ *
  * 2.7.2 — Fix: header sticky desaparece debajo de sliders al hacer scroll
  *
  *   PROBLEMA:
@@ -582,7 +636,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.7.2' );
+define( 'WELOW_CONC_VERSION', '2.8.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
@@ -634,6 +688,7 @@ require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-buscad
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-listado-completo.php';   // v2.4.0
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coche-extras.php';      // v2.5.0
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-header.php';            // v2.6.0
+require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coches-filtro.php';     // v2.8.0
 
 // Permalinks de coches
 require_once WELOW_CONC_PATH . 'includes/class-welow-coche-permalinks.php';                       // v2.5.0
