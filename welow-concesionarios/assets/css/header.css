@@ -84,14 +84,17 @@
    overflow o transform que rompen el contexto. fixed es robusto.
    El JS añade un spacer dinámico justo después del header para que
    el contenido siguiente no quede oculto debajo. */
+/* v2.7.2 — z-index muy alto para superponerse a sliders de Divi y otros
+   elementos con z-index propio. El overlay móvil va aún más alto (999999). */
 .welow-header--sticky {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     width: 100%;
-    z-index: 1000;
+    z-index: 99998;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    isolation: isolate;
 }
 
 /* Compatibilidad con admin bar de WP */

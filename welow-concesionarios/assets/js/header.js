@@ -111,6 +111,27 @@
     }
 
     /**
+     * v2.7.2 — Si el header es sticky, lo mueve al body para que escape de
+     * cualquier contexto de stacking padre (transforms, filters, will-change,
+     * isolation creados por Divi en secciones con sliders).
+     *
+     * Sin esto, el header fixed queda "atrapado" dentro de un contenedor
+     * Divi con transform y aparece DEBAJO de elementos con z-index propio
+     * (como los sliders fullwidth de Divi en páginas de marca).
+     *
+     * IMPORTANTE: el spacer ya debe haberse creado ANTES de mover el header,
+     * para que el spacer ocupe el espacio en el flujo original del DOM.
+     */
+    function moverHeaderAlBody(header) {
+        if (!header.classList.contains('welow-header--sticky')) return;
+        if (header.parentNode === document.body) return; // ya está en body
+        if (header.dataset.welowMoved) return;
+
+        document.body.insertBefore(header, document.body.firstChild);
+        header.dataset.welowMoved = '1';
+    }
+
+    /**
      * v2.7.1 — Detecta los contenedores Divi padres del header y les añade
      * clases para que el CSS pueda neutralizar sus paddings/margins.
      *
@@ -152,9 +173,16 @@
     function init() {
         document.querySelectorAll('.welow-header').forEach(function(header) {
             initHeader(header);
+
+            // 1. Detectar padres Divi y neutralizar paddings (mientras está en posición original)
             neutralizarPadresDivi(header);
-            // Pequeño delay para que el DOM se asiente tras la neutralización antes de medir
-            setTimeout(function() { setupStickySpacer(header); }, 50);
+
+            // 2. Crear el spacer en la posición original (antes de mover)
+            setupStickySpacer(header);
+
+            // 3. Mover el header al body si es sticky (escapa de contextos de stacking
+            //    creados por sliders Divi y otras secciones con transform/filter)
+            moverHeaderAlBody(header);
         });
     }
 

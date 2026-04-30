@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.7.1
+ * Version:     2.7.2
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,32 @@
  *
  * CHANGELOG
  * ---------
+ * 2.7.2 — Fix: header sticky desaparece debajo de sliders al hacer scroll
+ *
+ *   PROBLEMA:
+ *   En páginas con sliders fullwidth de Divi (típicamente las páginas
+ *   de marca con [welow_slider]), al hacer scroll el header sticky
+ *   se quedaba debajo del slider y desaparecía. Esto pasa porque las
+ *   secciones Divi pueden tener transform/filter/will-change que
+ *   crean un contexto de stacking propio, atrapando al header
+ *   `position: fixed` dentro y haciéndolo aparecer detrás de
+ *   elementos con z-index propio (sliders).
+ *
+ *   SOLUCIÓN — Mover el header al body:
+ *   El JS, tras detectar padres Divi y crear el spacer en la posición
+ *   original, MUEVE el `<header>` al `<body>` directamente. Así el
+ *   header escapa de cualquier contexto de stacking del Theme Builder
+ *   y siempre se posiciona respecto al viewport.
+ *
+ *   El spacer queda en la posición original ocupando el hueco para
+ *   que el contenido siguiente no se "salga" hacia arriba.
+ *
+ *   Adicionalmente:
+ *   - z-index del sticky subido de 1000 a 99998 (overlay sigue en 99999)
+ *   - `isolation: isolate` para crear contexto de stacking propio
+ *
+ *   Archivos: assets/js/header.js, assets/css/header.css
+ *
  * 2.7.1 — Fix: header con márgenes laterales en Theme Builder
  *
  *   PROBLEMA:
@@ -556,7 +582,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.7.1' );
+define( 'WELOW_CONC_VERSION', '2.7.2' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
