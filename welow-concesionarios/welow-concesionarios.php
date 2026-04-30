@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.6.0
+ * Version:     2.6.1
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,23 @@
  *
  * CHANGELOG
  * ---------
+ * 2.6.1 — Fix UI header: logo pegado a la izquierda + sin bullets en menú
+ *
+ *   LOGO PEGADO A LA IZQUIERDA:
+ *   El padding lateral del .welow-header__inner cambió de 24px a 0
+ *   para que el logo quede al ras del borde izquierdo y el botón CTA
+ *   al ras del borde derecho. En pantallas > 1280px se mantiene un
+ *   pequeño padding (16px) por estética.
+ *
+ *   QUITAR BULLETS DEL MENÚ:
+ *   Algunos temas (incluido Divi) aplicaban `list-style: disc` a los
+ *   <ul>/<li> con !important, sobrescribiendo el reset del plugin.
+ *   Reforzado con !important en todos los selectores del menú,
+ *   submenús y overlay móvil. Adicionalmente se neutralizan los
+ *   pseudo-elementos ::before y ::marker.
+ *
+ *   Archivo: assets/css/header.css
+ *
  * 2.6.0 — Cabecera responsive del sitio [welow_header]
  *
  *   NUEVO SHORTCODE [welow_header]:
@@ -454,7 +471,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.6.0' );
+define( 'WELOW_CONC_VERSION', '2.6.1' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

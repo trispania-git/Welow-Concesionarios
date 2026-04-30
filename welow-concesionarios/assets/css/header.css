@@ -50,9 +50,14 @@ body.admin-bar .welow-header--sticky { top: 32px; }
     display: flex;
     align-items: center;
     gap: var(--welow-h-gap);
-    padding: var(--welow-h-padding-y) 24px;
+    padding: var(--welow-h-padding-y) 0;        /* v2.6.1 — sin padding lateral por defecto */
     margin: 0 auto;
     width: 100%;
+}
+/* v2.6.1 — Si max-width está limitado, mantener algo de padding para que no toque
+   el borde en pantallas exactas al breakpoint. Si es 100%, queda pegado. */
+@media (min-width: 1281px) {
+    .welow-header__inner { padding-left: 16px; padding-right: 16px; }
 }
 
 /* ==========================================================================
@@ -89,8 +94,11 @@ body.admin-bar .welow-header--sticky { top: 32px; }
     display: flex;
     justify-content: center;
 }
+/* v2.6.1 — list-style none reforzado para sobrescribir cualquier reset del tema */
+.welow-header ul.welow-header__menu-list,
 .welow-header__menu-list {
-    list-style: none;
+    list-style: none !important;
+    list-style-type: none !important;
     margin: 0;
     padding: 0;
     display: flex;
@@ -98,7 +106,17 @@ body.admin-bar .welow-header--sticky { top: 32px; }
     flex-wrap: wrap;
     align-items: center;
 }
-.welow-header__menu-list li { position: relative; }
+.welow-header__menu-list li,
+.welow-header ul.welow-header__menu-list > li {
+    position: relative;
+    list-style: none !important;
+    list-style-type: none !important;
+}
+.welow-header__menu-list li::before,
+.welow-header__menu-list li::marker {
+    display: none !important;
+    content: none !important;
+}
 .welow-header__menu-list a {
     display: block;
     padding: 8px 14px;
@@ -120,7 +138,8 @@ body.admin-bar .welow-header--sticky { top: 32px; }
 
 /* Submenú dropdown */
 .welow-header__menu-list .sub-menu {
-    list-style: none;
+    list-style: none !important;
+    list-style-type: none !important;
     margin: 0;
     padding: 6px 0;
     position: absolute;
@@ -136,6 +155,15 @@ body.admin-bar .welow-header--sticky { top: 32px; }
     transform: translateY(8px);
     transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
     z-index: 110;
+}
+.welow-header__menu-list .sub-menu li {
+    list-style: none !important;
+    list-style-type: none !important;
+}
+.welow-header__menu-list .sub-menu li::before,
+.welow-header__menu-list .sub-menu li::marker {
+    display: none !important;
+    content: none !important;
 }
 .welow-header__menu-list li:hover > .sub-menu,
 .welow-header__menu-list li:focus-within > .sub-menu {
@@ -282,13 +310,22 @@ body.admin-bar .welow-header--sticky { top: 32px; }
     margin: 0 auto;
 }
 
-.welow-header__overlay-menu {
-    list-style: none;
+.welow-header__overlay-menu,
+.welow-header ul.welow-header__overlay-menu {
+    list-style: none !important;
+    list-style-type: none !important;
     margin: 0 0 30px;
     padding: 0;
 }
 .welow-header__overlay-menu li {
+    list-style: none !important;
+    list-style-type: none !important;
     border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.welow-header__overlay-menu li::before,
+.welow-header__overlay-menu li::marker {
+    display: none !important;
+    content: none !important;
 }
 .welow-header__overlay-menu a {
     display: block;
@@ -304,11 +341,14 @@ body.admin-bar .welow-header--sticky { top: 32px; }
     padding-left: 8px;
 }
 .welow-header__overlay-menu .sub-menu {
-    list-style: none;
+    list-style: none !important;
+    list-style-type: none !important;
     margin: 0 0 0 16px;
     padding: 0 0 8px;
 }
 .welow-header__overlay-menu .sub-menu li {
+    list-style: none !important;
+    list-style-type: none !important;
     border: none;
 }
 .welow-header__overlay-menu .sub-menu a {
