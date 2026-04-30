@@ -22,9 +22,20 @@
     --welow-h-padding-y: 12px;
     --welow-h-gap: 24px;
 
+    /* v2.7.0 — Variables tipográficas */
+    --welow-h-font: inherit;
+    --welow-h-fw-menu: 600;
+    --welow-h-fw-boton: 700;
+    --welow-h-fs-menu: 14px;
+    --welow-h-fs-boton: 14px;
+    --welow-h-fs-tel: 14px;
+    --welow-h-tt-menu: none;
+    --welow-h-ls-menu: normal;
+
     background: var(--welow-h-bg);
     color: var(--welow-h-color);
     border-bottom: 1px solid var(--welow-h-border);
+    font-family: var(--welow-h-font);
     width: 100%;
     box-sizing: border-box;
     z-index: 100;
@@ -138,8 +149,11 @@ body.admin-bar .welow-header--sticky { top: 32px; }
     padding: 8px 14px;
     color: var(--welow-h-color);
     text-decoration: none;
-    font-size: 14px;
-    font-weight: 600;
+    font-family: var(--welow-h-font);
+    font-size: var(--welow-h-fs-menu);
+    font-weight: var(--welow-h-fw-menu);
+    text-transform: var(--welow-h-tt-menu);
+    letter-spacing: var(--welow-h-ls-menu);
     border-radius: 6px;
     transition: background 0.15s, color 0.15s;
     line-height: 1.4;
@@ -210,8 +224,9 @@ body.admin-bar .welow-header--sticky { top: 32px; }
     gap: 6px;
     color: var(--welow-h-color);
     text-decoration: none;
+    font-family: var(--welow-h-font);
     font-weight: 700;
-    font-size: 14px;
+    font-size: var(--welow-h-fs-tel);
     padding: 8px 12px;
     border-radius: 6px;
     transition: background 0.15s;
@@ -224,8 +239,9 @@ body.admin-bar .welow-header--sticky { top: 32px; }
     padding: 10px 18px;
     border-radius: 8px;
     text-decoration: none;
-    font-weight: 700;
-    font-size: 14px;
+    font-family: var(--welow-h-font);
+    font-weight: var(--welow-h-fw-boton);
+    font-size: var(--welow-h-fs-boton);
     line-height: 1.2;
     transition: all 0.2s;
     white-space: nowrap;
@@ -347,8 +363,11 @@ body.admin-bar .welow-header--sticky { top: 32px; }
     display: block;
     color: #fff;
     text-decoration: none;
+    font-family: var(--welow-h-font);
     font-size: 18px;
-    font-weight: 600;
+    font-weight: var(--welow-h-fw-menu);
+    text-transform: var(--welow-h-tt-menu);
+    letter-spacing: var(--welow-h-ls-menu);
     padding: 16px 0;
     transition: color 0.15s, padding 0.15s;
 }

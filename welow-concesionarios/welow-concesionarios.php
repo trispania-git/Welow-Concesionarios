@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.6.2
+ * Version:     2.7.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,43 @@
  *
  * CHANGELOG
  * ---------
+ * 2.7.0 — Tipografía configurable del header + Google Fonts auto
+ *
+ *   NUEVA SECCIÓN "Tipografía del header" en Configuraciones:
+ *   - Familia tipográfica (texto libre con autocompletado de 19
+ *     fuentes Google populares: Figtree, Inter, Roboto, Poppins,
+ *     Open Sans, Montserrat, Lato, Raleway, Nunito, Outfit, DM Sans,
+ *     Manrope, Plus Jakarta Sans, Work Sans, Source Sans 3, Ubuntu,
+ *     Mulish, Barlow, Exo 2)
+ *   - ☑ Cargar desde Google Fonts (carga automática en el head)
+ *   - Peso del menú (300/400/500/600/700/800)
+ *   - Peso del botón CTA (400/500/600/700/800)
+ *   - Tamaño en px del menú, botón y teléfono (independientes)
+ *   - Estilo del menú: text-transform (none/uppercase/capitalize)
+ *   - Espaciado entre letras del menú (letter-spacing)
+ *
+ *   GOOGLE FONTS AUTO-LOAD:
+ *   Si "Cargar desde Google Fonts" está marcado y hay una familia
+ *   especificada, el plugin imprime los <link rel="preconnect"> +
+ *   <link rel="stylesheet"> en wp_head con los pesos solicitados,
+ *   sin necesidad de plugins externos. URL optimizada con &display=swap.
+ *
+ *   APLICACIÓN VÍA CSS VARIABLES:
+ *   Todas las propiedades tipográficas se aplican vía CSS custom
+ *   properties (--welow-h-font, --welow-h-fw-menu, --welow-h-fs-menu,
+ *   etc.) en el atributo style del header. Esto permite override por
+ *   shortcode sin tocar CSS.
+ *
+ *   OVERRIDE POR SHORTCODE:
+ *   [welow_header font_family="Figtree" font_weight_menu="500"
+ *                 font_size_menu="15" text_transform_menu="uppercase"]
+ *
+ *   Archivos:
+ *   - includes/admin/class-welow-settings.php  (UI + sanitize)
+ *   - includes/shortcodes/class-welow-shortcode-header.php  (params + Google Fonts)
+ *   - templates/header.php  (variables CSS inline)
+ *   - assets/css/header.css  (uso de las variables)
+ *
  * 2.6.2 — Fix sticky header: position fixed + spacer dinámico
  *
  *   PROBLEMA:
@@ -492,7 +529,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.6.2' );
+define( 'WELOW_CONC_VERSION', '2.7.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

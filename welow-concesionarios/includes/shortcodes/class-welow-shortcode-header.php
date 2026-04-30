@@ -22,8 +22,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Welow_Shortcode_Header {
 
+    /** Para acumular Google Fonts a cargar en el head (puede haber varios shortcodes) */
+    private static $google_fonts_to_load = array();
+
     public static function init() {
         add_shortcode( 'welow_header', array( __CLASS__, 'render' ) );
+        add_action( 'wp_head', array( __CLASS__, 'imprimir_google_fonts' ), 5 );
     }
 
     public static function render( $atts ) {
@@ -50,6 +54,16 @@ class Welow_Shortcode_Header {
             'color_boton_texto' => '',
             'sticky'            => '',          // si | no | (vacío = usa default)
             'ancho_max'         => '1280px',    // max-width del contenedor interior
+            // v2.7.0 — Tipografía
+            'font_family'       => '',
+            'font_google'       => '',          // si | no
+            'font_weight_menu'  => '',
+            'font_weight_boton' => '',
+            'font_size_menu'    => '',
+            'font_size_boton'   => '',
+            'font_size_telefono'=> '',
+            'text_transform_menu' => '',
+            'letter_spacing_menu' => '',
         ), $atts );
 
         // Combinar: shortcode atts > defaults globales
@@ -70,7 +84,25 @@ class Welow_Shortcode_Header {
             'color_boton_texto' => $atts['color_boton_texto'] ?: ( $defaults_globales['color_boton_texto'] ?? '' ),
             'sticky'            => self::resolver_bool( $atts['sticky'], ! empty( $defaults_globales['sticky'] ) ),
             'ancho_max'         => sanitize_text_field( $atts['ancho_max'] ),
+            // v2.7.0 — Tipografía
+            'font_family'        => $atts['font_family'] ?: ( $defaults_globales['font_family'] ?? '' ),
+            'font_google'        => self::resolver_bool( $atts['font_google'], ! empty( $defaults_globales['font_google'] ) ),
+            'font_weight_menu'   => $atts['font_weight_menu'] ?: ( $defaults_globales['font_weight_menu'] ?? '600' ),
+            'font_weight_boton'  => $atts['font_weight_boton'] ?: ( $defaults_globales['font_weight_boton'] ?? '700' ),
+            'font_size_menu'     => intval( $atts['font_size_menu'] ?: ( $defaults_globales['font_size_menu'] ?? 14 ) ),
+            'font_size_boton'    => intval( $atts['font_size_boton'] ?: ( $defaults_globales['font_size_boton'] ?? 14 ) ),
+            'font_size_telefono' => intval( $atts['font_size_telefono'] ?: ( $defaults_globales['font_size_telefono'] ?? 14 ) ),
+            'text_transform_menu' => $atts['text_transform_menu'] ?: ( $defaults_globales['text_transform_menu'] ?? 'none' ),
+            'letter_spacing_menu' => $atts['letter_spacing_menu'] ?: ( $defaults_globales['letter_spacing_menu'] ?? '' ),
         );
+
+        // Si la fuente debe cargarse desde Google Fonts, registrarla
+        if ( $config['font_google'] && $config['font_family'] ) {
+            self::registrar_google_font(
+                $config['font_family'],
+                array( $config['font_weight_menu'], $config['font_weight_boton'] )
+            );
+        }
 
         wp_enqueue_style( 'welow-header' );
         wp_enqueue_script( 'welow-header' );
@@ -112,5 +144,47 @@ class Welow_Shortcode_Header {
     private static function resolver_bool( $valor, $default = false ) {
         if ( '' === $valor || null === $valor ) return $default;
         return in_array( strtolower( $valor ), array( 'si', 'sí', '1', 'true', 'yes' ), true );
+    }
+
+    /**
+     * v2.7.0 — Registra una Google Font para imprimirla en wp_head.
+     */
+    public static function registrar_google_font( $family, $weights = array() ) {
+        if ( ! $family ) return;
+        $key = sanitize_title( $family );
+        if ( ! isset( self::$google_fonts_to_load[ $key ] ) ) {
+            self::$google_fonts_to_load[ $key ] = array(
+                'family'  => $family,
+                'weights' => array(),
+            );
+        }
+        foreach ( (array) $weights as $w ) {
+            $w = preg_replace( '/[^0-9]/', '', $w );
+            if ( $w ) self::$google_fonts_to_load[ $key ]['weights'][] = $w;
+        }
+        self::$google_fonts_to_load[ $key ]['weights'] = array_unique( self::$google_fonts_to_load[ $key ]['weights'] );
+    }
+
+    /**
+     * v2.7.0 — Imprime los <link> de Google Fonts en el head.
+     */
+    public static function imprimir_google_fonts() {
+        if ( empty( self::$google_fonts_to_load ) ) return;
+
+        // Preconnect (mejor performance)
+        echo '<link rel="preconnect" href="https://fonts.googleapis.com">' . "\n";
+        echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
+
+        $families = array();
+        foreach ( self::$google_fonts_to_load as $f ) {
+            // Reemplazar espacios por +
+            $family_url = str_replace( ' ', '+', $f['family'] );
+            $weights = ! empty( $f['weights'] ) ? $f['weights'] : array( '400', '600', '700' );
+            sort( $weights );
+            $families[] = $family_url . ':wght@' . implode( ';', $weights );
+        }
+
+        $url = 'https://fonts.googleapis.com/css2?family=' . implode( '&family=', $families ) . '&display=swap';
+        echo '<link rel="stylesheet" href="' . esc_url( $url ) . '">' . "\n";
     }
 }

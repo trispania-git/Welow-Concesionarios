@@ -14,13 +14,29 @@ $logo_url       = $config['logo_id'] ? wp_get_attachment_image_url( $config['log
 $logo_movil_url = $config['logo_movil_id'] ? wp_get_attachment_image_url( $config['logo_movil_id'], 'thumbnail' ) : '';
 $site_name      = get_bloginfo( 'name' );
 
-// Estilos inline a partir de los colores configurados (si los hay)
+// Estilos inline a partir de los colores y tipografía configurados (si los hay)
 $inline_styles = array();
 if ( $config['color_fondo'] )       $inline_styles[] = '--welow-h-bg:' . $config['color_fondo'];
 if ( $config['color_texto'] )       $inline_styles[] = '--welow-h-color:' . $config['color_texto'];
 if ( $config['color_boton'] )       $inline_styles[] = '--welow-h-btn-bg:' . $config['color_boton'];
 if ( $config['color_boton_texto'] ) $inline_styles[] = '--welow-h-btn-color:' . $config['color_boton_texto'];
 $inline_styles[] = '--welow-h-logo-h:' . $config['logo_altura'] . 'px';
+
+// v2.7.0 — Variables CSS de tipografía
+if ( ! empty( $config['font_family'] ) ) {
+    // Stack con fallbacks para evitar FOUT feo
+    $font_stack = '"' . $config['font_family'] . '", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    $inline_styles[] = '--welow-h-font:' . $font_stack;
+}
+if ( ! empty( $config['font_weight_menu'] ) )    $inline_styles[] = '--welow-h-fw-menu:' . $config['font_weight_menu'];
+if ( ! empty( $config['font_weight_boton'] ) )   $inline_styles[] = '--welow-h-fw-boton:' . $config['font_weight_boton'];
+if ( ! empty( $config['font_size_menu'] ) )      $inline_styles[] = '--welow-h-fs-menu:' . intval( $config['font_size_menu'] ) . 'px';
+if ( ! empty( $config['font_size_boton'] ) )     $inline_styles[] = '--welow-h-fs-boton:' . intval( $config['font_size_boton'] ) . 'px';
+if ( ! empty( $config['font_size_telefono'] ) )  $inline_styles[] = '--welow-h-fs-tel:' . intval( $config['font_size_telefono'] ) . 'px';
+if ( ! empty( $config['text_transform_menu'] ) && 'none' !== $config['text_transform_menu'] ) {
+    $inline_styles[] = '--welow-h-tt-menu:' . $config['text_transform_menu'];
+}
+if ( ! empty( $config['letter_spacing_menu'] ) ) $inline_styles[] = '--welow-h-ls-menu:' . $config['letter_spacing_menu'];
 
 $style_attr = ! empty( $inline_styles ) ? ' style="' . esc_attr( implode( ';', $inline_styles ) ) . '"' : '';
 $class_sticky = $config['sticky'] ? ' welow-header--sticky' : '';

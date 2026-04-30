@@ -127,6 +127,16 @@ class Welow_Settings {
                 'color_boton'       => isset( $h['color_boton'] ) ? sanitize_hex_color( $h['color_boton'] ) : '',
                 'color_boton_texto' => isset( $h['color_boton_texto'] ) ? sanitize_hex_color( $h['color_boton_texto'] ) : '',
                 'sticky'            => ! empty( $h['sticky'] ),
+                // v2.7.0 — Tipografía
+                'font_family'       => isset( $h['font_family'] ) ? sanitize_text_field( $h['font_family'] ) : '',
+                'font_google'       => ! empty( $h['font_google'] ),
+                'font_weight_menu'  => isset( $h['font_weight_menu'] ) ? sanitize_text_field( $h['font_weight_menu'] ) : '',
+                'font_weight_boton' => isset( $h['font_weight_boton'] ) ? sanitize_text_field( $h['font_weight_boton'] ) : '',
+                'font_size_menu'    => isset( $h['font_size_menu'] ) ? absint( $h['font_size_menu'] ) : 0,
+                'font_size_boton'   => isset( $h['font_size_boton'] ) ? absint( $h['font_size_boton'] ) : 0,
+                'font_size_telefono'=> isset( $h['font_size_telefono'] ) ? absint( $h['font_size_telefono'] ) : 0,
+                'text_transform_menu' => isset( $h['text_transform_menu'] ) && in_array( $h['text_transform_menu'], array( 'none', 'uppercase', 'capitalize' ), true ) ? $h['text_transform_menu'] : 'none',
+                'letter_spacing_menu' => isset( $h['letter_spacing_menu'] ) ? sanitize_text_field( $h['letter_spacing_menu'] ) : '',
             );
         }
 
@@ -424,6 +434,106 @@ class Welow_Settings {
                 </td>
             </tr>
         </table>
+
+        <h3 style="margin-top:30px;">🔤 Tipografía del header</h3>
+        <p>Personaliza la fuente, peso y tamaño de los textos del header. Si usas una fuente de Google Fonts, márcalo y se cargará automáticamente.</p>
+
+        <table class="form-table">
+            <tr>
+                <th scope="row"><label>Familia tipográfica</label></th>
+                <td>
+                    <input type="text" name="<?php echo esc_attr( $name ); ?>[font_family]"
+                           value="<?php echo esc_attr( $h['font_family'] ?? '' ); ?>"
+                           placeholder="ej: Figtree, Inter, Roboto..." class="regular-text" list="welow-fonts-suggestions" />
+                    <datalist id="welow-fonts-suggestions">
+                        <option value="Figtree">
+                        <option value="Inter">
+                        <option value="Roboto">
+                        <option value="Poppins">
+                        <option value="Open Sans">
+                        <option value="Montserrat">
+                        <option value="Lato">
+                        <option value="Raleway">
+                        <option value="Nunito">
+                        <option value="Outfit">
+                        <option value="DM Sans">
+                        <option value="Manrope">
+                        <option value="Plus Jakarta Sans">
+                        <option value="Work Sans">
+                        <option value="Source Sans 3">
+                        <option value="Ubuntu">
+                        <option value="Mulish">
+                        <option value="Barlow">
+                        <option value="Exo 2">
+                    </datalist>
+                    <p class="description">Nombre exacto de la fuente. Si la dejas vacía se usa la fuente del tema.</p>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><label>Origen</label></th>
+                <td>
+                    <label>
+                        <input type="checkbox" name="<?php echo esc_attr( $name ); ?>[font_google]" value="1" <?php checked( ! empty( $h['font_google'] ) || ! isset( $h['font_google'] ) ); ?> />
+                        <strong>Cargar desde Google Fonts</strong> automáticamente
+                    </label>
+                    <p class="description">Si la fuente está disponible en Google Fonts, se cargará en el head sin necesidad de plugins externos. Desmarca si la fuente está cargada por el tema o por otro plugin.</p>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><label>Peso</label></th>
+                <td>
+                    <label style="display:inline-block;margin-right:18px;">Menú:<br>
+                        <select name="<?php echo esc_attr( $name ); ?>[font_weight_menu]">
+                            <?php foreach ( array( '300' => '300 Light', '400' => '400 Regular', '500' => '500 Medium', '600' => '600 SemiBold', '700' => '700 Bold', '800' => '800 ExtraBold' ) as $w => $label ) : ?>
+                                <option value="<?php echo esc_attr( $w ); ?>" <?php selected( $h['font_weight_menu'] ?? '600', $w ); ?>><?php echo esc_html( $label ); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
+                    <label style="display:inline-block;">Botón CTA:<br>
+                        <select name="<?php echo esc_attr( $name ); ?>[font_weight_boton]">
+                            <?php foreach ( array( '400' => '400 Regular', '500' => '500 Medium', '600' => '600 SemiBold', '700' => '700 Bold', '800' => '800 ExtraBold' ) as $w => $label ) : ?>
+                                <option value="<?php echo esc_attr( $w ); ?>" <?php selected( $h['font_weight_boton'] ?? '700', $w ); ?>><?php echo esc_html( $label ); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><label>Tamaño (px)</label></th>
+                <td>
+                    <label style="display:inline-block;margin-right:18px;">Menú:<br>
+                        <input type="number" name="<?php echo esc_attr( $name ); ?>[font_size_menu]"
+                               value="<?php echo esc_attr( $h['font_size_menu'] ?? 14 ); ?>" min="10" max="32" step="1" style="width:80px;" /> px
+                    </label>
+                    <label style="display:inline-block;margin-right:18px;">Botón:<br>
+                        <input type="number" name="<?php echo esc_attr( $name ); ?>[font_size_boton]"
+                               value="<?php echo esc_attr( $h['font_size_boton'] ?? 14 ); ?>" min="10" max="24" step="1" style="width:80px;" /> px
+                    </label>
+                    <label style="display:inline-block;">Teléfono:<br>
+                        <input type="number" name="<?php echo esc_attr( $name ); ?>[font_size_telefono]"
+                               value="<?php echo esc_attr( $h['font_size_telefono'] ?? 14 ); ?>" min="10" max="24" step="1" style="width:80px;" /> px
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><label>Estilo del menú</label></th>
+                <td>
+                    <label style="display:inline-block;margin-right:18px;">Transformación:<br>
+                        <select name="<?php echo esc_attr( $name ); ?>[text_transform_menu]">
+                            <option value="none" <?php selected( $h['text_transform_menu'] ?? 'none', 'none' ); ?>>Normal</option>
+                            <option value="uppercase" <?php selected( $h['text_transform_menu'] ?? 'none', 'uppercase' ); ?>>MAYÚSCULAS</option>
+                            <option value="capitalize" <?php selected( $h['text_transform_menu'] ?? 'none', 'capitalize' ); ?>>Capitalize</option>
+                        </select>
+                    </label>
+                    <label style="display:inline-block;">Espaciado entre letras:<br>
+                        <input type="text" name="<?php echo esc_attr( $name ); ?>[letter_spacing_menu]"
+                               value="<?php echo esc_attr( $h['letter_spacing_menu'] ?? '' ); ?>"
+                               placeholder="ej: 0.5px, 0.04em" style="width:120px;" />
+                    </label>
+                    <p class="description">Útil cuando usas mayúsculas (ej: <code>0.5px</code> o <code>0.04em</code>).</p>
+                </td>
+            </tr>
+        </table>
         <?php
     }
 
@@ -442,6 +552,16 @@ class Welow_Settings {
             'color_fondo' => '', 'color_texto' => '',
             'color_boton' => '', 'color_boton_texto' => '',
             'sticky' => false,
+            // v2.7.0 — Tipografía
+            'font_family' => '',
+            'font_google' => true,
+            'font_weight_menu' => '600',
+            'font_weight_boton' => '700',
+            'font_size_menu' => 14,
+            'font_size_boton' => 14,
+            'font_size_telefono' => 14,
+            'text_transform_menu' => 'none',
+            'letter_spacing_menu' => '',
         );
         $h = isset( $opts['header'] ) && is_array( $opts['header'] ) ? $opts['header'] : array();
         return wp_parse_args( $h, $defaults );
