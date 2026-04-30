@@ -110,10 +110,51 @@
         window.addEventListener('load', actualizar);
     }
 
+    /**
+     * v2.7.1 — Detecta los contenedores Divi padres del header y les añade
+     * clases para que el CSS pueda neutralizar sus paddings/margins.
+     *
+     * Estructura típica en Theme Builder:
+     *   .et-l                                  ← layout wrapper
+     *     .et_pb_section                       ← sección (welow-header-section-parent)
+     *       .et_pb_row                         ← fila (welow-header-row-parent)
+     *         .et_pb_column
+     *           .et_pb_text                    ← módulo Texto
+     *             .et_pb_text_inner            ← (welow-header-parent)
+     *               <header class="welow-header"></header>
+     */
+    function neutralizarPadresDivi(header) {
+        // 1. Padre directo (típicamente .et_pb_text_inner)
+        var padreDirecto = header.parentElement;
+        if (padreDirecto) {
+            padreDirecto.classList.add('welow-header-parent');
+
+            // 2. Subir hasta el módulo Divi (.et_pb_module)
+            var modulo = padreDirecto.closest('.et_pb_module');
+            if (modulo) {
+                modulo.classList.add('welow-header-parent');
+            }
+
+            // 3. Subir hasta la fila Divi (.et_pb_row)
+            var fila = padreDirecto.closest('.et_pb_row');
+            if (fila) {
+                fila.classList.add('welow-header-row-parent');
+            }
+
+            // 4. Subir hasta la sección Divi (.et_pb_section)
+            var seccion = padreDirecto.closest('.et_pb_section');
+            if (seccion) {
+                seccion.classList.add('welow-header-section-parent');
+            }
+        }
+    }
+
     function init() {
         document.querySelectorAll('.welow-header').forEach(function(header) {
             initHeader(header);
-            setupStickySpacer(header);
+            neutralizarPadresDivi(header);
+            // Pequeño delay para que el DOM se asiente tras la neutralización antes de medir
+            setTimeout(function() { setupStickySpacer(header); }, 50);
         });
     }
 

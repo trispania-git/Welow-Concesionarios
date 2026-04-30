@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.7.0
+ * Version:     2.7.1
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,33 @@
  *
  * CHANGELOG
  * ---------
+ * 2.7.1 — Fix: header con márgenes laterales en Theme Builder
+ *
+ *   PROBLEMA:
+ *   Cuando se insertaba [welow_header] en un módulo Texto del Theme
+ *   Builder de Divi, aparecían márgenes laterales no deseados
+ *   (logo no llegaba al borde izquierdo, botón no llegaba al derecho)
+ *   por dos causas:
+ *
+ *   1) El default `ancho_max` era "1280px", que limitaba el contenido
+ *      interior y dejaba espacios en blanco a los lados en pantallas
+ *      anchas.
+ *   2) Los contenedores Divi (.et_pb_text_inner, .et_pb_module,
+ *      .et_pb_row, .et_pb_section) tienen padding propio que no se
+ *      podía controlar desde el shortcode.
+ *
+ *   SOLUCIÓN:
+ *   - `ancho_max` default cambiado de "1280px" a "100%"
+ *   - Truco "fullwidth breakout" CSS para headers no-sticky:
+ *     width: 100vw + margin: calc(50% - 50vw) → rompe contenedor padre
+ *   - JS detecta los 4 niveles de contenedores Divi padres y les
+ *     añade clases: welow-header-parent, welow-header-row-parent,
+ *     welow-header-section-parent. CSS neutraliza padding/margin de
+ *     todos ellos con !important.
+ *
+ *   Archivos: includes/shortcodes/class-welow-shortcode-header.php,
+ *   assets/css/header.css, assets/js/header.js
+ *
  * 2.7.0 — Tipografía configurable del header + Google Fonts auto
  *
  *   NUEVA SECCIÓN "Tipografía del header" en Configuraciones:
@@ -529,7 +556,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.7.0' );
+define( 'WELOW_CONC_VERSION', '2.7.1' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

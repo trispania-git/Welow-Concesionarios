@@ -53,7 +53,7 @@ class Welow_Shortcode_Header {
             'color_boton'       => '',
             'color_boton_texto' => '',
             'sticky'            => '',          // si | no | (vacío = usa default)
-            'ancho_max'         => '1280px',    // max-width del contenedor interior
+            'ancho_max'         => '100%',      // v2.7.1: default sin límite (era 1280px)
             // v2.7.0 — Tipografía
             'font_family'       => '',
             'font_google'       => '',          // si | no

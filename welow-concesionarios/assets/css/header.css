@@ -41,6 +41,40 @@
     z-index: 100;
 }
 
+/* v2.7.1 — Truco "fullwidth breakout": cuando el header NO es sticky/fixed,
+   hace que rompa cualquier contenedor padre (módulo Divi, fila, sección)
+   y ocupe el 100% del viewport. Cuando ES sticky/fixed, ya cubre el
+   viewport por su cuenta. */
+.welow-header:not(.welow-header--sticky) {
+    position: relative;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    max-width: none !important;
+}
+
+/* Neutralizar paddings del módulo Divi que contiene el shortcode.
+   El JS añade la clase .welow-header-parent al padre directo del header. */
+.welow-header-parent,
+.welow-header-parent > .et_pb_text_inner,
+.welow-header-parent > .et_pb_code_inner {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Si la sección/fila Divi también lo envuelve, neutralizar */
+.welow-header-section-parent {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+.welow-header-row-parent {
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
 .welow-header *,
 .welow-header *::before,
 .welow-header *::after { box-sizing: border-box; }
