@@ -44,23 +44,49 @@ $class_sticky = $config['sticky'] ? ' welow-header--sticky' : '';
 <header class="welow-header<?php echo esc_attr( $class_sticky ); ?>"<?php echo $style_attr; ?> role="banner">
     <div class="welow-header__inner" style="max-width: <?php echo esc_attr( $config['ancho_max'] ); ?>;">
 
-        <!-- ZONA 1: Logo -->
-        <div class="welow-header__logo">
-            <a href="<?php echo esc_url( $config['logo_url'] ); ?>" rel="home" aria-label="<?php echo esc_attr( $site_name ); ?>">
-                <?php if ( $logo_url ) : ?>
-                    <img class="welow-header__logo-img welow-header__logo-img--desktop"
-                         src="<?php echo esc_url( $logo_url ); ?>"
-                         alt="<?php echo esc_attr( $site_name ); ?>" />
+        <!-- ZONA 1: Logo (concesionario + opcional marca al lado) -->
+        <div class="welow-header__logo-wrap">
+            <div class="welow-header__logo">
+                <a href="<?php echo esc_url( $config['logo_url'] ); ?>" rel="home" aria-label="<?php echo esc_attr( $site_name ); ?>">
+                    <?php if ( $logo_url ) : ?>
+                        <img class="welow-header__logo-img welow-header__logo-img--desktop"
+                             src="<?php echo esc_url( $logo_url ); ?>"
+                             alt="<?php echo esc_attr( $site_name ); ?>" />
+                    <?php endif; ?>
+                    <?php if ( $logo_movil_url ) : ?>
+                        <img class="welow-header__logo-img welow-header__logo-img--movil"
+                             src="<?php echo esc_url( $logo_movil_url ); ?>"
+                             alt="<?php echo esc_attr( $site_name ); ?>" />
+                    <?php endif; ?>
+                    <?php if ( ! $logo_url && ! $logo_movil_url ) : ?>
+                        <span class="welow-header__logo-texto"><?php echo esc_html( $site_name ); ?></span>
+                    <?php endif; ?>
+                </a>
+            </div>
+
+            <?php // v2.9.0 — Logo de la marca actual al lado
+            if ( ! empty( $config['logo_marca_data']['url_logo'] ) ) :
+                $marca_data = $config['logo_marca_data'];
+                $marca_h    = $config['logo_marca_altura'] ?: $config['logo_altura'];
+            ?>
+                <?php if ( $config['logo_marca_separador'] ) : ?>
+                    <span class="welow-header__logo-separador" aria-hidden="true"></span>
                 <?php endif; ?>
-                <?php if ( $logo_movil_url ) : ?>
-                    <img class="welow-header__logo-img welow-header__logo-img--movil"
-                         src="<?php echo esc_url( $logo_movil_url ); ?>"
-                         alt="<?php echo esc_attr( $site_name ); ?>" />
-                <?php endif; ?>
-                <?php if ( ! $logo_url && ! $logo_movil_url ) : ?>
-                    <span class="welow-header__logo-texto"><?php echo esc_html( $site_name ); ?></span>
-                <?php endif; ?>
-            </a>
+                <div class="welow-header__logo-marca" style="--welow-h-logo-marca-h: <?php echo esc_attr( $marca_h ); ?>px;">
+                    <?php if ( ! empty( $marca_data['url_link'] ) ) : ?>
+                        <a href="<?php echo esc_url( $marca_data['url_link'] ); ?>"
+                           aria-label="<?php echo esc_attr( $marca_data['nombre'] ); ?>">
+                            <img class="welow-header__logo-marca-img"
+                                 src="<?php echo esc_url( $marca_data['url_logo'] ); ?>"
+                                 alt="<?php echo esc_attr( $marca_data['nombre'] ); ?>" />
+                        </a>
+                    <?php else : ?>
+                        <img class="welow-header__logo-marca-img"
+                             src="<?php echo esc_url( $marca_data['url_logo'] ); ?>"
+                             alt="<?php echo esc_attr( $marca_data['nombre'] ); ?>" />
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
         </div>
 
         <!-- ZONA 2: Menú (desktop) -->

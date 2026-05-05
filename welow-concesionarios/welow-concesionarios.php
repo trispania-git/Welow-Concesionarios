@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.8.1
+ * Version:     2.9.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,40 @@
  *
  * CHANGELOG
  * ---------
+ * 2.9.0 — Header con logo de marca al lado (variante para páginas de marca)
+ *
+ *   NUEVOS PARÁMETROS DE [welow_header]:
+ *   - logo_marca: '' (default) | 'auto' | slug de marca específica
+ *   - logo_marca_variante: original | negro (default) | blanco
+ *   - logo_marca_altura: px (por defecto igual al logo principal)
+ *   - logo_marca_separador: si | no — línea vertical entre logos
+ *
+ *   AUTO-DETECCIÓN ('auto'):
+ *   - Single welow_marca         → la marca actual
+ *   - Single welow_modelo        → marca asociada al modelo
+ *   - Single welow_coche_nuevo   → marca del modelo del coche
+ *   - Single welow_coche_ocasion → marca externa (icono del término)
+ *     o, si está sincronizada con una oficial, usa el logo oficial
+ *
+ *   USO TÍPICO en plantilla Theme Builder de "All Marca Posts":
+ *   [welow_header logo_marca="auto" logo_marca_variante="negro"]
+ *
+ *   Resultado: header normal con logo del concesionario a la izquierda,
+ *   un separador vertical fino, y el logo de la marca actual (negro)
+ *   al lado.
+ *
+ *   HELPER NUEVO:
+ *   Welow_Helpers::get_current_marca_logo_data($variante, $size)
+ *   Devuelve {tipo, id, nombre, url_logo, url_link} de la marca del
+ *   contexto actual, o null si no se puede determinar.
+ *
+ *   Archivos:
+ *   - includes/helpers/class-welow-helpers.php
+ *   - includes/shortcodes/class-welow-shortcode-header.php
+ *   - templates/header.php
+ *   - assets/css/header.css
+ *   - includes/admin/class-welow-help.php (doc)
+ *
  * 2.8.1 — Filtros con autosubmit (sin pulsar "Aplicar")
  *
  *   COMPORTAMIENTO MEJORADO:
@@ -655,7 +689,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.8.1' );
+define( 'WELOW_CONC_VERSION', '2.9.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

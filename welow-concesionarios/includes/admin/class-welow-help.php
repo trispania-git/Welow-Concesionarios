@@ -310,12 +310,18 @@ class Welow_Help {
                     'font_size_telefono'  => array( 'def' => '14', 'desc' => 'Tamaño del teléfono (px)' ),
                     'text_transform_menu' => array( 'def' => 'none', 'desc' => 'none | uppercase | capitalize' ),
                     'letter_spacing_menu' => array( 'def' => '', 'desc' => 'Espaciado letras (ej: 0.5px, 0.04em)' ),
+                    'logo_marca'          => array( 'def' => '', 'desc' => '"" | "auto" (detecta marca del contexto) | slug de marca específica' ),
+                    'logo_marca_variante' => array( 'def' => 'negro', 'desc' => 'original | negro | blanco' ),
+                    'logo_marca_altura'   => array( 'def' => '(igual que logo_altura)', 'desc' => 'Altura del logo de marca en px' ),
+                    'logo_marca_separador'=> array( 'def' => 'si', 'desc' => 'si | no — línea vertical entre logos' ),
                 ),
                 'ejemplos' => array(
                     '[welow_header]   <!-- usa todos los defaults de Configuraciones -->',
                     '[welow_header sticky="si"]',
                     '[welow_header menu="cabecera-coches" boton_texto="Cita taller" boton_enlace="/contacto/cita/"]',
                     '[welow_header font_family="Figtree" font_weight_menu="500" font_size_menu="15"]',
+                    '[welow_header logo_marca="auto"]   <!-- header de página de marca: logo concesionario + logo marca actual -->',
+                    '[welow_header logo_marca="toyota" logo_marca_variante="negro"]',
                 ),
             ),
 
@@ -689,6 +695,26 @@ Tras pulsar [☰] (overlay fullscreen):
         <div class="welow-info-box">
             <strong>💡 Hook para integraciones:</strong> existe la acción <code>welow_coche_contacto_enviado</code> que recibe un array con todos los datos de la solicitud. Útil para enviarlo a un CRM externo, Google Sheets, etc.
         </div>
+
+        <hr style="margin: 30px 0;">
+
+        <h2>🏷️ Header específico de marca (v2.9.0)</h2>
+        <p>En las plantillas Theme Builder de las <strong>páginas de marca, modelo o coche</strong>, puedes usar una variante del header que muestra <strong>el logo de la marca actual al lado del logo del concesionario</strong>:</p>
+
+        <pre style="background:#1e293b;color:#e2e8f0;padding:16px;border-radius:6px;overflow-x:auto;font-size:13px;line-height:1.7;">
+<span style="color:#94a3b8;">// En la plantilla "All Marca Posts" (o de modelos/coches):</span>
+[welow_header logo_marca="auto" logo_marca_variante="negro"]
+</pre>
+
+        <p>Detecta automáticamente la marca del contexto:</p>
+        <ul style="margin-left:20px;list-style:disc;">
+            <li>En single de <code>welow_marca</code> → la marca actual</li>
+            <li>En single de <code>welow_modelo</code> → marca asociada</li>
+            <li>En single de <code>welow_coche_nuevo</code> → marca del modelo</li>
+            <li>En single de <code>welow_coche_ocasion</code> → marca externa (con su icono o logo oficial si está sincronizada)</li>
+        </ul>
+
+        <p>Recordatorio: en <strong>Concesionarios → Marcas</strong>, asegúrate de que cada marca tiene cargado el <strong>logo en variante "Negro"</strong> (campo "Logos de la marca → Logo negro"). Si solo tiene el original, se mostrará el original como fallback.</p>
         <?php
     }
 

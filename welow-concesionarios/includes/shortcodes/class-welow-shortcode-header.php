@@ -64,6 +64,11 @@ class Welow_Shortcode_Header {
             'font_size_telefono'=> '',
             'text_transform_menu' => '',
             'letter_spacing_menu' => '',
+            // v2.9.0 — Logo de la marca actual al lado del logo principal
+            'logo_marca'           => '',     // '' | 'auto' | slug de marca
+            'logo_marca_variante'  => 'negro', // original | negro | blanco
+            'logo_marca_altura'    => '',     // px (default: igual que logo_altura)
+            'logo_marca_separador' => 'si',   // si | no — línea vertical separadora
         ), $atts );
 
         // Combinar: shortcode atts > defaults globales
@@ -94,7 +99,33 @@ class Welow_Shortcode_Header {
             'font_size_telefono' => intval( $atts['font_size_telefono'] ?: ( $defaults_globales['font_size_telefono'] ?? 14 ) ),
             'text_transform_menu' => $atts['text_transform_menu'] ?: ( $defaults_globales['text_transform_menu'] ?? 'none' ),
             'letter_spacing_menu' => $atts['letter_spacing_menu'] ?: ( $defaults_globales['letter_spacing_menu'] ?? '' ),
+
+            // v2.9.0 — Logo de marca al lado del principal
+            'logo_marca'           => $atts['logo_marca'],
+            'logo_marca_variante'  => sanitize_text_field( $atts['logo_marca_variante'] ),
+            'logo_marca_altura'    => intval( $atts['logo_marca_altura'] ),
+            'logo_marca_separador' => self::resolver_bool( $atts['logo_marca_separador'], true ),
         );
+
+        // Resolver logo de la marca según el contexto
+        $config['logo_marca_data'] = null;
+        if ( ! empty( $config['logo_marca'] ) ) {
+            if ( 'auto' === $config['logo_marca'] ) {
+                $config['logo_marca_data'] = Welow_Helpers::get_current_marca_logo_data( $config['logo_marca_variante'], 'medium' );
+            } else {
+                // Slug específico
+                $marca_id = Welow_Helpers::resolver_marca_id( $config['logo_marca'] );
+                if ( $marca_id ) {
+                    $config['logo_marca_data'] = array(
+                        'tipo'     => 'oficial',
+                        'id'       => $marca_id,
+                        'nombre'   => get_the_title( $marca_id ),
+                        'url_logo' => Welow_Helpers::get_logo_url( $marca_id, $config['logo_marca_variante'], 'medium' ),
+                        'url_link' => get_permalink( $marca_id ),
+                    );
+                }
+            }
+        }
 
         // Si la fuente debe cargarse desde Google Fonts, registrarla
         if ( $config['font_google'] && $config['font_family'] ) {

@@ -138,6 +138,71 @@ class Welow_Helpers {
     }
 
     /**
+     * Detecta el "logo de la marca actual" para usar en headers, breadcrumbs, etc.
+     *
+     * Soporta 4 contextos:
+     *  - single welow_marca    → la marca actual
+     *  - single welow_modelo   → marca asociada al modelo
+     *  - single welow_coche_nuevo  → marca del modelo asociado
+     *  - single welow_coche_ocasion → término de welow_marca_externa con su icono
+     *
+     * @since 2.9.0
+     * @param string $variante  original | negro | blanco
+     * @param string $size      Tamaño WP (medium, large, etc.)
+     * @return array|null  {tipo, id, nombre, url_logo, url_link} o null si no se puede determinar.
+     *   tipo: 'oficial' | 'externa'
+     */
+    public static function get_current_marca_logo_data( $variante = 'negro', $size = 'medium' ) {
+        // 1. Intentar marca oficial (CPT welow_marca, vía single de marca/modelo/coche-nuevo)
+        $marca_id = self::get_current_marca_id();
+        if ( $marca_id ) {
+            return array(
+                'tipo'     => 'oficial',
+                'id'       => $marca_id,
+                'nombre'   => get_the_title( $marca_id ),
+                'url_logo' => self::get_logo_url( $marca_id, $variante, $size ),
+                'url_link' => get_permalink( $marca_id ),
+            );
+        }
+
+        // 2. Si estamos en un coche de ocasión, intentar la marca externa (taxonomía)
+        $coche_id = self::get_current_coche_id();
+        if ( $coche_id && 'welow_coche_ocasion' === get_post_type( $coche_id ) ) {
+            $terms = wp_get_post_terms( $coche_id, 'welow_marca_externa' );
+            if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+                $term = $terms[0];
+                $icono_url = '';
+                if ( method_exists( 'Welow_Tax_Marca_Externa', 'get_term_icono_url' ) ) {
+                    $icono_url = Welow_Tax_Marca_Externa::get_term_icono_url( $term->term_id, $size );
+                }
+                // Si el término externo está sincronizado con una oficial, usar el logo oficial
+                $oficial_id = get_term_meta( $term->term_id, '_welow_marca_oficial_id', true );
+                if ( $oficial_id ) {
+                    return array(
+                        'tipo'     => 'oficial',
+                        'id'       => intval( $oficial_id ),
+                        'nombre'   => $term->name,
+                        'url_logo' => self::get_logo_url( $oficial_id, $variante, $size ),
+                        'url_link' => get_term_link( $term ),
+                    );
+                }
+                // Si solo tiene el icono de la taxonomía, devolverlo
+                if ( $icono_url ) {
+                    return array(
+                        'tipo'     => 'externa',
+                        'id'       => $term->term_id,
+                        'nombre'   => $term->name,
+                        'url_logo' => $icono_url,
+                        'url_link' => get_term_link( $term ),
+                    );
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Obtiene la URL del logo de una marca según la variante.
      *
      * @since 1.1.0
