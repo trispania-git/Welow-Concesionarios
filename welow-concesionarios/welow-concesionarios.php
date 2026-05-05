@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.9.0
+ * Version:     2.9.1
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,32 @@
  *
  * CHANGELOG
  * ---------
+ * 2.9.1 — Fix: galería del modelo se desbordaba sobre el sidebar admin
+ *
+ *   PROBLEMA:
+ *   En el editor del CPT welow_modelo, el metabox "Galería de imágenes"
+ *   usaba un grid fijo de 5 columnas (`repeat(5, 1fr)`). Cuando el
+ *   ancho del metabox se reducía por el panel lateral derecho de
+ *   metaboxes (Etiquetas visuales, Configuración), la quinta card de
+ *   imagen se desbordaba lateralmente y se solapaba con las etiquetas,
+ *   bloqueando los clicks.
+ *
+ *   SOLUCIÓN:
+ *   Cambiados todos los grids fijos del admin por `auto-fill` con
+ *   `minmax()`, que adapta el número de columnas al ancho real
+ *   disponible sin desbordar:
+ *
+ *   - Galería modelo:    minmax(150px, 1fr)
+ *   - Logos marca:       minmax(220px, 1fr)
+ *   - Banners marca:     minmax(280px, 1fr)
+ *
+ *   También añadido `min-width: 0` a las cards y `overflow: hidden` +
+ *   `max-width: 100%` en las previews para evitar overflows residuales.
+ *
+ *   Archivos:
+ *   - includes/cpt/class-welow-cpt-modelo.php
+ *   - includes/cpt/class-welow-cpt-marca.php
+ *
  * 2.9.0 — Header con logo de marca al lado (variante para páginas de marca)
  *
  *   NUEVOS PARÁMETROS DE [welow_header]:
@@ -689,7 +715,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.9.0' );
+define( 'WELOW_CONC_VERSION', '2.9.1' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

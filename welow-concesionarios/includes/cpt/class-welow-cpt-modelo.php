@@ -177,10 +177,27 @@ class Welow_CPT_Modelo {
             ?>
         </div>
         <style>
-            .welow-galeria-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
-            .welow-galeria-grid .welow-image-preview { min-height: 80px; background: #f5f5f5; }
-            @media (max-width: 1400px) { .welow-galeria-grid { grid-template-columns: repeat(3, 1fr); } }
-            @media (max-width: 900px)  { .welow-galeria-grid { grid-template-columns: repeat(2, 1fr); } }
+            /* v2.9.1 — auto-fill se adapta al ancho real del metabox sin
+               desbordar el sidebar de etiquetas (antes era repeat(5, 1fr)
+               y la quinta columna se metía en la zona derecha) */
+            .welow-galeria-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 12px;
+            }
+            .welow-galeria-grid > .welow-img-field-group {
+                min-width: 0;          /* permite que el grid encoja la card */
+            }
+            .welow-galeria-grid .welow-image-preview {
+                min-height: 80px;
+                background: #f5f5f5;
+                max-width: 100%;
+                overflow: hidden;
+            }
+            .welow-galeria-grid .welow-image-preview img {
+                max-width: 100%;
+                height: auto;
+            }
         </style>
         <?php
     }

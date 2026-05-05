@@ -183,9 +183,18 @@ class Welow_CPT_Marca {
             ?>
         </div>
         <style>
-            .welow-logos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-            .welow-logos-grid .welow-image-preview { background: #f5f5f5; padding: 10px; min-height: 100px; }
-            @media (max-width: 1200px) { .welow-logos-grid { grid-template-columns: 1fr; } }
+            /* v2.9.1 — auto-fill para adaptarse al ancho del metabox sin desbordar */
+            .welow-logos-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                gap: 20px;
+            }
+            .welow-logos-grid > .welow-img-field-group { min-width: 0; }
+            .welow-logos-grid .welow-image-preview {
+                background: #f5f5f5; padding: 10px; min-height: 100px;
+                max-width: 100%; overflow: hidden;
+            }
+            .welow-logos-grid .welow-image-preview img { max-width: 100%; height: auto; }
         </style>
         <?php
     }
@@ -245,9 +254,18 @@ class Welow_CPT_Marca {
         <style>
             .welow-banner-section-title { display: flex; align-items: center; gap: 8px; margin: 0 0 15px; font-size: 15px; }
             .welow-banner-section-title .dashicons { color: #2563eb; }
-            .welow-banner-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-            .welow-banner-pair .welow-image-preview { min-height: 120px; background: #f5f5f5; }
-            @media (max-width: 1200px) { .welow-banner-pair { grid-template-columns: 1fr; } }
+            /* v2.9.1 — auto-fill */
+            .welow-banner-pair {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 20px;
+            }
+            .welow-banner-pair > .welow-img-field-group { min-width: 0; }
+            .welow-banner-pair .welow-image-preview {
+                min-height: 120px; background: #f5f5f5;
+                max-width: 100%; overflow: hidden;
+            }
+            .welow-banner-pair .welow-image-preview img { max-width: 100%; height: auto; }
         </style>
         <?php
     }
