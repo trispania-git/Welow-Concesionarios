@@ -210,6 +210,31 @@
 }
 .welow-cf__limpiar:hover { color: #ef4444; }
 
+/* v2.8.1 — Cuando JS está activo, ocultar el botón "Aplicar filtros"
+   en desktop (autosubmit). En móvil sí lo mantenemos visible para
+   no recargar tras cada toque del drawer.
+   Como base hide y JS no hace nada, en navegadores sin JS el botón
+   sigue visible (fallback) — lo conseguimos con clase 'no-js' por defecto. */
+.welow-cf__form .welow-cf__acciones-aplicar {
+    display: none;
+}
+@media (max-width: 980px) {
+    .welow-cf__form .welow-cf__acciones-aplicar {
+        display: block;
+    }
+}
+
+/* Indicador visual mientras se hace submit (transición fluida) */
+.welow-coches-filtro.welow-cf--loading .welow-cf__main {
+    opacity: 0.4;
+    transition: opacity 0.15s;
+    pointer-events: none;
+}
+.welow-coches-filtro.welow-cf--loading .welow-cf__sidebar {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
 /* ==========================================================================
    MAIN (resultados)
    ========================================================================== */

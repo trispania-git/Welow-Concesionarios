@@ -38,10 +38,48 @@
             }
         });
 
-        // Autosubmit del selector de orden
+        /* ====================================================================
+           v2.8.1 — Autosubmit del formulario al cambiar cualquier filtro
+           ==================================================================== */
+        if (form) {
+            // Helper: enviar el form garantizando que la página vuelve a 1
+            function autosubmit() {
+                // Reset de paginación al cambiar un filtro
+                var pagedInput = form.querySelector('input[name="welow_paged"]');
+                if (pagedInput) pagedInput.value = 1;
+
+                // Indicador visual de "cargando"
+                container.classList.add('welow-cf--loading');
+                form.submit();
+            }
+
+            // Debounce para inputs number (precio, km, año, cv) que escriben con teclado
+            var debounceTimer;
+            function autosubmitDebounced(ms) {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(autosubmit, ms || 700);
+            }
+
+            // Checkboxes, radios y selects → submit inmediato al cambiar
+            form.querySelectorAll('input[type="checkbox"], input[type="radio"], select').forEach(function (el) {
+                el.addEventListener('change', autosubmit);
+            });
+
+            // Inputs number → debounce 700ms tras dejar de escribir
+            form.querySelectorAll('input[type="number"]').forEach(function (el) {
+                el.addEventListener('input', function () { autosubmitDebounced(700); });
+                // Y también submit al perder el foco (más rápido si el usuario salta)
+                el.addEventListener('blur', function () {
+                    clearTimeout(debounceTimer);
+                    if (el.value !== el.defaultValue) autosubmit();
+                });
+            });
+        }
+
+        // Autosubmit del selector de orden (estaba ya, ahora también
+        // sincroniza la pagina actual a 1)
         if (orden && form) {
             orden.addEventListener('change', function () {
-                // Sincronizar el valor con un input oculto en el form si no existe
                 var hidden = form.querySelector('input[name="welow_orden"]');
                 if (!hidden) {
                     hidden = document.createElement('input');
@@ -50,6 +88,7 @@
                     form.appendChild(hidden);
                 }
                 hidden.value = orden.value;
+                container.classList.add('welow-cf--loading');
                 form.submit();
             });
         }

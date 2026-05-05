@@ -249,7 +249,7 @@ $is_checked = function( $array, $value ) {
                 <?php endif; ?>
 
                 <div class="welow-cf__acciones">
-                    <button type="submit" class="welow-btn welow-btn-primary welow-btn-grande">Aplicar filtros</button>
+                    <button type="submit" class="welow-btn welow-btn-primary welow-btn-grande welow-cf__acciones-aplicar">Aplicar filtros</button>
                     <a href="<?php echo esc_url( $form_action ); ?>" class="welow-cf__limpiar">Limpiar filtros</a>
                 </div>
 
