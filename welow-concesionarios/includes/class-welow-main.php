@@ -206,6 +206,14 @@ class Welow_Main {
             if ( in_array( $screen->post_type, array( 'welow_coche_nuevo', 'welow_coche_ocasion' ), true ) ) {
                 wp_enqueue_script( 'jquery-ui-sortable' );
             }
+            // v2.10.0 — Color picker nativo de WP en pantalla de modelo
+            if ( 'welow_modelo' === $screen->post_type ) {
+                wp_enqueue_style( 'wp-color-picker' );
+                wp_enqueue_script( 'wp-color-picker' );
+                add_action( 'admin_print_footer_scripts', function() {
+                    echo '<script>jQuery(function($){ if($.fn.wpColorPicker){ $(".welow-color-field").wpColorPicker(); } });</script>';
+                } );
+            }
             wp_enqueue_style(
                 'welow-admin-marca',
                 WELOW_CONC_URL . 'assets/css/admin-marca.css',

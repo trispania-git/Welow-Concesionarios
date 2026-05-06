@@ -321,6 +321,9 @@ class Welow_CPT_Modelo {
         $enlace       = get_post_meta( $post->ID, self::META_PREFIX . 'enlace', true );
         $texto_enlace = get_post_meta( $post->ID, self::META_PREFIX . 'texto_enlace', true );
         $plazas       = get_post_meta( $post->ID, self::META_PREFIX . 'plazas', true );
+        // v2.10.0
+        $rotulo       = get_post_meta( $post->ID, self::META_PREFIX . 'rotulo', true );
+        $rotulo_color = get_post_meta( $post->ID, self::META_PREFIX . 'rotulo_color', true );
 
         // Obtener todas las marcas para el selector
         $marcas = get_posts( array(
@@ -367,6 +370,27 @@ class Welow_CPT_Modelo {
                            value="<?php echo esc_attr( $plazas ); ?>"
                            min="1" max="20" step="1" style="width: 80px;" />
                     <p class="description">Número de plazas del vehículo (1–20). Déjalo vacío si no aplica.</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="welow_modelo_rotulo">Rótulo destacado</label></th>
+                <td>
+                    <input type="text" id="welow_modelo_rotulo" name="welow_modelo_rotulo"
+                           value="<?php echo esc_attr( $rotulo ); ?>" class="large-text"
+                           maxlength="60"
+                           placeholder="ej: NUEVO · OFERTA EXCLUSIVA · 100% ELÉCTRICO · NOVEDAD 2026" />
+                    <p class="description">Texto opcional destacado que aparece en la card del modelo (encima del título).
+                    Ideal para llamadas de atención cortas. Máximo 60 caracteres.</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="welow_modelo_rotulo_color">Color del rótulo</label></th>
+                <td>
+                    <input type="text" id="welow_modelo_rotulo_color" name="welow_modelo_rotulo_color"
+                           value="<?php echo esc_attr( $rotulo_color ); ?>"
+                           placeholder="#2563eb" class="welow-color-field"
+                           data-default-color="#2563eb" />
+                    <p class="description">Color de fondo del rótulo. Si lo dejas vacío, se usa el azul por defecto del plugin.</p>
                 </td>
             </tr>
         </table>
@@ -429,6 +453,17 @@ class Welow_CPT_Modelo {
             ? absint( $_POST['welow_modelo_plazas'] )
             : '';
         update_post_meta( $post_id, self::META_PREFIX . 'plazas', $plazas );
+
+        // Rótulo destacado (v2.10.0)
+        $rotulo = isset( $_POST['welow_modelo_rotulo'] ) ? sanitize_text_field( $_POST['welow_modelo_rotulo'] ) : '';
+        update_post_meta( $post_id, self::META_PREFIX . 'rotulo', $rotulo );
+
+        $rotulo_color = isset( $_POST['welow_modelo_rotulo_color'] ) ? sanitize_text_field( $_POST['welow_modelo_rotulo_color'] ) : '';
+        // Validar formato hex (#000 o #000000)
+        if ( $rotulo_color && ! preg_match( '/^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$/', $rotulo_color ) ) {
+            $rotulo_color = '';
+        }
+        update_post_meta( $post_id, self::META_PREFIX . 'rotulo_color', $rotulo_color );
 
         // Orden
         $orden = isset( $_POST['welow_modelo_orden'] ) ? absint( $_POST['welow_modelo_orden'] ) : 0;

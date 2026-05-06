@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.9.1
+ * Version:     2.10.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,49 @@
  *
  * CHANGELOG
  * ---------
+ * 2.10.0 — Rediseño card modelo + nuevo campo "rótulo" destacado
+ *
+ *   CARDS DE MODELO en páginas de marca [welow_modelos]:
+ *
+ *   1) TÍTULO MÁS GRANDE Y DESTACADO
+ *      - Cambiado de h3 18px → h2 26px (22px tablet, 20px móvil)
+ *      - Font-weight 800, letter-spacing -0.01em
+ *      - Color #0f172a (más contrastado)
+ *
+ *   2) BADGES SIMPLIFICADAS
+ *      - ELIMINADAS: carrocería (Berlina, SUV, Compacto...) y plazas
+ *      - Solo se muestra COMBUSTIBLE (badge verde)
+ *
+ *   3) ETIQUETAS VISUALES (welow_etiqueta) MOVIDAS
+ *      - Antes: flotaban absolute sobre la imagen (top-left)
+ *      - Ahora: en el flujo del card, DEBAJO del título del modelo
+ *      - Más legibles, no tapan la imagen, mejor accesibilidad
+ *
+ *   4) BOTÓN "VER MODELO" REPOSICIONADO
+ *      - Ya no es un botón ancho azul abajo
+ *      - Ahora es un enlace pequeño en la esquina INFERIOR DERECHA
+ *      - Estilo: texto azul + flecha → con animación de hover
+ *      - Footer del card: precio (izq) + CTA (der), separados por borde
+ *
+ *   5) NUEVO CAMPO "RÓTULO DESTACADO" (opcional)
+ *      Editor del modelo (Concesionarios → Modelos → [Modelo]):
+ *      - Campo de texto (max 60 chars) para texto destacado
+ *        Ej: "NUEVO", "OFERTA EXCLUSIVA", "100% ELÉCTRICO", "NOVEDAD 2026"
+ *      - Color personalizable con color picker nativo de WP
+ *      - Aparece como pill/etiqueta encima del título en la card
+ *      - Si está vacío, no se muestra (no afecta al diseño)
+ *
+ *   FUENTES:
+ *   La card hereda la fuente del tema activo (Divi por defecto).
+ *   Si quieres usar la fuente del header (Figtree, etc.), podemos
+ *   añadir un CSS variable global compartida en próxima versión.
+ *
+ *   Archivos:
+ *   - includes/cpt/class-welow-cpt-modelo.php (campos rótulo + admin color picker)
+ *   - includes/class-welow-main.php (enqueue wp-color-picker en pantalla modelo)
+ *   - templates/modelos-grid.php (rediseño completo)
+ *   - assets/css/secciones.css (CSS card modelo)
+ *
  * 2.9.1 — Fix: galería del modelo se desbordaba sobre el sidebar admin
  *
  *   PROBLEMA:
@@ -715,7 +758,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.9.1' );
+define( 'WELOW_CONC_VERSION', '2.10.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
