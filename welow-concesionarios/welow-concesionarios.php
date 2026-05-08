@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.11.0
+ * Version:     2.12.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,35 @@
  *
  * CHANGELOG
  * ---------
+ * 2.12.0 — Ficha individual: bloque "resaltado" con rótulo + características
+ *
+ *   FICHA DE COCHE [welow_coche_ficha]:
+ *
+ *   1) NUEVO BLOQUE "resaltado" en el orquestador
+ *      - Renderiza rótulo grande + lista de características con checks azules
+ *      - Solo se muestra si el coche tiene rótulo o características rellenas
+ *      - Posición: justo después de la galería, antes de los datos técnicos
+ *
+ *   2) DEFAULT 'mostrar' ACTUALIZADO
+ *      - Antes: "galeria,destacados,precio,formulario,equipamiento,..."
+ *      - Ahora: "galeria,resaltado,destacados,precio,formulario,equipamiento,..."
+ *      - Para excluirlo: [welow_coche_ficha mostrar="galeria,destacados,..."]
+ *
+ *   3) DISEÑO DEL BLOQUE
+ *      - Fondo gradiente sutil (#f8fafc → #eef2ff)
+ *      - Borde lateral azul de 4px (#2563eb)
+ *      - Rótulo h2 24px (20px en móvil)
+ *      - Lista en 2 columnas en desktop, 1 en móvil
+ *      - Checks redondos azules con tick blanco
+ *
+ *   ARCHIVOS NUEVOS:
+ *      - templates/coche-resaltado.php
+ *
+ *   ARCHIVOS MODIFICADOS:
+ *      - includes/shortcodes/class-welow-shortcode-coche-ficha.php
+ *      - templates/coche-ficha.php
+ *      - assets/css/coche-ficha.css
+ *
  * 2.11.0 — Card de coches NUEVOS: rótulo + características principales
  *
  *   CPT welow_coche_nuevo — Nuevo metabox "I. Destacados (card)":
@@ -789,7 +818,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.11.0' );
+define( 'WELOW_CONC_VERSION', '2.12.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

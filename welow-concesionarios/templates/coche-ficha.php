@@ -51,6 +51,11 @@ if ( $es_nuevo ) {
                 <?php Welow_Helpers::get_template( 'coche-galeria.php', array( 'data' => $data ) ); ?>
             <?php endif; ?>
 
+            <?php // v2.12.0 — Bloque resaltado (rótulo + características principales) ?>
+            <?php if ( in_array( 'resaltado', $bloques ) ) : ?>
+                <?php Welow_Helpers::get_template( 'coche-resaltado.php', array( 'data' => $data ) ); ?>
+            <?php endif; ?>
+
             <?php if ( in_array( 'destacados', $bloques ) ) : ?>
                 <?php Welow_Helpers::get_template( 'coche-destacados.php', array( 'data' => $data ) ); ?>
             <?php endif; ?>
