@@ -322,8 +322,9 @@ class Welow_CPT_Modelo {
         $texto_enlace = get_post_meta( $post->ID, self::META_PREFIX . 'texto_enlace', true );
         $plazas       = get_post_meta( $post->ID, self::META_PREFIX . 'plazas', true );
         // v2.10.0
-        $rotulo       = get_post_meta( $post->ID, self::META_PREFIX . 'rotulo', true );
-        $rotulo_color = get_post_meta( $post->ID, self::META_PREFIX . 'rotulo_color', true );
+        $rotulo          = get_post_meta( $post->ID, self::META_PREFIX . 'rotulo', true );
+        $rotulo_color    = get_post_meta( $post->ID, self::META_PREFIX . 'rotulo_color', true );
+        $caracteristicas = get_post_meta( $post->ID, self::META_PREFIX . 'caracteristicas', true ); // v2.13.0
 
         // Obtener todas las marcas para el selector
         $marcas = get_posts( array(
@@ -391,6 +392,16 @@ class Welow_CPT_Modelo {
                            placeholder="#2563eb" class="welow-color-field"
                            data-default-color="#2563eb" />
                     <p class="description">Color de fondo del rótulo. Si lo dejas vacío, se usa el azul por defecto del plugin.</p>
+                </td>
+            </tr>
+            <?php // v2.13.0 — Características principales (lista de bullets) ?>
+            <tr>
+                <th><label for="welow_modelo_caracteristicas">Características principales</label></th>
+                <td>
+                    <textarea id="welow_modelo_caracteristicas" name="welow_modelo_caracteristicas"
+                              rows="6" class="large-text"
+                              placeholder="Una característica por línea, p.ej.:&#10;Sistema de Sonido Sony de 12 Altavoces&#10;Control por Voz de 4 Zonas&#10;Pantalla Central Deslizante de 15,6&#10;19 Asistentes de Conducción (ADAS)"><?php echo esc_textarea( $caracteristicas ); ?></textarea>
+                    <p class="description">Una característica por línea. Se mostrará como lista en la card del modelo (recomendado: 3-5 líneas).</p>
                 </td>
             </tr>
         </table>
@@ -464,6 +475,10 @@ class Welow_CPT_Modelo {
             $rotulo_color = '';
         }
         update_post_meta( $post_id, self::META_PREFIX . 'rotulo_color', $rotulo_color );
+
+        // v2.13.0 — Características principales
+        $caracteristicas = isset( $_POST['welow_modelo_caracteristicas'] ) ? sanitize_textarea_field( $_POST['welow_modelo_caracteristicas'] ) : '';
+        update_post_meta( $post_id, self::META_PREFIX . 'caracteristicas', $caracteristicas );
 
         // Orden
         $orden = isset( $_POST['welow_modelo_orden'] ) ? absint( $_POST['welow_modelo_orden'] ) : 0;

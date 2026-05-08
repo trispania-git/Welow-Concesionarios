@@ -53,6 +53,13 @@ $icono_disclaimer_url = $icono_disclaimer_id ? wp_get_attachment_image_url( $ico
         $rotulo       = Welow_Helpers::get_modelo_meta( $modelo->ID, 'rotulo' );
         $rotulo_color = Welow_Helpers::get_modelo_meta( $modelo->ID, 'rotulo_color' );
 
+        // v2.13.0 — Características principales (lista de bullets)
+        $caracteristicas = Welow_Helpers::get_modelo_meta( $modelo->ID, 'caracteristicas' );
+        $caract_lineas   = array();
+        if ( $caracteristicas ) {
+            $caract_lineas = array_filter( array_map( 'trim', preg_split( "/\r\n|\n|\r/", $caracteristicas ) ) );
+        }
+
         // Estilo inline para el color del rótulo (si está definido)
         $rotulo_style = $rotulo_color ? ' style="background:' . esc_attr( $rotulo_color ) . ';"' : '';
     ?>
@@ -114,6 +121,15 @@ $icono_disclaimer_url = $icono_disclaimer_id ? wp_get_attachment_image_url( $ico
 
                 <?php if ( $descripcion ) : ?>
                     <p class="welow-modelo-card__desc"><?php echo esc_html( $descripcion ); ?></p>
+                <?php endif; ?>
+
+                <?php // v2.13.0 — Características principales (lista bullets) ?>
+                <?php if ( ! empty( $caract_lineas ) ) : ?>
+                    <ul class="welow-modelo-card__caracteristicas">
+                        <?php foreach ( $caract_lineas as $linea ) : ?>
+                            <li><?php echo esc_html( $linea ); ?></li>
+                        <?php endforeach; ?>
+                    </ul>
                 <?php endif; ?>
 
                 <?php // v2.10.0 — Footer: precio (izq) + "Ver modelo" pequeño (der) ?>

@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.12.0
+ * Version:     2.13.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,24 @@
  *
  * CHANGELOG
  * ---------
+ * 2.13.0 — Características principales en CPT welow_modelo
+ *
+ *   FICHA DE MODELO (admin):
+ *   - Nuevo campo "Características principales" (textarea, una por línea)
+ *     en el metabox "Datos del modelo", justo debajo del rótulo y color.
+ *   - Meta key: _welow_modelo_caracteristicas
+ *
+ *   CARD DE MODELO en páginas de marca [welow_modelos]:
+ *   - Nueva lista de características renderizada entre la descripción
+ *     y el footer (precio + CTA).
+ *   - Estilo: borde lateral gris, una característica por línea.
+ *   - Si no hay características, la card se mantiene como en v2.10.0.
+ *
+ *   ARCHIVOS MODIFICADOS:
+ *   - includes/cpt/class-welow-cpt-modelo.php (campo + save)
+ *   - templates/modelos-grid.php (render bullets)
+ *   - assets/css/secciones.css (estilos lista)
+ *
  * 2.12.0 — Ficha individual: bloque "resaltado" con rótulo + características
  *
  *   FICHA DE COCHE [welow_coche_ficha]:
@@ -818,7 +836,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.12.0' );
+define( 'WELOW_CONC_VERSION', '2.13.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

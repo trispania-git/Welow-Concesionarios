@@ -319,8 +319,24 @@
     color: #6b7280;
     line-height: 1.5;
     margin: 0 0 16px;
+}
+
+/* v2.13.0 — Características principales (bullets) */
+.welow-modelo-card__caracteristicas {
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 0 0 0 14px;
+    border-left: 2px solid #e2e8f0;
+    font-size: 14px;
+    color: #475569;
+    line-height: 1.5;
     flex: 1;
 }
+.welow-modelo-card__caracteristicas li {
+    margin: 0 0 4px;
+    padding: 0;
+}
+.welow-modelo-card__caracteristicas li:last-child { margin-bottom: 0; }
 
 /* v2.10.0 — Footer del card: precio (izq) + CTA pequeño (der) */
 .welow-modelo-card__footer {
