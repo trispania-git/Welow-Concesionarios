@@ -19,6 +19,61 @@ class Welow_CPT_Coche_Nuevo extends Welow_CPT_Coche_Base {
 
     public static function init() {
         parent::init_base( self::POST_TYPE );
+
+        // v2.11.0 — Metabox extra "Destacados" (rótulo + características principales)
+        add_action( 'add_meta_boxes', array( __CLASS__, 'registrar_metabox_destacados' ) );
+    }
+
+    /**
+     * v2.11.0 — Metabox adicional "Destacados" solo para coches nuevos.
+     */
+    public static function registrar_metabox_destacados() {
+        add_meta_box(
+            'welow_coche_destacados',
+            'I. Destacados (card)',
+            array( __CLASS__, 'render_metabox_destacados' ),
+            self::POST_TYPE,
+            'normal',
+            'default'
+        );
+    }
+
+    /**
+     * v2.11.0 — Render del metabox "Destacados".
+     *
+     * Campos:
+     *  - rotulo: frase corta destacada (encima de las características).
+     *  - caracteristicas: lista de bullets, una característica por línea.
+     */
+    public static function render_metabox_destacados( $post ) {
+        $rotulo          = get_post_meta( $post->ID, self::META_PREFIX . 'rotulo', true );
+        $caracteristicas = get_post_meta( $post->ID, self::META_PREFIX . 'caracteristicas', true );
+        ?>
+        <p class="description" style="margin-top:0;">
+            Aparece en la <strong>card del listado</strong> de coches nuevos para destacar el modelo.
+        </p>
+        <table class="form-table welow-metabox-table">
+            <tr>
+                <th><label for="welow_coche_rotulo">Rótulo destacado</label></th>
+                <td>
+                    <input type="text" id="welow_coche_rotulo" name="welow_coche_rotulo"
+                           value="<?php echo esc_attr( $rotulo ); ?>" class="large-text"
+                           maxlength="80"
+                           placeholder="ej: La innovación tiene nuevo nombre" />
+                    <p class="description">Frase corta (máx. 80 caracteres) que se muestra en negrita encima de las características.</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="welow_coche_caracteristicas">Características principales</label></th>
+                <td>
+                    <textarea id="welow_coche_caracteristicas" name="welow_coche_caracteristicas"
+                              rows="6" class="large-text"
+                              placeholder="Una característica por línea, p.ej.:&#10;Sistema de Sonido Sony de 12 Altavoces&#10;Control por Voz de 4 Zonas&#10;Pantalla Central Deslizante de 15,6&#10;19 Asistentes de Conducción (ADAS)"><?php echo esc_textarea( $caracteristicas ); ?></textarea>
+                    <p class="description">Una característica por línea. Recomendado: 3-5 líneas.</p>
+                </td>
+            </tr>
+        </table>
+        <?php
     }
 
     public static function get_labels() {
@@ -138,6 +193,13 @@ class Welow_CPT_Coche_Nuevo extends Welow_CPT_Coche_Base {
 
         // Para coches NUEVOS no hay tipo_venta (siempre es "nuevo"), ni km, ni anio_matricula
         update_post_meta( $post_id, self::META_PREFIX . 'tipo_venta', 'nuevo' );
+
+        // v2.11.0 — Destacados (rótulo + características principales)
+        $rotulo = isset( $_POST['welow_coche_rotulo'] ) ? sanitize_text_field( $_POST['welow_coche_rotulo'] ) : '';
+        update_post_meta( $post_id, self::META_PREFIX . 'rotulo', $rotulo );
+
+        $caracteristicas = isset( $_POST['welow_coche_caracteristicas'] ) ? sanitize_textarea_field( $_POST['welow_coche_caracteristicas'] ) : '';
+        update_post_meta( $post_id, self::META_PREFIX . 'caracteristicas', $caracteristicas );
     }
 
     /**
