@@ -20,9 +20,19 @@
     margin: 0 0 10px;
 }
 
+/* v2.14.0 — Fila combinada: etiqueta DGT (primero) + badge combustible */
+.welow-modelo-card__etiquetas-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 10px;
+}
+
 .welow-modelo-etiqueta {
-    max-width: 56px;
-    max-height: 56px;
+    /* v2.14.0 — Reducidas al 70% (56→39px) */
+    max-width: 39px;
+    max-height: 39px;
     width: auto;
     height: auto;
     object-fit: contain;
@@ -184,8 +194,9 @@
         right: -20px;
     }
     .welow-modelo-etiqueta {
-        max-width: 48px;
-        max-height: 48px;
+        /* v2.14.0 — 70% (48→34px) */
+        max-width: 34px;
+        max-height: 34px;
     }
 }
 

@@ -93,29 +93,32 @@ $icono_disclaimer_url = $icono_disclaimer_id ? wp_get_attachment_image_url( $ico
                     <a href="<?php echo esc_url( $permalink ); ?>"><?php echo esc_html( $nombre ); ?></a>
                 </h2>
 
-                <?php // v2.10.0 — Etiquetas visuales DEBAJO del nombre (antes flotaban sobre la imagen) ?>
-                <?php if ( ! empty( $etiquetas ) ) : ?>
-                    <div class="welow-modelo-card__etiquetas">
-                        <?php foreach ( $etiquetas as $et ) :
-                            $et_img_id = get_post_meta( $et->ID, '_welow_etiqueta_imagen', true );
-                            if ( ! $et_img_id ) continue;
-                            $et_img_url = wp_get_attachment_image_url( $et_img_id, 'medium' );
-                        ?>
-                            <img src="<?php echo esc_url( $et_img_url ); ?>"
-                                 alt="<?php echo esc_attr( $et->post_title ); ?>"
-                                 title="<?php echo esc_attr( $et->post_title ); ?>"
-                                 class="welow-modelo-etiqueta"
-                                 loading="lazy" />
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
+                <?php // v2.14.0 — Etiquetas DGT (70% tamaño) + combustible en MISMA fila (etiqueta primero) ?>
+                <?php
+                    $hay_etiquetas    = ! empty( $etiquetas );
+                    $hay_combustibles = ! empty( $combustibles ) && ! is_wp_error( $combustibles );
+                ?>
+                <?php if ( $hay_etiquetas || $hay_combustibles ) : ?>
+                    <div class="welow-modelo-card__etiquetas-row">
+                        <?php if ( $hay_etiquetas ) : ?>
+                            <?php foreach ( $etiquetas as $et ) :
+                                $et_img_id = get_post_meta( $et->ID, '_welow_etiqueta_imagen', true );
+                                if ( ! $et_img_id ) continue;
+                                $et_img_url = wp_get_attachment_image_url( $et_img_id, 'medium' );
+                            ?>
+                                <img src="<?php echo esc_url( $et_img_url ); ?>"
+                                     alt="<?php echo esc_attr( $et->post_title ); ?>"
+                                     title="<?php echo esc_attr( $et->post_title ); ?>"
+                                     class="welow-modelo-etiqueta"
+                                     loading="lazy" />
+                            <?php endforeach; ?>
+                        <?php endif; ?>
 
-                <?php // v2.10.0 — Solo combustible (carrocería ya no aparece). Plazas tampoco. ?>
-                <?php if ( ! empty( $combustibles ) && ! is_wp_error( $combustibles ) ) : ?>
-                    <div class="welow-modelo-card__meta">
-                        <?php foreach ( $combustibles as $c ) : ?>
-                            <span class="welow-badge welow-badge--combustible"><?php echo esc_html( $c->name ); ?></span>
-                        <?php endforeach; ?>
+                        <?php if ( $hay_combustibles ) : ?>
+                            <?php foreach ( $combustibles as $c ) : ?>
+                                <span class="welow-badge welow-badge--combustible"><?php echo esc_html( $c->name ); ?></span>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 <?php endif; ?>
 
