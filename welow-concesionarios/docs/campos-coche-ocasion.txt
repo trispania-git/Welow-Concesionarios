@@ -1,0 +1,80 @@
+CPT: welow_coche_ocasion — Coches de segunda mano + KM0
+Plugin Welow Concesionarios (v2.14.0)
+
+==========================================================
+A. IDENTIFICACIÓN
+==========================================================
+- Título (post_title) — Auto-construible: Marca + Modelo + Versión
+- Modelo* (_welow_coche_modelo_texto) — Texto libre. Obligatorio. Ej: "Serie 3"
+- Versión / Acabado (_welow_coche_version) — Texto. Ej: "320d xDrive Sport"
+- Tipo (_welow_coche_tipo_venta) — Select: ocasion / km0
+- Estado (_welow_coche_estado) — Select: disponible / reservado / vendido
+- Referencia interna (_welow_coche_referencia) — Texto. Ej: "7539"
+- Mes matriculación (_welow_coche_mes_matricula) — Select 1-12
+- Año matriculación (_welow_coche_anio_matricula) — Número 1980 - año actual+1
+- Kilómetros (_welow_coche_km) — Número entero
+
+==========================================================
+B. PRECIO
+==========================================================
+- Precio al contado (_welow_coche_precio_contado) — Número (2 decimales)
+- Precio financiado (_welow_coche_precio_financiado) — Número (2 decimales)
+- Precio anterior, tachado (_welow_coche_precio_anterior) — Número (2 decimales)
+- Cuota mensual (_welow_coche_cuota) — Número (2 decimales)
+- Disclaimer override (_welow_coche_disclaimer) — Textarea
+
+==========================================================
+C. DATOS TÉCNICOS
+==========================================================
+- Cambio (_welow_coche_cambio) — Select: manual / automatico / semiautomatico
+- Nº de marchas (_welow_coche_marchas) — Número 1-10
+- Potencia CV (_welow_coche_cv) — Número (decimales). Auto-calcula kW
+- Potencia kW (_welow_coche_kw) — Número (decimales). Auto-calcula CV
+- Cilindrada cc (_welow_coche_cilindrada) — Número entero
+- Plazas (_welow_coche_plazas) — Número 1-20
+- Puertas (_welow_coche_puertas) — Número 1-6
+- Color (_welow_coche_color) — Texto
+- Tipo pintura (_welow_coche_tipo_pintura) — Select: solida / metalizada / mate / perlada
+- Etiqueta DGT (_welow_coche_etiqueta_dgt) — Select: 0 / eco / c / b / sin
+
+==========================================================
+D. GALERÍA
+==========================================================
+- Imagen destacada (_thumbnail_id) — Media estándar WP
+- Galería (_welow_coche_galeria) — Array de IDs, hasta 30 imágenes, ordenables
+- URL de vídeo (_welow_coche_video) — URL (YouTube/Vimeo)
+
+==========================================================
+E. EQUIPAMIENTO
+==========================================================
+- Equipamiento (_welow_coche_equipamiento) — WYSIWYG (TinyMCE)
+
+==========================================================
+F. GARANTÍAS
+==========================================================
+- Garantías (_welow_coche_garantias) — WYSIWYG (TinyMCE)
+
+==========================================================
+G. COMERCIAL (sidebar)
+==========================================================
+- Concesionario (_welow_coche_concesionario) — Select de welow_concesionario
+- Programa especial (_welow_coche_programa) — Texto
+
+==========================================================
+H. DATOS PRIVADOS (sidebar, NO se muestran en frontend)
+==========================================================
+- Matrícula (_welow_coche_matricula) — Texto, máx 10 chars
+- Bastidor / VIN (_welow_coche_vin) — Texto, máx 17 chars
+
+==========================================================
+TAXONOMÍAS (panel lateral derecho)
+==========================================================
+- Marca externa (welow_marca_externa) — BMW, Audi, Renault... Plana, no jerárquica
+- Combustible (welow_combustible) — Gasolina, Diésel, Eléctrico, Híbrido (con icono)
+- Carrocería (welow_categoria_modelo) — SUV, Berlina, Compacto (con icono)
+
+==========================================================
+OTROS (soporte WP estándar)
+==========================================================
+- Resumen / Excerpt — Descripción corta
+- Permalink — /coches/segunda-mano/{marca}/{modelo}/{slug}/

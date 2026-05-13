@@ -1,0 +1,83 @@
+CPT: welow_coche_nuevo — Coches nuevos del catálogo oficial
+Plugin Welow Concesionarios (v2.14.0)
+
+==========================================================
+A. IDENTIFICACIÓN
+==========================================================
+- Título (post_title) — Auto-construible: Marca + Modelo + Versión
+- Modelo* (_welow_coche_modelo) — Select de welow_modelo (catálogo oficial). Obligatorio
+- Versión / Acabado (_welow_coche_version) — Texto. Ej: "1.0 VVT-i 72CV Play"
+- Estado (_welow_coche_estado) — Select: disponible / reservado / vendido
+- Referencia interna (_welow_coche_referencia) — Texto. Ej: "7539"
+- (Tipo venta fijo: "nuevo" — no editable)
+
+==========================================================
+B. PRECIO
+==========================================================
+- Precio al contado (_welow_coche_precio_contado) — Número (2 decimales)
+- Precio financiado (_welow_coche_precio_financiado) — Número (2 decimales)
+- Precio anterior, tachado (_welow_coche_precio_anterior) — Número (2 decimales)
+- Cuota mensual (_welow_coche_cuota) — Número (2 decimales)
+- Disclaimer override (_welow_coche_disclaimer) — Textarea
+
+==========================================================
+C. DATOS TÉCNICOS
+==========================================================
+- Cambio (_welow_coche_cambio) — Select: manual / automatico / semiautomatico
+- Nº de marchas (_welow_coche_marchas) — Número 1-10
+- Potencia CV (_welow_coche_cv) — Número (decimales). Auto-calcula kW
+- Potencia kW (_welow_coche_kw) — Número (decimales). Auto-calcula CV
+- Cilindrada cc (_welow_coche_cilindrada) — Número entero
+- Plazas (_welow_coche_plazas) — Número 1-20
+- Puertas (_welow_coche_puertas) — Número 1-6
+- Color (_welow_coche_color) — Texto
+- Tipo pintura (_welow_coche_tipo_pintura) — Select: solida / metalizada / mate / perlada
+- Etiqueta DGT (_welow_coche_etiqueta_dgt) — Select: 0 / eco / c / b / sin
+
+==========================================================
+D. GALERÍA
+==========================================================
+- Imagen destacada (_thumbnail_id) — Media estándar WP
+- Galería (_welow_coche_galeria) — Array de IDs, hasta 30 imágenes, ordenables
+- URL de vídeo (_welow_coche_video) — URL (YouTube/Vimeo)
+
+==========================================================
+E. EQUIPAMIENTO
+==========================================================
+- Equipamiento (_welow_coche_equipamiento) — WYSIWYG (TinyMCE)
+
+==========================================================
+F. GARANTÍAS
+==========================================================
+- Garantías (_welow_coche_garantias) — WYSIWYG (TinyMCE)
+
+==========================================================
+G. COMERCIAL (sidebar)
+==========================================================
+- Concesionario (_welow_coche_concesionario) — Select de welow_concesionario
+- Programa especial (_welow_coche_programa) — Texto
+
+==========================================================
+H. DATOS PRIVADOS (sidebar, NO se muestran en frontend)
+==========================================================
+- Matrícula (_welow_coche_matricula) — Texto, máx 10 chars
+- Bastidor / VIN (_welow_coche_vin) — Texto, máx 17 chars
+
+==========================================================
+I. DESTACADOS (card) — v2.11.0
+==========================================================
+- Rótulo destacado (_welow_coche_rotulo) — Texto, máx 80 chars
+- Características principales (_welow_coche_caracteristicas) — Textarea, una por línea
+
+==========================================================
+TAXONOMÍAS (panel lateral derecho)
+==========================================================
+- Combustible (welow_combustible) — Gasolina, Diésel, Eléctrico, Híbrido (con icono)
+- Carrocería (welow_categoria_modelo) — SUV, Berlina, Compacto (con icono)
+- (NOTA: la marca se hereda automáticamente del modelo seleccionado en A)
+
+==========================================================
+OTROS (soporte WP estándar)
+==========================================================
+- Resumen / Excerpt — Descripción corta
+- Permalink — /coche-nuevo/{slug}/
