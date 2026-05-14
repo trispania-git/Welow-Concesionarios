@@ -1197,22 +1197,44 @@ Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"berlina|compacto",5,"e
 
         update_post_meta( $post_id, '_welow_modelo_marca', $marca_id );
 
-        // Metas
-        $metas = array(
-            '_welow_modelo_enlace'       => $fila['enlace'] ?? '',
-            '_welow_modelo_texto_enlace' => $fila['texto_enlace'] ?? '',
-            '_welow_modelo_precio_desde' => $fila['precio_desde'] ?? '',
-            '_welow_modelo_disclaimer'   => $fila['disclaimer'] ?? '',
-            '_welow_modelo_plazas'       => $fila['plazas'] ?? '',
-            '_welow_modelo_orden'        => $fila['orden'] ?? 0,
-            '_welow_modelo_activo'       => isset( $fila['activo'] ) && '' !== $fila['activo'] ? $fila['activo'] : '1',
-            // v2.15.0 — Rótulo + características
-            '_welow_modelo_rotulo'           => $fila['rotulo'] ?? '',
-            '_welow_modelo_rotulo_color'     => $fila['rotulo_color'] ?? '',
-            '_welow_modelo_caracteristicas'  => $fila['caracteristicas'] ?? '',
+        // v2.17.2 — Lógica de actualización predecible:
+        //   - Si el modelo ES NUEVO: se aplica todo con defaults (activo=1, orden=0).
+        //   - Si el modelo YA EXISTE (update): campos vacíos NO se tocan (preservan).
+        $es_nuevo = ! $existente;
+
+        $mapa_metas = array(
+            'enlace'           => '_welow_modelo_enlace',
+            'texto_enlace'     => '_welow_modelo_texto_enlace',
+            'precio_desde'     => '_welow_modelo_precio_desde',
+            'disclaimer'       => '_welow_modelo_disclaimer',
+            'plazas'           => '_welow_modelo_plazas',
+            'orden'            => '_welow_modelo_orden',
+            'activo'           => '_welow_modelo_activo',
+            'rotulo'           => '_welow_modelo_rotulo',
+            'rotulo_color'     => '_welow_modelo_rotulo_color',
+            'caracteristicas'  => '_welow_modelo_caracteristicas',
         );
-        foreach ( $metas as $key => $val ) {
-            update_post_meta( $post_id, $key, $val );
+
+        // Defaults aplicados solo al CREAR
+        $defaults_create = array(
+            'orden'        => '0',
+            'activo'       => '1',
+            'texto_enlace' => 'Ver modelo',
+        );
+
+        foreach ( $mapa_metas as $col => $meta_key ) {
+            $valor = isset( $fila[ $col ] ) ? trim( (string) $fila[ $col ] ) : '';
+
+            if ( $valor === '' ) {
+                if ( $es_nuevo ) {
+                    // Aplicar default si existe, si no, dejar vacío
+                    $valor = $defaults_create[ $col ] ?? '';
+                    update_post_meta( $post_id, $meta_key, $valor );
+                }
+                // Si es update y vacío: NO tocar (preservar valor existente)
+                continue;
+            }
+            update_post_meta( $post_id, $meta_key, $valor );
         }
 
         // Combustible (taxonomía)

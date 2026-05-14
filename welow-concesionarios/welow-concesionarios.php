@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.17.1
+ * Version:     2.17.2
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,24 @@
  *
  * CHANGELOG
  * ---------
+ * 2.17.2 — Modelos: comportamiento predecible con campos vacíos
+ *
+ *   IMPORTADOR DE MODELOS (CSV + SuperExcel):
+ *   - CREAR modelo nuevo:
+ *       slug vacío         → se genera desde el nombre
+ *       texto_enlace vacío → "Ver modelo" (default)
+ *       orden vacío        → 0
+ *       activo vacío       → 1 (activo por defecto)
+ *       resto vacío        → meta vacía
+ *   - ACTUALIZAR modelo existente:
+ *       cualquier campo vacío → SE PRESERVA el valor anterior.
+ *       Permite exportar todo, editar pocos campos, y reimportar sin
+ *       perder el resto.
+ *   - Taxonomías (combustible, categoria_modelo, etiquetas) e imágenes
+ *     ya se comportaban así desde antes (no se tocaban si vacías).
+ *
+ *   INSTRUCCIONES del SuperExcel actualizadas con tabla de comportamiento.
+ *
  * 2.17.1 — SuperExcel: columnas alineadas con ficha admin del modelo
  *
  *   - Eliminadas "descripcion" y "excerpt" del SuperExcel hoja Modelos
@@ -927,7 +945,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.17.1' );
+define( 'WELOW_CONC_VERSION', '2.17.2' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
