@@ -27,6 +27,7 @@ class Welow_Main {
         Welow_Admin_Menu::init();              // v1.1.0
         Welow_Settings::init();                // v1.1.0
         Welow_Importer::init();                // v1.1.0
+        Welow_SuperExcel::init();              // v2.17.0
         Welow_Divi_Library_Admin::init();      // v1.4.0
         Welow_Marca_Sync::init();              // v2.2.0
         Welow_Help::init();                    // v2.4.0

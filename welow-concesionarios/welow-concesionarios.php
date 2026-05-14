@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.16.0
+ * Version:     2.17.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,38 @@
  *
  * CHANGELOG
  * ---------
+ * 2.17.0 — SuperExcel (Fase 1: Modelos)
+ *
+ *   NUEVA FUNCIONALIDAD: superExcel
+ *   - Un único archivo .xlsx que combina la hoja editable de Modelos
+ *     con hojas de referencia (Marcas, Combustibles, Carrocerías, Etiquetas).
+ *   - Las hojas de referencia se generan al vuelo desde la BD: siempre
+ *     reflejan los datos actuales del sitio.
+ *   - Columnas con desplegable (data validation) en marca_slug, combustible,
+ *     categoria_modelo, etiquetas y activo (0/1).
+ *   - Importación leyendo el .xlsx directamente, sin paso intermedio por CSV.
+ *
+ *   IMPLEMENTACIÓN:
+ *   - Escritor y lector XLSX propios en PHP puro (OOXML mínimo), sin
+ *     dependencias externas. ~50KB de código añadido al plugin.
+ *   - Reutiliza el procesador de fila de modelo existente para no duplicar
+ *     lógica (creación/actualización/imágenes).
+ *
+ *   ARCHIVOS NUEVOS:
+ *   - includes/lib/class-welow-xlsx-writer.php
+ *   - includes/lib/class-welow-xlsx-reader.php
+ *   - includes/admin/class-welow-superexcel.php
+ *
+ *   ARCHIVOS MODIFICADOS:
+ *   - welow-concesionarios.php (requires)
+ *   - includes/class-welow-main.php (init)
+ *   - includes/admin/class-welow-importer.php (UI superExcel)
+ *
+ *   PRÓXIMAS FASES:
+ *   - v2.18.0 — Añadir Marcas y Concesionarios al superExcel
+ *   - v2.19.0 — Añadir Coches Nuevos
+ *   - v2.20.0 — Añadir Coches de Ocasión
+ *
  * 2.16.0 — Plantilla de modelos autoadaptable + errores más útiles
  *
  *   IMPORTADOR:
@@ -884,7 +916,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.16.0' );
+define( 'WELOW_CONC_VERSION', '2.17.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
@@ -900,6 +932,7 @@ require_once WELOW_CONC_PATH . 'includes/admin/class-welow-divi-library-admin.ph
 require_once WELOW_CONC_PATH . 'includes/admin/class-welow-icons.php';               // v2.0.0
 require_once WELOW_CONC_PATH . 'includes/admin/class-welow-marca-sync.php';          // v2.2.0
 require_once WELOW_CONC_PATH . 'includes/admin/class-welow-help.php';                // v2.4.0
+require_once WELOW_CONC_PATH . 'includes/admin/class-welow-superexcel.php';          // v2.17.0
 
 // API
 require_once WELOW_CONC_PATH . 'includes/api/class-welow-rest-api.php';              // v2.4.0

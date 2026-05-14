@@ -141,6 +141,46 @@ class Welow_Importer {
                 </div>
             <?php endif; ?>
 
+            <?php // v2.17.0 — SuperExcel (todo en uno con dropdowns) ?>
+            <div class="welow-importer-card welow-importer-card--superexcel" style="background:linear-gradient(135deg,#eff6ff 0%,#dbeafe 100%);border:2px solid #2563eb;padding:20px;margin:0 0 24px;border-radius:8px;">
+                <h2 style="margin-top:0;"><span class="dashicons dashicons-media-spreadsheet" style="color:#2563eb;"></span> SuperExcel
+                    <span style="background:#2563eb;color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;margin-left:8px;vertical-align:middle;">NUEVO v2.17.0</span>
+                </h2>
+                <p style="font-size:14px;">
+                    Un único archivo <strong>.xlsx</strong> con todas las listas de referencia (marcas, combustibles, carrocerías, etiquetas) y desplegables.
+                    Edita en Excel sin tener que recordar slugs y luego súbelo entero.
+                </p>
+                <p style="font-size:13px;color:#475569;margin-top:0;">
+                    <strong>Fase 1:</strong> Modelos. Próximas fases: Coches nuevos, Coches ocasión, Marcas, Concesionarios.
+                </p>
+
+                <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;">
+                    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+                        <?php wp_nonce_field( 'welow_superexcel_descargar' ); ?>
+                        <input type="hidden" name="action" value="welow_superexcel_descargar">
+                        <button type="submit" class="button button-primary button-large">
+                            <span class="dashicons dashicons-download" style="margin-top:4px;"></span>
+                            Descargar superExcel
+                        </button>
+                    </form>
+
+                    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" enctype="multipart/form-data" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                        <?php wp_nonce_field( 'welow_superexcel_importar' ); ?>
+                        <input type="hidden" name="action" value="welow_superexcel_importar">
+                        <input type="file" name="archivo_xlsx" accept=".xlsx" required>
+                        <label style="font-size:12px;"><input type="checkbox" name="actualizar" value="1" checked> Actualizar existentes</label>
+                        <label style="font-size:12px;"><input type="checkbox" name="descargar_imagenes" value="1" checked> Descargar imágenes</label>
+                        <button type="submit" class="button button-primary button-large">
+                            <span class="dashicons dashicons-upload" style="margin-top:4px;"></span>
+                            Importar superExcel
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <h2 style="margin-top:30px;">Importación clásica por CSV</h2>
+            <p style="color:#6b7280;font-size:13px;">Si prefieres trabajar con CSVs individuales, sigue funcionando como hasta ahora.</p>
+
             <div class="welow-importer-grid">
 
                 <!-- MARCAS -->
