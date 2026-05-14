@@ -89,6 +89,19 @@ class Welow_SuperExcel {
             '  • nombre: nombre visible del modelo (ej. "Corolla").',
             '  • marca_slug: slug de la marca. Debe existir previamente en la web.',
             '',
+            'CAMPOS INCLUIDOS (alineados con la ficha del modelo en admin):',
+            '  • Identificación: nombre, slug, marca_slug',
+            '  • Enlace: enlace, texto_enlace',
+            '  • Precio: precio_desde, disclaimer',
+            '  • Taxonomías: combustible, categoria_modelo, etiquetas',
+            '  • Atributos: plazas, orden, activo',
+            '  • Destacado: rotulo, rotulo_color (HEX), caracteristicas',
+            '  • Imágenes: imagen_url (destacada) + imagen_2/3/4/5_url',
+            '',
+            '  NO se incluyen "descripcion" (post_content) ni "excerpt" — la ficha',
+            '  del CPT no los usa. Si los tienes rellenados desde el editor de WP,',
+            '  la importación NO los borrará (se preservan).',
+            '',
             'CAMPOS MÚLTIPLES',
             '  • combustible / categoria_modelo / etiquetas: separa varios valores con "|".',
             '    Ej: "hibrido|electrico" o "berlina|compacto".',
@@ -117,8 +130,12 @@ class Welow_SuperExcel {
         $hoja = self::HOJA_MODELOS;
         $w->add_sheet( $hoja );
 
+        // v2.17.1 — Columnas alineadas con la ficha admin del modelo.
+        // QUITADOS: 'descripcion' (post_content) y 'excerpt' (post_excerpt)
+        // — la ficha admin del CPT no los pide y el usuario no los usa.
+        // El campo "Características principales" sí está incluido (caracteristicas).
         $columnas = array(
-            'nombre', 'slug', 'marca_slug', 'descripcion', 'excerpt',
+            'nombre', 'slug', 'marca_slug',
             'enlace', 'texto_enlace', 'precio_desde', 'disclaimer',
             'combustible', 'categoria_modelo', 'plazas',
             'etiquetas', 'orden', 'activo',
@@ -130,43 +147,40 @@ class Welow_SuperExcel {
 
         // Anchos de columna razonables
         $w->set_col_widths( $hoja, array(
-            1 => 22, 2 => 18, 3 => 18, 4 => 36, 5 => 28,
-            6 => 22, 7 => 16, 8 => 12, 9 => 32,
-            10 => 18, 11 => 22, 12 => 8,
-            13 => 18, 14 => 8, 15 => 8,
-            16 => 30, 17 => 14, 18 => 50,
-            19 => 30, 20 => 30, 21 => 30, 22 => 30, 23 => 30,
+            1 => 22, 2 => 18, 3 => 18,
+            4 => 22, 5 => 16, 6 => 12, 7 => 32,
+            8 => 18, 9 => 22, 10 => 8,
+            11 => 18, 12 => 8, 13 => 8,
+            14 => 30, 15 => 14, 16 => 50,
+            17 => 30, 18 => 30, 19 => 30, 20 => 30, 21 => 30,
         ) );
 
-        // Una fila vacía de ejemplo para que el usuario vea dónde escribir
-        $w->add_row( $hoja, array( '', '', '', '', '', '', 'Ver modelo', '', '', '', '', '5', '', '10', '1', '', '#2563eb', '', '', '', '', '', '' ) );
+        // Fila de ejemplo vacía
+        $w->add_row( $hoja, array( '', '', '', '', 'Ver modelo', '', '', '', '', '5', '', '10', '1', '', '#2563eb', '', '', '', '', '', '' ) );
 
-        // Validaciones de datos (dropdowns).
-        // Las filas de referencia tienen cabecera en fila 1 → datos desde la 2.
-        // Generamos rangos amplios (hasta 1000 filas en Modelos, hasta n+50 en referencias).
+        // Validaciones de datos (dropdowns) — actualizadas a las nuevas posiciones de columna.
         $marca_max = max( 2, $n_marcas + 1 );
         $comb_max  = max( 2, $n_combustibles + 1 );
         $carr_max  = max( 2, $n_carrocerias + 1 );
         $etiq_max  = max( 2, $n_etiquetas + 1 );
 
-        // C = marca_slug (col 3), valida con Marcas!$A$2:$A$<marca_max>
+        // C = marca_slug (col 3)
         $w->add_list_validation( $hoja, 'C2:C1001', self::HOJA_MARCAS_REF . '!$A$2:$A$' . $marca_max );
 
-        // J = combustible (col 10) — DROPDOWN SIMPLE (un solo valor).
-        // Para multi-valor con "|" el usuario tiene que escribir a mano; lo dejamos como guía.
+        // H = combustible (col 8)
         if ( $n_combustibles > 0 ) {
-            $w->add_list_validation( $hoja, 'J2:J1001', self::HOJA_COMBUSTIBLES . '!$A$2:$A$' . $comb_max );
+            $w->add_list_validation( $hoja, 'H2:H1001', self::HOJA_COMBUSTIBLES . '!$A$2:$A$' . $comb_max );
         }
-        // K = categoria_modelo (col 11)
+        // I = categoria_modelo (col 9)
         if ( $n_carrocerias > 0 ) {
-            $w->add_list_validation( $hoja, 'K2:K1001', self::HOJA_CARROCERIAS . '!$A$2:$A$' . $carr_max );
+            $w->add_list_validation( $hoja, 'I2:I1001', self::HOJA_CARROCERIAS . '!$A$2:$A$' . $carr_max );
         }
-        // M = etiquetas (col 13)
+        // K = etiquetas (col 11)
         if ( $n_etiquetas > 0 ) {
-            $w->add_list_validation( $hoja, 'M2:M1001', self::HOJA_ETIQUETAS . '!$A$2:$A$' . $etiq_max );
+            $w->add_list_validation( $hoja, 'K2:K1001', self::HOJA_ETIQUETAS . '!$A$2:$A$' . $etiq_max );
         }
-        // O = activo (col 15) — solo 0 o 1
-        $w->add_list_validation( $hoja, 'O2:O1001', '"0,1"' );
+        // M = activo (col 13) — solo 0 o 1
+        $w->add_list_validation( $hoja, 'M2:M1001', '"0,1"' );
     }
 
     private static function escribir_hoja_referencia( Welow_Xlsx_Writer $w, $nombre, $descripcion, $columnas, $filas ) {

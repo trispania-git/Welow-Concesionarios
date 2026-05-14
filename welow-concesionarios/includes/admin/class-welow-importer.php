@@ -1166,14 +1166,21 @@ Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"berlina|compacto",5,"e
             throw new Exception( 'El modelo "' . $slug . '" ya existe en la marca "' . $marca_slug . '".' );
         }
 
+        // v2.17.1 — Solo actualizar post_content/post_excerpt si las columnas
+        // están presentes en la fila. Así el SuperExcel (que no las incluye)
+        // no sobrescribe el contenido existente.
         $post_data = array(
-            'post_type'    => 'welow_modelo',
-            'post_title'   => $nombre,
-            'post_name'    => $slug,
-            'post_status'  => 'publish',
-            'post_content' => $fila['descripcion'] ?? '',
-            'post_excerpt' => $fila['excerpt'] ?? '',
+            'post_type'   => 'welow_modelo',
+            'post_title'  => $nombre,
+            'post_name'   => $slug,
+            'post_status' => 'publish',
         );
+        if ( array_key_exists( 'descripcion', $fila ) ) {
+            $post_data['post_content'] = $fila['descripcion'];
+        }
+        if ( array_key_exists( 'excerpt', $fila ) ) {
+            $post_data['post_excerpt'] = $fila['excerpt'];
+        }
 
         if ( $existente ) {
             $post_data['ID'] = $existente[0]->ID;
