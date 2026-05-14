@@ -60,6 +60,8 @@ class Welow_Importer {
             'enlace', 'texto_enlace', 'precio_desde', 'disclaimer',
             'combustible', 'categoria_modelo', 'plazas',
             'etiquetas', 'orden', 'activo',
+            // v2.15.0 — Nuevos campos: rótulo + características (v2.10.0/2.13.0)
+            'rotulo', 'rotulo_color', 'caracteristicas',
             'imagen_url', 'imagen_2_url', 'imagen_3_url', 'imagen_4_url', 'imagen_5_url',
         );
     }
@@ -199,7 +201,12 @@ class Welow_Importer {
 
                 <!-- MODELOS -->
                 <div class="welow-importer-card">
-                    <h2><span class="dashicons dashicons-car"></span> Modelos</h2>
+                    <h2><span class="dashicons dashicons-car"></span> Modelos del catálogo</h2>
+                    <p style="background:#f0f6fc;border-left:3px solid #2271b1;padding:8px 12px;font-size:13px;">
+                        <strong>¿Modelos o Coches Nuevos?</strong><br>
+                        <strong>Modelos</strong> = catálogo oficial (ficha del modelo, sin precio fijo, sin stock). Ej: "Toyota Corolla", "JAECOO 7".<br>
+                        <strong>Coches Nuevos</strong> = unidades concretas en stock para vender (con versión, color, referencia, precio fijo).
+                    </p>
 
                     <h3>Descargar plantilla</h3>
                     <p>Plantilla CSV con las columnas necesarias para importar modelos.</p>
@@ -455,10 +462,12 @@ Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"berlina|compacto",5,"e
         } elseif ( 'modelos' === $tipo ) {
             $columnas = self::columnas_modelos();
             $ejemplo = array(
-                'Corolla', 'corolla', 'toyota', 'Compacto híbrido de última generación', 'Desde 24.990€',
+                'Corolla', 'corolla', 'toyota', 'Compacto híbrido de última generación.', 'Hatchback híbrido autorrecargable.',
                 '', 'Ver modelo', '24990', '',
                 'hibrido', 'berlina|compacto', '5',
                 'eco|nuevo', '10', '1',
+                // v2.15.0 — rotulo, rotulo_color, caracteristicas
+                'La movilidad híbrida más vendida', '#2563eb', "Híbrido autorrecargable\nHasta 1.000 km de autonomía\n5 plazas + 361 L maletero\nGarantía Toyota Relax hasta 15 años",
                 '', '', '', '', '',
             );
             $filename = 'plantilla-modelos.csv';
@@ -648,6 +657,10 @@ Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"berlina|compacto",5,"e
             implode( '|', $etiquetas_slugs ),
             get_post_meta( $modelo->ID, '_welow_modelo_orden', true ),
             get_post_meta( $modelo->ID, '_welow_modelo_activo', true ) ?: '1',
+            // v2.15.0 — Rótulo + características
+            get_post_meta( $modelo->ID, '_welow_modelo_rotulo', true ),
+            get_post_meta( $modelo->ID, '_welow_modelo_rotulo_color', true ),
+            get_post_meta( $modelo->ID, '_welow_modelo_caracteristicas', true ),
             $thumb_id ? wp_get_attachment_url( $thumb_id ) : '',
             $get_img_url( '_welow_modelo_img_2' ),
             $get_img_url( '_welow_modelo_img_3' ),
@@ -923,12 +936,31 @@ Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"berlina|compacto",5,"e
         self::redirect_back();
     }
 
+    /**
+     * Detecta automáticamente el separador del CSV (',' o ';').
+     * v2.15.0 — Excel en locales con coma decimal (ES) re-guarda con ';'.
+     */
+    private static function detectar_delimitador( $ruta ) {
+        $handle = fopen( $ruta, 'r' );
+        if ( ! $handle ) return ',';
+        $primera_linea = fgets( $handle );
+        fclose( $handle );
+        if ( false === $primera_linea ) return ',';
+        // Quitar BOM
+        $primera_linea = preg_replace( '/^\xEF\xBB\xBF/', '', $primera_linea );
+        $comas = substr_count( $primera_linea, ',' );
+        $semis = substr_count( $primera_linea, ';' );
+        return $semis > $comas ? ';' : ',';
+    }
+
     private static function parsear_csv( $ruta ) {
         $handle = fopen( $ruta, 'r' );
         if ( ! $handle ) return array();
 
+        $delim = self::detectar_delimitador( $ruta );
+
         // Leer cabeceras
-        $cabeceras = fgetcsv( $handle );
+        $cabeceras = fgetcsv( $handle, 0, $delim );
         if ( ! $cabeceras ) return array();
 
         // Quitar BOM si existe
@@ -936,7 +968,7 @@ Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"berlina|compacto",5,"e
         $cabeceras = array_map( 'trim', $cabeceras );
 
         $filas = array();
-        while ( ( $row = fgetcsv( $handle ) ) !== false ) {
+        while ( ( $row = fgetcsv( $handle, 0, $delim ) ) !== false ) {
             if ( count( array_filter( $row ) ) === 0 ) continue; // fila vacía
             $filas[] = array_combine( $cabeceras, array_pad( $row, count( $cabeceras ), '' ) );
         }
@@ -1096,6 +1128,10 @@ Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"berlina|compacto",5,"e
             '_welow_modelo_plazas'       => $fila['plazas'] ?? '',
             '_welow_modelo_orden'        => $fila['orden'] ?? 0,
             '_welow_modelo_activo'       => isset( $fila['activo'] ) && '' !== $fila['activo'] ? $fila['activo'] : '1',
+            // v2.15.0 — Rótulo + características
+            '_welow_modelo_rotulo'           => $fila['rotulo'] ?? '',
+            '_welow_modelo_rotulo_color'     => $fila['rotulo_color'] ?? '',
+            '_welow_modelo_caracteristicas'  => $fila['caracteristicas'] ?? '',
         );
         foreach ( $metas as $key => $val ) {
             update_post_meta( $post_id, $key, $val );
