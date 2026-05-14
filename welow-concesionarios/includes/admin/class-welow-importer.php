@@ -461,13 +461,29 @@ Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"berlina|compacto",5,"e
             $filename = 'plantilla-marcas.csv';
         } elseif ( 'modelos' === $tipo ) {
             $columnas = self::columnas_modelos();
+
+            // v2.16.0 — Usar el slug de una marca real existente para que el
+            // ejemplo sea importable directamente sin error "Marca no encontrada".
+            $marca_existente = get_posts( array(
+                'post_type'   => 'welow_marca',
+                'post_status' => 'publish',
+                'numberposts' => 1,
+                'orderby'     => 'title',
+                'order'       => 'ASC',
+                'fields'      => 'ids',
+            ) );
+            $marca_slug_ejemplo = ! empty( $marca_existente )
+                ? get_post_field( 'post_name', $marca_existente[0] )
+                : 'toyota';
+
             $ejemplo = array(
-                'Corolla', 'corolla', 'toyota', 'Compacto híbrido de última generación.', 'Hatchback híbrido autorrecargable.',
+                'Modelo ejemplo (BORRAR)', 'modelo-ejemplo', $marca_slug_ejemplo,
+                'Descripción larga del modelo.', 'Resumen corto.',
                 '', 'Ver modelo', '24990', '',
                 'hibrido', 'berlina|compacto', '5',
                 'eco|nuevo', '10', '1',
                 // v2.15.0 — rotulo, rotulo_color, caracteristicas
-                'La movilidad híbrida más vendida', '#2563eb', "Híbrido autorrecargable\nHasta 1.000 km de autonomía\n5 plazas + 361 L maletero\nGarantía Toyota Relax hasta 15 años",
+                'La movilidad híbrida más vendida', '#2563eb', "Híbrido autorrecargable\nHasta 1.000 km de autonomía\n5 plazas + 361 L maletero\nGarantía 15 años",
                 '', '', '', '', '',
             );
             $filename = 'plantilla-modelos.csv';
@@ -1075,7 +1091,22 @@ Corolla,corolla,toyota,"Compacto híbrido",24990,hibrido,"berlina|compacto",5,"e
 
         $marca_id = Welow_Helpers::resolver_marca_id( $marca_slug );
         if ( ! $marca_id ) {
-            throw new Exception( 'Marca "' . $marca_slug . '" no encontrada.' );
+            // v2.16.0 — Listar marcas existentes para ayudar al usuario
+            $marcas_disponibles = get_posts( array(
+                'post_type'   => 'welow_marca',
+                'post_status' => 'publish',
+                'numberposts' => -1,
+                'fields'      => 'ids',
+            ) );
+            $slugs = array();
+            foreach ( $marcas_disponibles as $mid ) {
+                $s = get_post_field( 'post_name', $mid );
+                if ( $s ) $slugs[] = $s;
+            }
+            $ayuda = empty( $slugs )
+                ? ' Aún no has creado ninguna marca: crea una en "Concesionarios → Marcas" antes de importar modelos.'
+                : ' Marcas disponibles: ' . implode( ', ', $slugs );
+            throw new Exception( 'Marca "' . $marca_slug . '" no encontrada.' . $ayuda );
         }
 
         $slug = ! empty( $fila['slug'] ) ? sanitize_title( $fila['slug'] ) : sanitize_title( $nombre );
