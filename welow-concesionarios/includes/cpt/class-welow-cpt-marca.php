@@ -201,6 +201,9 @@ class Welow_CPT_Marca {
 
     /**
      * Metabox: Banners (Portada + Zona media, cada uno con desktop + móvil).
+     *
+     * @version 2.19.0 — Cada slot ahora soporta texto superpuesto opcional
+     *                   (título, subtítulo, botón) con posición y fondo translúcido.
      */
     public static function render_metabox_banners( $post ) {
         $banner_portada_desktop = get_post_meta( $post->ID, self::META_PREFIX . 'banner_portada_desktop', true );
@@ -208,6 +211,12 @@ class Welow_CPT_Marca {
         $banner_media_desktop   = get_post_meta( $post->ID, self::META_PREFIX . 'banner_media_desktop', true );
         $banner_media_movil     = get_post_meta( $post->ID, self::META_PREFIX . 'banner_media_movil', true );
         ?>
+        <p style="background:#eff6ff;border-left:3px solid #2563eb;padding:8px 12px;margin:0 0 18px;font-size:13px;">
+            <strong>Texto superpuesto (opcional):</strong> debajo de cada imagen tienes campos
+            para añadir un título, subtítulo y botón que se mostrarán encima del banner
+            con un fondo translúcido oscuro. Si los dejas vacíos, el banner se muestra como imagen pura.
+        </p>
+
         <h3 class="welow-banner-section-title">
             <span class="dashicons dashicons-format-image"></span> Banner de Portada
         </h3>
@@ -219,6 +228,7 @@ class Welow_CPT_Marca {
                 'Se muestra en pantallas > 980px.',
                 $banner_portada_desktop
             );
+            self::render_campos_overlay( $post->ID, 'banner_portada_desktop' );
 
             self::render_campo_imagen(
                 'welow_banner_portada_movil',
@@ -226,6 +236,7 @@ class Welow_CPT_Marca {
                 'Se muestra en pantallas ≤ 980px.',
                 $banner_portada_movil
             );
+            self::render_campos_overlay( $post->ID, 'banner_portada_movil' );
             ?>
         </div>
 
@@ -242,6 +253,7 @@ class Welow_CPT_Marca {
                 'Se muestra en pantallas > 980px.',
                 $banner_media_desktop
             );
+            self::render_campos_overlay( $post->ID, 'banner_media_desktop' );
 
             self::render_campo_imagen(
                 'welow_banner_media_movil',
@@ -249,6 +261,7 @@ class Welow_CPT_Marca {
                 'Se muestra en pantallas ≤ 980px.',
                 $banner_media_movil
             );
+            self::render_campos_overlay( $post->ID, 'banner_media_movil' );
             ?>
         </div>
         <style>
@@ -332,6 +345,78 @@ class Welow_CPT_Marca {
     }
 
     /**
+     * v2.19.0 — Render de los campos de overlay (texto superpuesto) para un slot.
+     *
+     * @param int    $post_id  ID de la marca.
+     * @param string $slot     ej. "banner_portada_desktop"
+     */
+    private static function render_campos_overlay( $post_id, $slot ) {
+        $titulo     = get_post_meta( $post_id, self::META_PREFIX . $slot . '_overlay_titulo', true );
+        $subtitulo  = get_post_meta( $post_id, self::META_PREFIX . $slot . '_overlay_subtitulo', true );
+        $btn_texto  = get_post_meta( $post_id, self::META_PREFIX . $slot . '_overlay_btn_texto', true );
+        $btn_url    = get_post_meta( $post_id, self::META_PREFIX . $slot . '_overlay_btn_url', true );
+        $posicion   = get_post_meta( $post_id, self::META_PREFIX . $slot . '_overlay_posicion', true );
+        if ( '' === $posicion ) $posicion = 'middle-center';
+
+        $posiciones = array(
+            'top-left'      => '↖ Arriba izq.',
+            'top-center'    => '↑ Arriba centro',
+            'top-right'     => '↗ Arriba der.',
+            'middle-left'   => '← Medio izq.',
+            'middle-center' => '● Centro',
+            'middle-right'  => '→ Medio der.',
+            'bottom-left'   => '↙ Abajo izq.',
+            'bottom-center' => '↓ Abajo centro',
+            'bottom-right'  => '↘ Abajo der.',
+        );
+
+        $base = 'welow_overlay_' . $slot;
+        ?>
+        <div class="welow-overlay-fields" style="margin:8px 0 18px;padding:10px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;">
+            <p style="margin:0 0 8px;font-size:12px;color:#475569;">
+                <strong>Texto superpuesto (opcional)</strong> · Si lo dejas vacío, solo se ve la imagen.
+            </p>
+            <p style="margin:0 0 6px;">
+                <label style="font-size:12px;display:block;margin-bottom:2px;">Título</label>
+                <input type="text" name="<?php echo esc_attr( $base ); ?>_titulo"
+                       value="<?php echo esc_attr( $titulo ); ?>" class="widefat"
+                       maxlength="80" placeholder="Ej: Descubre la nueva gama 2025" />
+            </p>
+            <p style="margin:0 0 6px;">
+                <label style="font-size:12px;display:block;margin-bottom:2px;">Subtítulo</label>
+                <textarea name="<?php echo esc_attr( $base ); ?>_subtitulo" rows="2"
+                          class="widefat" maxlength="200"
+                          placeholder="Frase secundaria, oferta, lema..."><?php echo esc_textarea( $subtitulo ); ?></textarea>
+            </p>
+            <p style="margin:0 0 6px;display:flex;gap:6px;">
+                <span style="flex:1;">
+                    <label style="font-size:12px;display:block;margin-bottom:2px;">Texto del botón</label>
+                    <input type="text" name="<?php echo esc_attr( $base ); ?>_btn_texto"
+                           value="<?php echo esc_attr( $btn_texto ); ?>" class="widefat"
+                           maxlength="40" placeholder="Ej: Ver modelos" />
+                </span>
+                <span style="flex:2;">
+                    <label style="font-size:12px;display:block;margin-bottom:2px;">URL del botón</label>
+                    <input type="url" name="<?php echo esc_attr( $base ); ?>_btn_url"
+                           value="<?php echo esc_attr( $btn_url ); ?>" class="widefat"
+                           placeholder="https://..." />
+                </span>
+            </p>
+            <p style="margin:0;">
+                <label style="font-size:12px;display:block;margin-bottom:2px;">Posición del texto sobre la imagen</label>
+                <select name="<?php echo esc_attr( $base ); ?>_posicion" class="widefat" style="max-width:200px;">
+                    <?php foreach ( $posiciones as $val => $label ) : ?>
+                        <option value="<?php echo esc_attr( $val ); ?>" <?php selected( $posicion, $val ); ?>>
+                            <?php echo esc_html( $label ); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </p>
+        </div>
+        <?php
+    }
+
+    /**
      * Guarda los meta fields.
      */
     public static function guardar_meta( $post_id, $post ) {
@@ -382,6 +467,25 @@ class Welow_CPT_Marca {
         foreach ( $campos_imagen as $post_key => $meta_key ) {
             $val = isset( $_POST[ $post_key ] ) ? absint( $_POST[ $post_key ] ) : '';
             update_post_meta( $post_id, self::META_PREFIX . $meta_key, $val );
+        }
+
+        // v2.19.0 — Overlays de texto para cada banner slot
+        $slots = array( 'banner_portada_desktop', 'banner_portada_movil', 'banner_media_desktop', 'banner_media_movil' );
+        $posiciones_validas = array( 'top-left','top-center','top-right','middle-left','middle-center','middle-right','bottom-left','bottom-center','bottom-right' );
+        foreach ( $slots as $slot ) {
+            $base = 'welow_overlay_' . $slot;
+            $titulo    = isset( $_POST[ $base . '_titulo' ] )    ? sanitize_text_field( $_POST[ $base . '_titulo' ] )    : '';
+            $subtitulo = isset( $_POST[ $base . '_subtitulo' ] ) ? sanitize_textarea_field( $_POST[ $base . '_subtitulo' ] ) : '';
+            $btn_txt   = isset( $_POST[ $base . '_btn_texto' ] ) ? sanitize_text_field( $_POST[ $base . '_btn_texto' ] ) : '';
+            $btn_url   = isset( $_POST[ $base . '_btn_url' ] )   ? esc_url_raw( $_POST[ $base . '_btn_url' ] )           : '';
+            $posicion  = isset( $_POST[ $base . '_posicion' ] )  ? sanitize_key( $_POST[ $base . '_posicion' ] )         : 'middle-center';
+            if ( ! in_array( $posicion, $posiciones_validas, true ) ) $posicion = 'middle-center';
+
+            update_post_meta( $post_id, self::META_PREFIX . $slot . '_overlay_titulo',    $titulo );
+            update_post_meta( $post_id, self::META_PREFIX . $slot . '_overlay_subtitulo', $subtitulo );
+            update_post_meta( $post_id, self::META_PREFIX . $slot . '_overlay_btn_texto', $btn_txt );
+            update_post_meta( $post_id, self::META_PREFIX . $slot . '_overlay_btn_url',   $btn_url );
+            update_post_meta( $post_id, self::META_PREFIX . $slot . '_overlay_posicion',  $posicion );
         }
 
         // Orden

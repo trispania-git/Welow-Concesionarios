@@ -61,14 +61,37 @@ class Welow_Shortcode_Marca_Banner {
 
         $marca_title = get_the_title( $marca_id );
 
+        // v2.19.0 — Overlays de texto para los slots desktop y móvil de este tipo
+        $get_overlay = function( $slot ) use ( $marca_id ) {
+            $base = '_welow_marca_' . $slot;
+            $titulo = get_post_meta( $marca_id, $base . '_overlay_titulo', true );
+            $sub    = get_post_meta( $marca_id, $base . '_overlay_subtitulo', true );
+            $btn_t  = get_post_meta( $marca_id, $base . '_overlay_btn_texto', true );
+            $btn_u  = get_post_meta( $marca_id, $base . '_overlay_btn_url', true );
+            $pos    = get_post_meta( $marca_id, $base . '_overlay_posicion', true );
+            if ( ! $titulo && ! $sub && ! $btn_t ) return null;
+            return array(
+                'titulo'    => $titulo,
+                'subtitulo' => $sub,
+                'btn_texto' => $btn_t,
+                'btn_url'   => $btn_u,
+                'posicion'  => $pos ?: 'middle-center',
+            );
+        };
+
+        $overlay_desktop = $get_overlay( 'banner_' . $tipo . '_desktop' );
+        $overlay_movil   = $get_overlay( 'banner_' . $tipo . '_movil' );
+
         ob_start();
         Welow_Helpers::get_template( 'marca-banner.php', array(
-            'url_desktop'  => $url_desktop,
-            'url_movil'    => $url_movil,
-            'enlace'       => esc_url( $atts['enlace'] ),
-            'altura'       => sanitize_text_field( $atts['altura'] ),
-            'tipo'         => $tipo,
-            'alt'          => $marca_title,
+            'url_desktop'     => $url_desktop,
+            'url_movil'       => $url_movil,
+            'enlace'          => esc_url( $atts['enlace'] ),
+            'altura'          => sanitize_text_field( $atts['altura'] ),
+            'tipo'            => $tipo,
+            'alt'             => $marca_title,
+            'overlay_desktop' => $overlay_desktop,
+            'overlay_movil'   => $overlay_movil,
         ) );
         return ob_get_clean();
     }

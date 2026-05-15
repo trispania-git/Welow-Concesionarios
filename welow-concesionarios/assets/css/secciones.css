@@ -225,6 +225,77 @@
     height: 100%;
 }
 
+/* v2.19.0 — Banner con texto superpuesto (overlay) */
+.welow-marca-banner--with-overlay {
+    position: relative;
+    line-height: normal;
+}
+.welow-marca-banner__overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    padding: clamp(16px, 4vw, 48px);
+    pointer-events: none; /* deja pasar clicks excepto en .welow-marca-banner__overlay-inner */
+}
+.welow-marca-banner__overlay-inner {
+    pointer-events: auto;
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+    padding: clamp(14px, 2.5vw, 28px) clamp(18px, 3vw, 36px);
+    border-radius: 6px;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    max-width: min(90%, 600px);
+}
+.welow-marca-banner__overlay-titulo {
+    color: #fff;
+    font-size: clamp(20px, 3.2vw, 40px);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 0 0 8px;
+}
+.welow-marca-banner__overlay-subtitulo {
+    color: #f1f5f9;
+    font-size: clamp(13px, 1.4vw, 17px);
+    line-height: 1.4;
+    margin: 0 0 14px;
+}
+.welow-marca-banner__overlay-boton {
+    display: inline-block;
+    background: #fff;
+    color: #0f172a;
+    padding: 10px 22px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 14px;
+    transition: transform .15s ease, background .15s ease;
+}
+.welow-marca-banner__overlay-boton:hover {
+    background: #2563eb;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+/* Posicionamiento del overlay (9 anclas) */
+.welow-pos-top-left      { align-items: flex-start;  justify-content: flex-start; }
+.welow-pos-top-center    { align-items: flex-start;  justify-content: center; }
+.welow-pos-top-right     { align-items: flex-start;  justify-content: flex-end; }
+.welow-pos-middle-left   { align-items: center;      justify-content: flex-start; }
+.welow-pos-middle-center { align-items: center;      justify-content: center; text-align: center; }
+.welow-pos-middle-right  { align-items: center;      justify-content: flex-end; }
+.welow-pos-bottom-left   { align-items: flex-end;    justify-content: flex-start; }
+.welow-pos-bottom-center { align-items: flex-end;    justify-content: center; text-align: center; }
+.welow-pos-bottom-right  { align-items: flex-end;    justify-content: flex-end; }
+
+/* Visibilidad por viewport: desktop > 980px, móvil <= 980px */
+.welow-marca-banner__overlay--movil { display: none; }
+@media (max-width: 980px) {
+    .welow-marca-banner__overlay--desktop { display: none; }
+    .welow-marca-banner__overlay--movil { display: flex; }
+}
+
 /* ==========================================================================
    MODELOS GRID
    ========================================================================== */

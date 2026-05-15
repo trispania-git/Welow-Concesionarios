@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.18.0
+ * Version:     2.19.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,34 @@
  *
  * CHANGELOG
  * ---------
+ * 2.19.0 — Banners de marca con texto superpuesto opcional
+ *
+ *   FICHA DE MARCA:
+ *   - Cada uno de los 4 slots de banner (portada/zona-media × desktop/móvil)
+ *     gana 5 campos opcionales: título, subtítulo, texto y URL del botón,
+ *     y posición del texto (9 anclas: top-left, top-center, ..., bottom-right).
+ *   - Si los dejas vacíos, el banner se muestra como imagen pura (igual que antes).
+ *
+ *   FRONTEND:
+ *   - Banner ahora soporta overlay con fondo translúcido oscuro (rgba(0,0,0,.45))
+ *     y texto blanco. Backdrop-filter blur para resaltar sobre cualquier imagen.
+ *   - Overlay desktop/móvil independientes: se ven según viewport vía media query.
+ *   - Si hay botón propio en el overlay, el enlace global del shortcode se desactiva
+ *     (evita anidar enlaces — accesibilidad).
+ *
+ *   META KEYS nuevas (4 slots × 5 campos = 20 nuevas):
+ *     _welow_marca_banner_<slot>_overlay_titulo
+ *     _welow_marca_banner_<slot>_overlay_subtitulo
+ *     _welow_marca_banner_<slot>_overlay_btn_texto
+ *     _welow_marca_banner_<slot>_overlay_btn_url
+ *     _welow_marca_banner_<slot>_overlay_posicion
+ *
+ *   ARCHIVOS MODIFICADOS:
+ *   - includes/cpt/class-welow-cpt-marca.php (admin + save)
+ *   - includes/shortcodes/class-welow-shortcode-marca-banner.php
+ *   - templates/marca-banner.php
+ *   - assets/css/secciones.css
+ *
  * 2.18.0 — Modelos: filtro por marca + toggle activo en la lista
  *
  *   LISTA ADMIN DE MODELOS:
@@ -961,7 +989,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.18.0' );
+define( 'WELOW_CONC_VERSION', '2.19.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
