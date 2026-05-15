@@ -23,6 +23,12 @@ class Welow_CPT_Modelo {
         add_filter( 'manage_' . self::POST_TYPE . '_posts_columns', array( __CLASS__, 'columnas_admin' ) );
         add_action( 'manage_' . self::POST_TYPE . '_posts_custom_column', array( __CLASS__, 'contenido_columnas' ), 10, 2 );
         add_filter( 'manage_edit-' . self::POST_TYPE . '_sortable_columns', array( __CLASS__, 'columnas_ordenables' ) );
+
+        // v2.18.0 — Filtro por marca + toggle activo desde la lista
+        add_action( 'restrict_manage_posts', array( __CLASS__, 'filtro_marca' ) );
+        add_action( 'pre_get_posts',         array( __CLASS__, 'aplicar_filtro_marca' ) );
+        add_action( 'wp_ajax_welow_modelo_toggle_activo', array( __CLASS__, 'ajax_toggle_activo' ) );
+        add_action( 'admin_footer-edit.php', array( __CLASS__, 'js_toggle_activo' ) );
     }
 
     /**
@@ -424,12 +430,35 @@ class Welow_CPT_Modelo {
             <input type="number" id="welow_modelo_orden" name="welow_modelo_orden" value="<?php echo esc_attr( $orden ); ?>" min="0" step="1" style="width: 80px;" />
             <span class="description">Menor = primero</span>
         </p>
-        <p>
-            <label class="welow-checkbox-label">
-                <input type="checkbox" name="welow_modelo_activo" value="1" <?php checked( $activo, '1' ); ?> />
-                <strong>Modelo activo</strong>
+        <?php // v2.18.0 — Toggle "activo" destacado tipo switch ?>
+        <p style="margin-top:14px;">
+            <strong>Estado del modelo</strong><br>
+            <label class="welow-toggle-switch" style="display:inline-flex;align-items:center;gap:10px;cursor:pointer;margin-top:6px;">
+                <input type="checkbox" name="welow_modelo_activo" value="1" <?php checked( $activo, '1' ); ?>
+                       class="welow-toggle-switch-input" style="position:absolute;opacity:0;width:0;height:0;" />
+                <span class="welow-toggle-switch-track"
+                      style="position:relative;display:inline-block;width:48px;height:26px;background:<?php echo '1' === $activo ? '#16a34a' : '#cbd5e1'; ?>;border-radius:13px;transition:background .2s;">
+                    <span class="welow-toggle-switch-thumb"
+                          style="position:absolute;top:3px;left:<?php echo '1' === $activo ? '25px' : '3px'; ?>;width:20px;height:20px;background:#fff;border-radius:50%;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></span>
+                </span>
+                <span class="welow-toggle-switch-label" style="font-weight:600;color:<?php echo '1' === $activo ? '#15803d' : '#991b1b'; ?>;">
+                    <?php echo '1' === $activo ? 'Activo (visible en listas)' : 'Inactivo (oculto en listas)'; ?>
+                </span>
             </label>
         </p>
+        <script>
+        jQuery(function($){
+            $('.welow-toggle-switch-input').on('change', function(){
+                var $wrap = $(this).closest('.welow-toggle-switch');
+                var on = $(this).is(':checked');
+                $wrap.find('.welow-toggle-switch-track').css('background', on ? '#16a34a' : '#cbd5e1');
+                $wrap.find('.welow-toggle-switch-thumb').css('left', on ? '25px' : '3px');
+                $wrap.find('.welow-toggle-switch-label')
+                     .css('color', on ? '#15803d' : '#991b1b')
+                     .text(on ? 'Activo (visible en listas)' : 'Inactivo (oculto en listas)');
+            });
+        });
+        </script>
         <?php
     }
 
@@ -566,10 +595,25 @@ class Welow_CPT_Modelo {
                 echo esc_html( get_post_meta( $post_id, self::META_PREFIX . 'orden', true ) ?: '0' );
                 break;
             case 'welow_activo':
+                // v2.18.0 — Toggle clicable vía AJAX
                 $activo = get_post_meta( $post_id, self::META_PREFIX . 'activo', true );
-                echo ( '1' === $activo || '' === $activo )
-                    ? '<span class="dashicons dashicons-yes-alt" style="color:#46b450;"></span>'
-                    : '<span class="dashicons dashicons-dismiss" style="color:#dc3232;"></span>';
+                $es_activo = ( '1' === $activo || '' === $activo );
+                $nonce = wp_create_nonce( 'welow_modelo_toggle_' . $post_id );
+                ?>
+                <button type="button"
+                        class="welow-toggle-activo button button-small"
+                        data-post-id="<?php echo esc_attr( $post_id ); ?>"
+                        data-nonce="<?php echo esc_attr( $nonce ); ?>"
+                        data-estado="<?php echo $es_activo ? '1' : '0'; ?>"
+                        title="<?php echo $es_activo ? 'Click para desactivar' : 'Click para activar'; ?>"
+                        style="<?php echo $es_activo
+                            ? 'background:#dcfce7;border-color:#16a34a;color:#15803d;'
+                            : 'background:#fee2e2;border-color:#dc2626;color:#991b1b;'; ?>min-width:90px;">
+                    <span class="dashicons <?php echo $es_activo ? 'dashicons-yes-alt' : 'dashicons-dismiss'; ?>"
+                          style="line-height:1.4;"></span>
+                    <span class="welow-toggle-label"><?php echo $es_activo ? 'Activo' : 'Inactivo'; ?></span>
+                </button>
+                <?php
                 break;
         }
     }
@@ -581,5 +625,134 @@ class Welow_CPT_Modelo {
         $columns['welow_marca'] = 'welow_marca';
         $columns['welow_orden'] = 'welow_orden';
         return $columns;
+    }
+
+    /* =====================================================================
+     * v2.18.0 — FILTRO POR MARCA
+     * ===================================================================== */
+
+    /**
+     * Renderiza el desplegable de filtro por marca encima de la lista.
+     */
+    public static function filtro_marca() {
+        global $typenow;
+        if ( self::POST_TYPE !== $typenow ) return;
+
+        $marcas = get_posts( array(
+            'post_type'   => 'welow_marca',
+            'post_status' => 'publish',
+            'numberposts' => -1,
+            'orderby'     => 'title',
+            'order'       => 'ASC',
+        ) );
+
+        $selected = isset( $_GET['welow_marca_filter'] ) ? intval( $_GET['welow_marca_filter'] ) : 0;
+        ?>
+        <select name="welow_marca_filter" id="welow_marca_filter">
+            <option value="0"><?php esc_html_e( 'Todas las marcas', 'welow-concesionarios' ); ?></option>
+            <?php foreach ( $marcas as $m ) : ?>
+                <option value="<?php echo esc_attr( $m->ID ); ?>" <?php selected( $selected, $m->ID ); ?>>
+                    <?php echo esc_html( $m->post_title ); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <?php
+    }
+
+    /**
+     * Aplica el filtro de marca a la query de la lista.
+     */
+    public static function aplicar_filtro_marca( $query ) {
+        global $pagenow, $typenow;
+        if ( ! is_admin() || 'edit.php' !== $pagenow ) return;
+        if ( self::POST_TYPE !== $typenow ) return;
+        if ( ! $query->is_main_query() ) return;
+
+        $marca_id = isset( $_GET['welow_marca_filter'] ) ? intval( $_GET['welow_marca_filter'] ) : 0;
+        if ( $marca_id > 0 ) {
+            $meta_query = (array) $query->get( 'meta_query' );
+            $meta_query[] = array(
+                'key'   => self::META_PREFIX . 'marca',
+                'value' => $marca_id,
+            );
+            $query->set( 'meta_query', $meta_query );
+        }
+    }
+
+    /* =====================================================================
+     * v2.18.0 — TOGGLE ACTIVO DESDE LA LISTA (AJAX)
+     * ===================================================================== */
+
+    public static function ajax_toggle_activo() {
+        $post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
+        $nonce   = isset( $_POST['nonce'] ) ? sanitize_text_field( $_POST['nonce'] ) : '';
+
+        if ( ! $post_id || ! wp_verify_nonce( $nonce, 'welow_modelo_toggle_' . $post_id ) ) {
+            wp_send_json_error( array( 'message' => 'Nonce inválido' ), 403 );
+        }
+        if ( ! current_user_can( 'edit_post', $post_id ) ) {
+            wp_send_json_error( array( 'message' => 'Sin permisos' ), 403 );
+        }
+        if ( self::POST_TYPE !== get_post_type( $post_id ) ) {
+            wp_send_json_error( array( 'message' => 'CPT no válido' ), 400 );
+        }
+
+        $actual = get_post_meta( $post_id, self::META_PREFIX . 'activo', true );
+        $es_activo_ahora = ( '1' === $actual || '' === $actual );
+        $nuevo = $es_activo_ahora ? '0' : '1';
+        update_post_meta( $post_id, self::META_PREFIX . 'activo', $nuevo );
+
+        wp_send_json_success( array(
+            'estado' => $nuevo,
+            'label'  => '1' === $nuevo ? 'Activo' : 'Inactivo',
+        ) );
+    }
+
+    /**
+     * JS inline para manejar el toggle AJAX desde la lista.
+     */
+    public static function js_toggle_activo() {
+        $screen = get_current_screen();
+        if ( ! $screen || self::POST_TYPE !== $screen->post_type ) return;
+        ?>
+        <script>
+        jQuery(function($){
+            $(document).on('click', '.welow-toggle-activo', function(e){
+                e.preventDefault();
+                var $btn   = $(this);
+                if ( $btn.prop('disabled') ) return;
+                $btn.prop('disabled', true).css('opacity', 0.6);
+
+                $.post(ajaxurl, {
+                    action:  'welow_modelo_toggle_activo',
+                    post_id: $btn.data('post-id'),
+                    nonce:   $btn.data('nonce')
+                }).done(function(res){
+                    if ( ! res || ! res.success ) {
+                        alert( (res && res.data && res.data.message) ? res.data.message : 'Error' );
+                        return;
+                    }
+                    var activo = '1' === res.data.estado;
+                    $btn.data('estado', res.data.estado).attr('data-estado', res.data.estado);
+                    $btn.find('.welow-toggle-label').text(res.data.label);
+                    $btn.find('.dashicons')
+                        .removeClass('dashicons-yes-alt dashicons-dismiss')
+                        .addClass(activo ? 'dashicons-yes-alt' : 'dashicons-dismiss');
+                    $btn.attr('style',
+                        (activo
+                            ? 'background:#dcfce7;border-color:#16a34a;color:#15803d;'
+                            : 'background:#fee2e2;border-color:#dc2626;color:#991b1b;') +
+                        'min-width:90px;'
+                    );
+                    $btn.attr('title', activo ? 'Click para desactivar' : 'Click para activar');
+                }).fail(function(){
+                    alert('Error de red al actualizar el estado.');
+                }).always(function(){
+                    $btn.prop('disabled', false).css('opacity', 1);
+                });
+            });
+        });
+        </script>
+        <?php
     }
 }
