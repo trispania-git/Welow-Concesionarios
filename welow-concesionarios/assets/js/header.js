@@ -75,6 +75,8 @@
      */
     function setupStickySpacer(header) {
         if (!header.classList.contains('welow-header--sticky')) return;
+        // v2.20.0 — En modo overlay NO se crea spacer: el contenido va por debajo del header.
+        if (header.classList.contains('welow-header--overlay')) return;
 
         var spacer = header.nextElementSibling;
         if (!spacer || !spacer.classList || !spacer.classList.contains('welow-header-spacer')) {

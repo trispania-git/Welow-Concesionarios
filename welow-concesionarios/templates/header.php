@@ -16,7 +16,21 @@ $site_name      = get_bloginfo( 'name' );
 
 // Estilos inline a partir de los colores y tipografía configurados (si los hay)
 $inline_styles = array();
-if ( $config['color_fondo'] )       $inline_styles[] = '--welow-h-bg:' . $config['color_fondo'];
+<?php // v2.20.0 — Si hay opacidad < 100, convertir el color a rgba con alpha
+$_opa = isset( $config['opacidad_fondo'] ) ? intval( $config['opacidad_fondo'] ) : 100;
+if ( $config['color_fondo'] ) {
+    $_bg = ( $_opa > 0 && $_opa < 100 )
+        ? Welow_Shortcode_Header::color_a_rgba( $config['color_fondo'], $_opa )
+        : $config['color_fondo'];
+    $inline_styles[] = '--welow-h-bg:' . $_bg;
+} elseif ( $_opa < 100 ) {
+    // Sin color_fondo definido (usa blanco por defecto) pero con opacidad: aplicar blanco translúcido
+    $inline_styles[] = '--welow-h-bg:' . Welow_Shortcode_Header::color_a_rgba( '#ffffff', $_opa );
+}
+if ( ! empty( $config['blur'] ) ) {
+    $inline_styles[] = '--welow-h-blur:' . intval( $config['blur'] ) . 'px';
+}
+?>
 if ( $config['color_texto'] )       $inline_styles[] = '--welow-h-color:' . $config['color_texto'];
 if ( $config['color_boton'] )       $inline_styles[] = '--welow-h-btn-bg:' . $config['color_boton'];
 if ( $config['color_boton_texto'] ) $inline_styles[] = '--welow-h-btn-color:' . $config['color_boton_texto'];
@@ -39,9 +53,12 @@ if ( ! empty( $config['text_transform_menu'] ) && 'none' !== $config['text_trans
 if ( ! empty( $config['letter_spacing_menu'] ) ) $inline_styles[] = '--welow-h-ls-menu:' . $config['letter_spacing_menu'];
 
 $style_attr = ! empty( $inline_styles ) ? ' style="' . esc_attr( implode( ';', $inline_styles ) ) . '"' : '';
-$class_sticky = $config['sticky'] ? ' welow-header--sticky' : '';
+$class_sticky  = $config['sticky']  ? ' welow-header--sticky'  : '';
+// v2.20.0 — overlay implica sticky=si (no tiene sentido en flow normal)
+$class_overlay = ! empty( $config['overlay'] ) ? ' welow-header--overlay' : '';
+if ( $class_overlay ) $class_sticky = ' welow-header--sticky';
 ?>
-<header class="welow-header<?php echo esc_attr( $class_sticky ); ?>"<?php echo $style_attr; ?> role="banner">
+<header class="welow-header<?php echo esc_attr( $class_sticky . $class_overlay ); ?>"<?php echo $style_attr; ?> role="banner">
     <div class="welow-header__inner" style="max-width: <?php echo esc_attr( $config['ancho_max'] ); ?>;">
 
         <!-- ZONA 1: Logo (concesionario + opcional marca al lado) -->

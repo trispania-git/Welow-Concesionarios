@@ -54,6 +54,10 @@ class Welow_Shortcode_Header {
             'color_boton_texto' => '',
             'sticky'            => '',          // si | no | (vacío = usa default)
             'ancho_max'         => '100%',      // v2.7.1: default sin límite (era 1280px)
+            // v2.20.0 — Transparencia + overlay (header se superpone al contenido)
+            'opacidad_fondo'    => '',          // 0-100. Default 100 (opaco). Ej: 80 = 80% opaco
+            'overlay'           => '',          // si | no. Si=el header NO empuja contenido (slider va hasta arriba)
+            'blur'              => '',          // px. Aplica backdrop-filter blur (3 = como el ejemplo)
             // v2.7.0 — Tipografía
             'font_family'       => '',
             'font_google'       => '',          // si | no
@@ -89,6 +93,10 @@ class Welow_Shortcode_Header {
             'color_boton_texto' => $atts['color_boton_texto'] ?: ( $defaults_globales['color_boton_texto'] ?? '' ),
             'sticky'            => self::resolver_bool( $atts['sticky'], ! empty( $defaults_globales['sticky'] ) ),
             'ancho_max'         => sanitize_text_field( $atts['ancho_max'] ),
+            // v2.20.0 — Transparencia + overlay
+            'opacidad_fondo'    => $atts['opacidad_fondo'] !== '' ? intval( $atts['opacidad_fondo'] ) : intval( $defaults_globales['opacidad_fondo'] ?? 100 ),
+            'overlay'           => self::resolver_bool( $atts['overlay'], ! empty( $defaults_globales['overlay'] ) ),
+            'blur'              => $atts['blur'] !== '' ? intval( $atts['blur'] ) : intval( $defaults_globales['blur'] ?? 0 ),
             // v2.7.0 — Tipografía
             'font_family'        => $atts['font_family'] ?: ( $defaults_globales['font_family'] ?? '' ),
             'font_google'        => self::resolver_bool( $atts['font_google'], ! empty( $defaults_globales['font_google'] ) ),
@@ -172,6 +180,42 @@ class Welow_Shortcode_Header {
     /**
      * Resuelve "si"/"no"/"" a boolean.
      */
+    /**
+     * v2.20.0 — Convierte un color (#hex, #rgb o rgb/rgba) a rgba con opacidad.
+     *
+     * @param string $color   Color de entrada (ej: "#fff", "#ffffff", "rgb(...)", "rgba(...)").
+     * @param int    $alpha   0-100. 100 = opaco.
+     * @return string         rgba(R,G,B,A) listo para CSS, o cadena original si no se pudo parsear.
+     */
+    public static function color_a_rgba( $color, $alpha = 100 ) {
+        $color = trim( (string) $color );
+        if ( '' === $color ) return $color;
+        $alpha = max( 0, min( 100, intval( $alpha ) ) );
+        $a = round( $alpha / 100, 3 );
+
+        // Si ya es rgba(...), reemplazamos el último valor
+        if ( preg_match( '/^rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i', $color, $m ) ) {
+            return sprintf( 'rgba(%d,%d,%d,%s)', intval( $m[1] ), intval( $m[2] ), intval( $m[3] ), $a );
+        }
+
+        // Hex #rgb o #rrggbb
+        if ( preg_match( '/^#([a-f0-9]{3}|[a-f0-9]{6})$/i', $color, $m ) ) {
+            $hex = $m[1];
+            if ( 3 === strlen( $hex ) ) {
+                $r = hexdec( $hex[0] . $hex[0] );
+                $g = hexdec( $hex[1] . $hex[1] );
+                $b = hexdec( $hex[2] . $hex[2] );
+            } else {
+                $r = hexdec( substr( $hex, 0, 2 ) );
+                $g = hexdec( substr( $hex, 2, 2 ) );
+                $b = hexdec( substr( $hex, 4, 2 ) );
+            }
+            return sprintf( 'rgba(%d,%d,%d,%s)', $r, $g, $b, $a );
+        }
+
+        return $color; // No reconocido, devolvemos tal cual.
+    }
+
     private static function resolver_bool( $valor, $default = false ) {
         if ( '' === $valor || null === $valor ) return $default;
         return in_array( strtolower( $valor ), array( 'si', 'sí', '1', 'true', 'yes' ), true );

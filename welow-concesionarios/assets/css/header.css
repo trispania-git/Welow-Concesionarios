@@ -39,6 +39,9 @@
     width: 100%;
     box-sizing: border-box;
     z-index: 100;
+    /* v2.20.0 — Backdrop blur opcional cuando el header es translúcido */
+    backdrop-filter: blur(var(--welow-h-blur, 0));
+    -webkit-backdrop-filter: blur(var(--welow-h-blur, 0));
 }
 
 /* v2.7.1 — Truco "fullwidth breakout": cuando el header NO es sticky/fixed,

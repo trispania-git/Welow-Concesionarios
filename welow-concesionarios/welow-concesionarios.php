@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.19.0
+ * Version:     2.20.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,33 @@
  *
  * CHANGELOG
  * ---------
+ * 2.20.0 — Header translúcido + modo overlay (slider hasta arriba)
+ *
+ *   NUEVOS ATRIBUTOS de [welow_header]:
+ *   - opacidad_fondo: 0-100 (default 100 = opaco). Convierte el color de fondo
+ *     a rgba con el alpha indicado. Ej: opacidad_fondo="80" deja el header
+ *     al 80% (ejemplo de referencia del cliente).
+ *   - overlay: si | no. Si "si", el header se superpone al contenido y NO
+ *     se crea el spacer → el slider/contenido empieza desde y=0, con el
+ *     header flotando encima. Implica sticky=si automáticamente.
+ *   - blur: px (default 0). Aplica backdrop-filter blur al fondo del header.
+ *     Recomendado: blur="3" cuando opacidad_fondo está bajo 90.
+ *
+ *   USO TÍPICO para conseguir el look del ejemplo:
+ *     [welow_header opacidad_fondo="80" blur="3" overlay="si"]
+ *
+ *   IMPLEMENTACIÓN:
+ *   - Welow_Shortcode_Header::color_a_rgba() — helper que convierte HEX a rgba.
+ *   - templates/header.php aplica la conversión y la clase .welow-header--overlay.
+ *   - assets/js/header.js omite la creación del spacer en modo overlay.
+ *   - assets/css/header.css aplica backdrop-filter con la variable --welow-h-blur.
+ *
+ *   ARCHIVOS MODIFICADOS:
+ *   - includes/shortcodes/class-welow-shortcode-header.php
+ *   - templates/header.php
+ *   - assets/js/header.js
+ *   - assets/css/header.css
+ *
  * 2.19.0 — Banners de marca con texto superpuesto opcional
  *
  *   FICHA DE MARCA:
@@ -989,7 +1016,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.19.0' );
+define( 'WELOW_CONC_VERSION', '2.20.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
