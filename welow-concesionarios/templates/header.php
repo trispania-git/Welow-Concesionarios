@@ -16,7 +16,7 @@ $site_name      = get_bloginfo( 'name' );
 
 // Estilos inline a partir de los colores y tipografía configurados (si los hay)
 $inline_styles = array();
-<?php // v2.20.0 — Si hay opacidad < 100, convertir el color a rgba con alpha
+// v2.20.0 — Si hay opacidad < 100, convertir el color a rgba con alpha
 $_opa = isset( $config['opacidad_fondo'] ) ? intval( $config['opacidad_fondo'] ) : 100;
 if ( $config['color_fondo'] ) {
     $_bg = ( $_opa > 0 && $_opa < 100 )
@@ -24,13 +24,12 @@ if ( $config['color_fondo'] ) {
         : $config['color_fondo'];
     $inline_styles[] = '--welow-h-bg:' . $_bg;
 } elseif ( $_opa < 100 ) {
-    // Sin color_fondo definido (usa blanco por defecto) pero con opacidad: aplicar blanco translúcido
+    // Sin color_fondo definido (usa blanco por defecto): aplicar blanco translúcido
     $inline_styles[] = '--welow-h-bg:' . Welow_Shortcode_Header::color_a_rgba( '#ffffff', $_opa );
 }
 if ( ! empty( $config['blur'] ) ) {
     $inline_styles[] = '--welow-h-blur:' . intval( $config['blur'] ) . 'px';
 }
-?>
 if ( $config['color_texto'] )       $inline_styles[] = '--welow-h-color:' . $config['color_texto'];
 if ( $config['color_boton'] )       $inline_styles[] = '--welow-h-btn-bg:' . $config['color_boton'];
 if ( $config['color_boton_texto'] ) $inline_styles[] = '--welow-h-btn-color:' . $config['color_boton_texto'];

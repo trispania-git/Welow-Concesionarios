@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.20.0
+ * Version:     2.20.1
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,11 @@
  *
  * CHANGELOG
  * ---------
+ * 2.20.1 — Hotfix: error crítico en header.php (tags <?php anidados)
+ *   - templates/header.php abría <?php dentro de un bloque PHP existente,
+ *     rompiendo el parser y devolviendo "Error crítico" en cualquier página
+ *     que renderizara el header.
+ *
  * 2.20.0 — Header translúcido + modo overlay (slider hasta arriba)
  *
  *   NUEVOS ATRIBUTOS de [welow_header]:
@@ -1016,7 +1021,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.20.0' );
+define( 'WELOW_CONC_VERSION', '2.20.1' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
