@@ -51,13 +51,23 @@ if ( ! empty( $config['text_transform_menu'] ) && 'none' !== $config['text_trans
 }
 if ( ! empty( $config['letter_spacing_menu'] ) ) $inline_styles[] = '--welow-h-ls-menu:' . $config['letter_spacing_menu'];
 
+// v2.21.0 — Separación entre items del menú
+if ( isset( $config['menu_gap'] ) && '' !== $config['menu_gap'] ) {
+    $inline_styles[] = '--welow-h-menu-gap:' . intval( $config['menu_gap'] ) . 'px';
+}
+
 $style_attr = ! empty( $inline_styles ) ? ' style="' . esc_attr( implode( ';', $inline_styles ) ) . '"' : '';
 $class_sticky  = $config['sticky']  ? ' welow-header--sticky'  : '';
 // v2.20.0 — overlay implica sticky=si (no tiene sentido en flow normal)
 $class_overlay = ! empty( $config['overlay'] ) ? ' welow-header--overlay' : '';
 if ( $class_overlay ) $class_sticky = ' welow-header--sticky';
+// v2.21.0 — Estilo de hover del menú
+$hover_validos = array( 'fondo', 'underline', 'subrayado-animado', 'color' );
+$menu_hover    = ! empty( $config['menu_hover'] ) && in_array( $config['menu_hover'], $hover_validos, true )
+    ? $config['menu_hover'] : 'fondo';
+$class_hover   = ' welow-header--hover-' . $menu_hover;
 ?>
-<header class="welow-header<?php echo esc_attr( $class_sticky . $class_overlay ); ?>"<?php echo $style_attr; ?> role="banner">
+<header class="welow-header<?php echo esc_attr( $class_sticky . $class_overlay . $class_hover ); ?>"<?php echo $style_attr; ?> role="banner">
     <div class="welow-header__inner" style="max-width: <?php echo esc_attr( $config['ancho_max'] ); ?>;">
 
         <!-- ZONA 1: Logo (concesionario + opcional marca al lado) -->

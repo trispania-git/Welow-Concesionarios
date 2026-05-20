@@ -58,6 +58,9 @@ class Welow_Shortcode_Header {
             'opacidad_fondo'    => '',          // 0-100. Default 100 (opaco). Ej: 80 = 80% opaco
             'overlay'           => '',          // si | no. Si=el header NO empuja contenido (slider va hasta arriba)
             'blur'              => '',          // px. Aplica backdrop-filter blur (3 = como el ejemplo)
+            // v2.21.0 — Menú: separación y estilo de hover
+            'menu_gap'          => '',          // px entre items del menú (default 4)
+            'menu_hover'        => '',          // fondo | underline | subrayado-animado | color  (default fondo)
             // v2.7.0 — Tipografía
             'font_family'       => '',
             'font_google'       => '',          // si | no
@@ -97,6 +100,9 @@ class Welow_Shortcode_Header {
             'opacidad_fondo'    => $atts['opacidad_fondo'] !== '' ? intval( $atts['opacidad_fondo'] ) : intval( $defaults_globales['opacidad_fondo'] ?? 100 ),
             'overlay'           => self::resolver_bool( $atts['overlay'], ! empty( $defaults_globales['overlay'] ) ),
             'blur'              => $atts['blur'] !== '' ? intval( $atts['blur'] ) : intval( $defaults_globales['blur'] ?? 0 ),
+            // v2.21.0 — Menú
+            'menu_gap'          => $atts['menu_gap']   !== '' ? intval( $atts['menu_gap'] ) : intval( $defaults_globales['menu_gap']   ?? 4 ),
+            'menu_hover'        => $atts['menu_hover'] !== '' ? sanitize_key( $atts['menu_hover'] ) : sanitize_key( $defaults_globales['menu_hover'] ?? 'fondo' ),
             // v2.7.0 — Tipografía
             'font_family'        => $atts['font_family'] ?: ( $defaults_globales['font_family'] ?? '' ),
             'font_google'        => self::resolver_bool( $atts['font_google'], ! empty( $defaults_globales['font_google'] ) ),

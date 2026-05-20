@@ -211,6 +211,9 @@ body.admin-bar .welow-header--sticky { top: 32px; }
     justify-content: center;
 }
 /* v2.6.1 — list-style none reforzado para sobrescribir cualquier reset del tema */
+/* v2.21.0 — Separación entre items configurable */
+.welow-header { --welow-h-menu-gap: 4px; }
+
 .welow-header ul.welow-header__menu-list,
 .welow-header__menu-list {
     list-style: none !important;
@@ -218,7 +221,7 @@ body.admin-bar .welow-header--sticky { top: 32px; }
     margin: 0;
     padding: 0;
     display: flex;
-    gap: 4px;
+    gap: var(--welow-h-menu-gap, 4px);
     flex-wrap: wrap;
     align-items: center;
 }
@@ -247,12 +250,86 @@ body.admin-bar .welow-header--sticky { top: 32px; }
     transition: background 0.15s, color 0.15s;
     line-height: 1.4;
 }
-.welow-header__menu-list a:hover,
-.welow-header__menu-list .current-menu-item > a,
-.welow-header__menu-list .current-menu-parent > a,
-.welow-header__menu-list .current-menu-ancestor > a {
+/* v2.21.0 — Estilos de hover seleccionables vía clase del header */
+
+/* fondo (default): pill azul claro */
+.welow-header--hover-fondo .welow-header__menu-list a:hover,
+.welow-header--hover-fondo .welow-header__menu-list .current-menu-item > a,
+.welow-header--hover-fondo .welow-header__menu-list .current-menu-parent > a,
+.welow-header--hover-fondo .welow-header__menu-list .current-menu-ancestor > a {
     background: rgba(37, 99, 235, 0.08);
     color: var(--welow-h-btn-bg);
+}
+
+/* color: solo cambia el color del texto */
+.welow-header--hover-color .welow-header__menu-list a:hover,
+.welow-header--hover-color .welow-header__menu-list .current-menu-item > a,
+.welow-header--hover-color .welow-header__menu-list .current-menu-parent > a,
+.welow-header--hover-color .welow-header__menu-list .current-menu-ancestor > a {
+    color: var(--welow-h-btn-bg);
+    background: transparent;
+}
+
+/* underline: subrayado estático bajo el ítem activo / en hover */
+.welow-header--hover-underline .welow-header__menu-list > li > a {
+    position: relative;
+    background: transparent;
+    border-radius: 0;
+}
+.welow-header--hover-underline .welow-header__menu-list > li > a::after {
+    content: "";
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 2px;
+    height: 2px;
+    background: var(--welow-h-btn-bg);
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+.welow-header--hover-underline .welow-header__menu-list > li > a:hover,
+.welow-header--hover-underline .welow-header__menu-list .current-menu-item > a,
+.welow-header--hover-underline .welow-header__menu-list .current-menu-parent > a,
+.welow-header--hover-underline .welow-header__menu-list .current-menu-ancestor > a {
+    color: var(--welow-h-btn-bg);
+    background: transparent;
+}
+.welow-header--hover-underline .welow-header__menu-list > li > a:hover::after,
+.welow-header--hover-underline .welow-header__menu-list .current-menu-item > a::after,
+.welow-header--hover-underline .welow-header__menu-list .current-menu-parent > a::after,
+.welow-header--hover-underline .welow-header__menu-list .current-menu-ancestor > a::after {
+    opacity: 1;
+}
+
+/* subrayado-animado: la barra crece desde el centro al hover (estilo Divi) */
+.welow-header--hover-subrayado-animado .welow-header__menu-list > li > a {
+    position: relative;
+    background: transparent;
+    border-radius: 0;
+}
+.welow-header--hover-subrayado-animado .welow-header__menu-list > li > a::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 2px;
+    width: 0;
+    height: 2px;
+    background: var(--welow-h-btn-bg);
+    transform: translateX(-50%);
+    transition: width 0.22s ease;
+}
+.welow-header--hover-subrayado-animado .welow-header__menu-list > li > a:hover,
+.welow-header--hover-subrayado-animado .welow-header__menu-list .current-menu-item > a,
+.welow-header--hover-subrayado-animado .welow-header__menu-list .current-menu-parent > a,
+.welow-header--hover-subrayado-animado .welow-header__menu-list .current-menu-ancestor > a {
+    color: var(--welow-h-btn-bg);
+    background: transparent;
+}
+.welow-header--hover-subrayado-animado .welow-header__menu-list > li > a:hover::after,
+.welow-header--hover-subrayado-animado .welow-header__menu-list .current-menu-item > a::after,
+.welow-header--hover-subrayado-animado .welow-header__menu-list .current-menu-parent > a::after,
+.welow-header--hover-subrayado-animado .welow-header__menu-list .current-menu-ancestor > a::after {
+    width: calc(100% - 28px);
 }
 
 /* Submenú dropdown */

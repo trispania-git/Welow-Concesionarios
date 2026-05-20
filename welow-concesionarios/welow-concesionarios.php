@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.20.1
+ * Version:     2.21.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,25 @@
  *
  * CHANGELOG
  * ---------
+ * 2.21.0 — Header: separación de items y estilos de hover del menú
+ *
+ *   NUEVOS ATRIBUTOS de [welow_header]:
+ *   - menu_gap: px entre items del menú (default 4). Ej: 28.
+ *   - menu_hover: estilo del hover sobre los enlaces del menú:
+ *       • "fondo" (default): pill azul claro de fondo
+ *       • "color":           solo cambia el color del texto
+ *       • "underline":       subrayado estático que aparece al hover
+ *       • "subrayado-animado": barra que crece desde el centro (estilo Divi)
+ *
+ *   El estilo activo se aplica también al item correspondiente a la página
+ *   actual (current-menu-item / current-menu-parent / current-menu-ancestor).
+ *
+ *   USO TÍPICO (look como ejemplo cliente):
+ *     [welow_header opacidad_fondo="80" blur="3" overlay="si"
+ *                   font_size_menu="15" text_transform_menu="uppercase"
+ *                   letter_spacing_menu="1.5px"
+ *                   menu_gap="28" menu_hover="subrayado-animado"]
+ *
  * 2.20.1 — Hotfix: error crítico en header.php (tags <?php anidados)
  *   - templates/header.php abría <?php dentro de un bloque PHP existente,
  *     rompiendo el parser y devolviendo "Error crítico" en cualquier página
@@ -1021,7 +1040,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.20.1' );
+define( 'WELOW_CONC_VERSION', '2.21.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
