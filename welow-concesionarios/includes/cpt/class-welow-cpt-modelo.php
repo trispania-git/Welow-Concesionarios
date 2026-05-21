@@ -365,9 +365,21 @@ class Welow_CPT_Modelo {
                 </td>
             </tr>
             <tr>
-                <th><label for="welow_modelo_texto_enlace">Texto del botón</label></th>
+                <th><label for="welow_modelo_texto_enlace">Texto del botón "Ver modelo"</label></th>
                 <td>
                     <input type="text" id="welow_modelo_texto_enlace" name="welow_modelo_texto_enlace" value="<?php echo esc_attr( $texto_enlace ); ?>" class="regular-text" placeholder="Ver modelo" />
+                    <p class="description">Solo se muestra si el campo "Enlace" tiene URL. Se abre en nueva pestaña.</p>
+                </td>
+            </tr>
+            <?php // v2.22.0 — URL del botón "¡Me interesa!" ?>
+            <tr>
+                <th><label for="welow_modelo_interesa_url">URL del botón "¡Me interesa!"</label></th>
+                <td>
+                    <?php $interesa_url = get_post_meta( $post->ID, self::META_PREFIX . 'interesa_url', true ); ?>
+                    <input type="url" id="welow_modelo_interesa_url" name="welow_modelo_interesa_url"
+                           value="<?php echo esc_url( $interesa_url ); ?>" class="large-text"
+                           placeholder="https://... (formulario, contacto, presupuesto...)" />
+                    <p class="description">Si rellenas esta URL, aparece un botón "¡Me interesa!" en la parte inferior izquierda de la card del modelo.</p>
                 </td>
             </tr>
             <tr>
@@ -487,6 +499,10 @@ class Welow_CPT_Modelo {
         // Texto enlace
         $texto = isset( $_POST['welow_modelo_texto_enlace'] ) ? sanitize_text_field( $_POST['welow_modelo_texto_enlace'] ) : '';
         update_post_meta( $post_id, self::META_PREFIX . 'texto_enlace', $texto );
+
+        // v2.22.0 — URL del botón "¡Me interesa!"
+        $interesa_url = isset( $_POST['welow_modelo_interesa_url'] ) ? esc_url_raw( $_POST['welow_modelo_interesa_url'] ) : '';
+        update_post_meta( $post_id, self::META_PREFIX . 'interesa_url', $interesa_url );
 
         // Plazas (v1.2.0)
         $plazas = isset( $_POST['welow_modelo_plazas'] ) && '' !== $_POST['welow_modelo_plazas']

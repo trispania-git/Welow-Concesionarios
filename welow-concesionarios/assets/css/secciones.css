@@ -460,6 +460,31 @@
     transform: translateX(2px);
 }
 
+/* v2.22.0 — Botón "¡Me interesa!" (parte inferior izquierda de la card) */
+.welow-modelo-card__interesa-wrap {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 12px;
+}
+.welow-modelo-card__interesa {
+    display: inline-block;
+    background: #2563eb;
+    color: #fff;
+    padding: 9px 18px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+.welow-modelo-card__interesa:hover {
+    background: #1d4ed8;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37,99,235,0.25);
+}
+
 /* Modelos - Tablet */
 @media (max-width: 980px) {
     .welow-modelos-grid {

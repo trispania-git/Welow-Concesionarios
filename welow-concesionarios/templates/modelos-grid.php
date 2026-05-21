@@ -38,9 +38,12 @@ $icono_disclaimer_url = $icono_disclaimer_id ? wp_get_attachment_image_url( $ico
         $img_url      = get_the_post_thumbnail_url( $modelo->ID, 'large' );
         $nombre       = get_the_title( $modelo->ID );
         $descripcion  = get_the_excerpt( $modelo->ID );
+        // v2.22.0 — "Ver modelo" SOLO se renderiza si hay enlace propio definido
+        // (antes caía a get_permalink() y abría una ficha vacía del CPT).
         $enlace       = Welow_Helpers::get_modelo_meta( $modelo->ID, 'enlace' );
         $texto_enlace = Welow_Helpers::get_modelo_meta( $modelo->ID, 'texto_enlace', $texto_boton );
-        $permalink    = $enlace ?: get_permalink( $modelo->ID );
+        // v2.22.0 — Botón "¡Me interesa!" — URL opcional, configurable por modelo
+        $interesa_url = Welow_Helpers::get_modelo_meta( $modelo->ID, 'interesa_url' );
 
         $precio_desde = Welow_Helpers::get_modelo_meta( $modelo->ID, 'precio_desde' );
         $disclaimer   = Welow_Helpers::get_modelo_disclaimer( $modelo->ID );
@@ -65,13 +68,12 @@ $icono_disclaimer_url = $icono_disclaimer_id ? wp_get_attachment_image_url( $ico
     ?>
         <article class="welow-modelo-card<?php echo $rotulo ? ' welow-modelo-card--con-rotulo' : ''; ?>">
 
+            <?php // v2.22.0 — Imagen sin enlace ?>
             <div class="welow-modelo-card__imagen">
                 <?php if ( $img_url ) : ?>
-                    <a href="<?php echo esc_url( $permalink ); ?>" aria-label="<?php echo esc_attr( $nombre ); ?>">
-                        <img src="<?php echo esc_url( $img_url ); ?>"
-                             alt="<?php echo esc_attr( $nombre ); ?>"
-                             loading="lazy" />
-                    </a>
+                    <img src="<?php echo esc_url( $img_url ); ?>"
+                         alt="<?php echo esc_attr( $nombre ); ?>"
+                         loading="lazy" />
                 <?php else : ?>
                     <div class="welow-modelo-card__placeholder">
                         <span class="dashicons dashicons-car"></span>
@@ -88,9 +90,13 @@ $icono_disclaimer_url = $icono_disclaimer_id ? wp_get_attachment_image_url( $ico
                     </span>
                 <?php endif; ?>
 
-                <?php // v2.10.0 — Título grande (h2) ?>
+                <?php // v2.10.0 — Título grande (h2). v2.22.0 — solo enlazado si hay $enlace propio ?>
                 <h2 class="welow-modelo-card__nombre">
-                    <a href="<?php echo esc_url( $permalink ); ?>"><?php echo esc_html( $nombre ); ?></a>
+                    <?php if ( $enlace ) : ?>
+                        <a href="<?php echo esc_url( $enlace ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $nombre ); ?></a>
+                    <?php else : ?>
+                        <?php echo esc_html( $nombre ); ?>
+                    <?php endif; ?>
                 </h2>
 
                 <?php // v2.14.0 — Etiquetas DGT (70% tamaño) + combustible en MISMA fila (etiqueta primero) ?>
@@ -161,11 +167,25 @@ $icono_disclaimer_url = $icono_disclaimer_id ? wp_get_attachment_image_url( $ico
                         <span class="welow-modelo-card__precio-vacio"></span>
                     <?php endif; ?>
 
-                    <a href="<?php echo esc_url( $permalink ); ?>" class="welow-modelo-card__cta">
-                        <?php echo esc_html( $texto_enlace ); ?>
-                        <span aria-hidden="true">→</span>
-                    </a>
+                    <?php // v2.22.0 — "Ver modelo" solo si hay enlace propio. Abre en pestaña nueva. ?>
+                    <?php if ( $enlace ) : ?>
+                        <a href="<?php echo esc_url( $enlace ); ?>"
+                           class="welow-modelo-card__cta"
+                           target="_blank" rel="noopener">
+                            <?php echo esc_html( $texto_enlace ); ?>
+                            <span aria-hidden="true">→</span>
+                        </a>
+                    <?php endif; ?>
                 </div>
+
+                <?php // v2.22.0 — Botón "¡Me interesa!" en parte inferior izquierda (solo si hay URL) ?>
+                <?php if ( $interesa_url ) : ?>
+                    <div class="welow-modelo-card__interesa-wrap">
+                        <a href="<?php echo esc_url( $interesa_url ); ?>" class="welow-modelo-card__interesa">
+                            ¡Me interesa!
+                        </a>
+                    </div>
+                <?php endif; ?>
             </div>
 
         </article>
