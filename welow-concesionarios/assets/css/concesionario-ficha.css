@@ -6,11 +6,16 @@
 .welow-conc-ficha { max-width: 1280px; margin: 0 auto; }
 
 /* ============== Banner ============== */
+/* v2.27.3 — Banner full-width: rompe el max-width del wrapper .welow-conc-ficha */
 .welow-conc-banner {
-    width: 100%;
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    margin-top: 0;
+    margin-bottom: 28px;
     overflow: hidden;
-    border-radius: 8px;
-    margin: 0 0 28px;
+    border-radius: 0;
     background: #f1f5f9;
 }
 .welow-conc-banner--with-overlay { position: relative; }
@@ -240,4 +245,12 @@
 .welow-conc-mapa__link:hover { text-decoration: underline; }
 
 /* ============== Sección Divi ============== */
-.welow-conc-divi { margin-top: 12px; }
+/* v2.27.3 — Sección Divi también full-width (los layouts Divi suelen necesitar
+   el ancho completo para sus secciones con fondo de color/imagen). */
+.welow-conc-divi {
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    margin-top: 12px;
+}

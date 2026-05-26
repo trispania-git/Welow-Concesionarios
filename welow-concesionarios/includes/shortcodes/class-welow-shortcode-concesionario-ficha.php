@@ -284,13 +284,21 @@ class Welow_Shortcode_Concesionario_Ficha {
             return;
         }
 
-        // Render directo del contenido del layout sin pasar por otro shortcode
-        // (más fiable: do_shortcode aplicado al contenido del layout).
-        $contenido = $layout->post_content;
-        $contenido = do_shortcode( $contenido );
+        // v2.27.3 — Usar apply_filters('the_content') que es más robusto:
+        // ejecuta do_shortcode + wpautop + los filtros propios de Divi (esenciales
+        // para que se rendericen los módulos Divi correctamente, especialmente
+        // si el layout fue creado con el Visual Builder).
+        $contenido_raw = $layout->post_content;
 
-        if ( '' === trim( wp_strip_all_tags( $contenido ) ) && empty( $contenido ) ) {
-            echo self::msg_admin( 'El layout "' . esc_html( $layout->post_title ) . '" (ID=' . $layout_id . ') está vacío o no devolvió contenido.' );
+        if ( '' === trim( $contenido_raw ) ) {
+            echo self::msg_admin( 'El layout "' . esc_html( $layout->post_title ) . '" (ID=' . $layout_id . ') está vacío.' );
+            return;
+        }
+
+        $contenido = apply_filters( 'the_content', $contenido_raw );
+
+        if ( '' === trim( $contenido ) ) {
+            echo self::msg_admin( 'El layout "' . esc_html( $layout->post_title ) . '" (ID=' . $layout_id . ') tiene contenido pero apply_filters("the_content") devolvió vacío. Posible filtro de Divi bloqueando — prueba con un layout más simple para confirmar.' );
             return;
         }
 

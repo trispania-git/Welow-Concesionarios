@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.27.2
+ * Version:     2.27.3
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,15 @@
  *
  * CHANGELOG
  * ---------
+ * 2.27.3 — Concesionario ficha: banner + Divi a full-width, render Divi mejorado
+ *   - Banner ahora rompe el max-width del wrapper y se muestra a 100vw
+ *     (mismo truco CSS para la sección Divi, que suele necesitar el ancho
+ *     completo para sus secciones con fondo de color/imagen).
+ *   - render_divi cambia de do_shortcode → apply_filters('the_content'),
+ *     que es compatible con layouts del Visual Builder de Divi 5 y
+ *     ejecuta los filtros propios de Divi necesarios para renderizar
+ *     correctamente módulos como et_pb_section.
+ *
  * 2.27.2 — [welow_concesionario_ficha]: 3 ajustes
  *   1) "mapa" añadido al default de mostrar, así si tienes lat/lng se ve
  *      automáticamente sin tener que pasarlo en el atributo mostrar.
@@ -1190,7 +1199,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.27.2' );
+define( 'WELOW_CONC_VERSION', '2.27.3' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
