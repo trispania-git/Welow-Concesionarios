@@ -894,9 +894,14 @@ class Welow_Helpers {
         $mes  = self::get_coche_meta( $coche_id, 'mes_matricula' );
         $anio = self::get_coche_meta( $coche_id, 'anio_matricula' );
 
-        // Concesionario completo
+        // Concesionario completo.
+        // v2.25.0 — Fallback en cascada: meta directa → modelo→marca→concesionario
+        // (coches nuevos heredan automáticamente del concesionario que vende su marca).
         $concesionario = null;
         $conc_id = self::get_coche_meta( $coche_id, 'concesionario' );
+        if ( ! $conc_id ) {
+            $conc_id = self::resolver_concesionario_via_marca( $coche_id );
+        }
         if ( $conc_id ) {
             $concesionario = self::get_concesionario_data( $conc_id );
         }
@@ -969,9 +974,54 @@ class Welow_Helpers {
                 return wp_get_attachment_image_url( intval( $id ), 'large' );
             }, self::get_coche_galeria( $coche_id ) ) ),
 
-            // Concesionario completo
+            // Concesionario completo (incluye fallback automático vía marca→concesionario en coches nuevos)
             'concesionario'     => $concesionario,
+
+            // v2.25.0 — Timestamps para sync incremental (chatbots / agentes)
+            'fecha_alta'         => mysql2date( 'c', $coche->post_date_gmt, false ),
+            'fecha_modificacion' => mysql2date( 'c', $coche->post_modified_gmt, false ),
         );
+    }
+
+    /**
+     * v2.25.0 — Devuelve el ID de concesionario al que pertenece un coche a través
+     * de la relación marca→concesionario. Útil cuando el meta directo está vacío.
+     *
+     * Solo funciona para coches NUEVOS (que tienen modelo del catálogo → marca oficial).
+     * Para ocasión devuelve 0 (su marca es externa, no oficial).
+     *
+     * Si una marca pertenece a varios concesionarios, devuelve el primero por orden.
+     *
+     * @param int $coche_id
+     * @return int  0 si no se puede resolver
+     */
+    public static function resolver_concesionario_via_marca( $coche_id ) {
+        $post = get_post( $coche_id );
+        if ( ! $post || 'welow_coche_nuevo' !== $post->post_type ) return 0;
+
+        $modelo_id = self::get_coche_meta( $coche_id, 'modelo' );
+        if ( ! $modelo_id ) return 0;
+
+        $marca_id = get_post_meta( $modelo_id, '_welow_modelo_marca', true );
+        if ( ! $marca_id ) return 0;
+
+        // Buscar concesionarios cuya meta '_welow_concesionario_marcas' (array de IDs)
+        // contenga este marca_id.
+        $concesionarios = get_posts( array(
+            'post_type'      => 'welow_concesionario',
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+            'orderby'        => 'menu_order title',
+            'order'          => 'ASC',
+            'fields'         => 'ids',
+        ) );
+        foreach ( $concesionarios as $cid ) {
+            $marcas = get_post_meta( $cid, '_welow_conc_marcas', true );
+            if ( is_array( $marcas ) && in_array( intval( $marca_id ), array_map( 'intval', $marcas ), true ) ) {
+                return intval( $cid );
+            }
+        }
+        return 0;
     }
 
     /**
@@ -1124,8 +1174,10 @@ class Welow_Helpers {
         if ( ! $post || 'welow_concesionario' !== $post->post_type ) return null;
 
         return array(
-            'id'        => $id,
+            'id'        => intval( $id ),
+            'slug'      => $post->post_name,
             'nombre'    => $post->post_title,
+            'url'       => get_permalink( $id ),
             'logo'      => get_the_post_thumbnail_url( $id, 'medium' ),
             'direccion' => self::get_concesionario_meta( $id, 'direccion' ),
             'cp'        => self::get_concesionario_meta( $id, 'cp' ),

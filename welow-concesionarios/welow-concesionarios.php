@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.24.0
+ * Version:     2.25.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,34 @@
  *
  * CHANGELOG
  * ---------
+ * 2.25.0 — REST API: concesionario en cascada + endpoint /concesionarios + timestamps
+ *
+ *   1) CONCESIONARIO EN CADA COCHE (resolución en cascada):
+ *      Si el coche tiene asignado un concesionario en su meta, se usa ese.
+ *      Si NO (campo vacío), para coches NUEVOS se resuelve automáticamente:
+ *        coche → modelo (catálogo) → marca oficial → concesionario que vende
+ *        esa marca (busca en welow_concesionario._welow_conc_marcas).
+ *      Para coches de OCASIÓN no hay cascada posible (marca externa libre).
+ *      El JSON sale con: { id, slug, nombre, url, direccion, telefono, email, ... }
+ *
+ *   2) NUEVO ENDPOINT /wp-json/welow/v1/concesionarios
+ *      Lista completa de concesionarios físicos publicados con datos
+ *      (direccion, telefono, email, horario, lat/lng, url, logo) +
+ *      array de marcas que vende cada uno + timestamps.
+ *
+ *   3) NUEVOS CAMPOS EN COCHE: fecha_alta y fecha_modificacion (ISO 8601 UTC).
+ *      Permite sync incremental: el chatbot puede filtrar por fecha_modificacion
+ *      desde la última pasada para no procesar todo cada vez.
+ *
+ *   NOTA sobre /info.estadisticas.concesionarios:
+ *      El número refleja wp_count_posts('welow_concesionario')->publish. Si el
+ *      cliente confirma 3 pero el endpoint dice 2, hay 1 concesionario sin
+ *      publicar (borrador, pendiente o papelera).
+ *
+ *   ARCHIVOS MODIFICADOS:
+ *   - includes/helpers/class-welow-helpers.php (cascada + timestamps + id/slug/url en concesionario)
+ *   - includes/api/class-welow-rest-api.php (endpoint /concesionarios)
+ *
  * 2.24.0 — Card de modelo: mini-slider de galería (hasta 5 imágenes)
  *
  *   - Si el modelo tiene 2+ imágenes (destacada + img_2..img_5), la card
@@ -1089,7 +1117,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.24.0' );
+define( 'WELOW_CONC_VERSION', '2.25.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

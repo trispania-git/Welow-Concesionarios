@@ -100,6 +100,13 @@ class Welow_Rest_API {
             'callback' => array( __CLASS__, 'endpoint_info' ),
             'permission_callback' => '__return_true',
         ) );
+
+        // v2.25.0 — Endpoint de concesionarios físicos
+        register_rest_route( self::NAMESPACE_API, '/concesionarios', array(
+            'methods'  => 'GET',
+            'callback' => array( __CLASS__, 'endpoint_concesionarios' ),
+            'permission_callback' => '__return_true',
+        ) );
     }
 
     /* ========================================================================
@@ -168,6 +175,52 @@ class Welow_Rest_API {
         ) );
     }
 
+    /**
+     * v2.25.0 — Lista de concesionarios físicos con datos completos
+     * y nombres/slugs de las marcas que vende cada uno.
+     */
+    public static function endpoint_concesionarios( $request ) {
+        $posts = get_posts( array(
+            'post_type'      => 'welow_concesionario',
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+            'orderby'        => 'menu_order title',
+            'order'          => 'ASC',
+        ) );
+
+        $datos = array();
+        foreach ( $posts as $p ) {
+            $base = Welow_Helpers::get_concesionario_data( $p->ID );
+            if ( ! $base ) continue;
+
+            // Anexar marcas asignadas (slug + nombre)
+            $marca_ids = get_post_meta( $p->ID, '_welow_conc_marcas', true );
+            $marcas    = array();
+            if ( is_array( $marca_ids ) ) {
+                foreach ( $marca_ids as $mid ) {
+                    $mp = get_post( intval( $mid ) );
+                    if ( $mp && 'welow_marca' === $mp->post_type ) {
+                        $marcas[] = array(
+                            'id'     => intval( $mp->ID ),
+                            'slug'   => $mp->post_name,
+                            'nombre' => $mp->post_title,
+                        );
+                    }
+                }
+            }
+            $base['marcas']             = $marcas;
+            $base['fecha_alta']         = mysql2date( 'c', $p->post_date_gmt, false );
+            $base['fecha_modificacion'] = mysql2date( 'c', $p->post_modified_gmt, false );
+            $datos[] = $base;
+        }
+
+        return rest_ensure_response( array(
+            'total'           => count( $datos ),
+            'concesionarios'  => $datos,
+            'generado'        => current_time( 'c' ),
+        ) );
+    }
+
     public static function endpoint_info( $request ) {
         return rest_ensure_response( array(
             'sitio'       => array(
@@ -194,6 +247,7 @@ class Welow_Rest_API {
                 'coche_individual' => rest_url( self::NAMESPACE_API . '/coches/{id}' ),
                 'modelos'          => rest_url( self::NAMESPACE_API . '/modelos' ),
                 'marcas'           => rest_url( self::NAMESPACE_API . '/marcas' ),
+                'concesionarios'   => rest_url( self::NAMESPACE_API . '/concesionarios' ), // v2.25.0
             ),
             'generado'   => current_time( 'c' ),
         ) );
