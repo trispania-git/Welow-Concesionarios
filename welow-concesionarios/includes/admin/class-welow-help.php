@@ -843,6 +843,7 @@ Tras pulsar [☰] (overlay fullscreen):
             array( '/coches/{id}',            'Datos de un coche concreto por ID' ),
             array( '/modelos',                'Catálogo de modelos del concesionario' ),
             array( '/marcas',                 'Marcas oficiales con sus modelos' ),
+            array( '/concesionarios',         'Concesionarios físicos con datos completos + marcas que vende cada uno (v2.25.0)' ),
         );
         foreach ( $endpoints as $ep ) :
             $url = rtrim( $base, '/' ) . $ep[0];
