@@ -281,3 +281,151 @@
     width: 100%;
     margin-top: 24px;
 }
+
+/* =========================================================
+   v2.28.0 — Grid de fichas [welow_concesionarios]
+   ========================================================= */
+.welow-conc-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--welow-cc-cols, 3), 1fr);
+    gap: 28px;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+@media (max-width: 980px) {
+    .welow-conc-grid { grid-template-columns: repeat(var(--welow-cc-cols-tablet, 2), 1fr); gap: 20px; }
+}
+@media (max-width: 600px) {
+    .welow-conc-grid { grid-template-columns: repeat(var(--welow-cc-cols-movil, 1), 1fr); }
+}
+
+.welow-conc-card {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+}
+.welow-conc-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    border-color: #2563eb;
+}
+
+.welow-conc-card__imagen {
+    display: block;
+    aspect-ratio: 16/10;
+    overflow: hidden;
+    background: #f1f5f9;
+}
+.welow-conc-card__imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .35s;
+}
+.welow-conc-card:hover .welow-conc-card__imagen img {
+    transform: scale(1.04);
+}
+.welow-conc-card__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-size: 48px;
+}
+
+.welow-conc-card__info {
+    padding: 20px 22px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.welow-conc-card__localidad {
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+}
+.welow-conc-card__localidad a {
+    color: inherit;
+    text-decoration: none;
+}
+.welow-conc-card__localidad a:hover { color: #2563eb; }
+
+.welow-conc-card__direccion {
+    font-size: 13px;
+    color: #64748b;
+    margin: 0 0 6px;
+    line-height: 1.4;
+}
+
+.welow-conc-card__marcas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+    margin: 4px 0 14px;
+    padding-top: 12px;
+    border-top: 1px solid #f1f5f9;
+}
+.welow-conc-card__marca-logo {
+    max-width: 60px;
+    max-height: 30px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    filter: grayscale(0.2);
+    transition: filter .15s, transform .15s;
+}
+.welow-conc-card__marca-logo:hover {
+    filter: grayscale(0);
+    transform: scale(1.05);
+}
+.welow-conc-card__marca-text {
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+    background: #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 4px;
+}
+
+.welow-conc-card__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: auto;
+    align-self: flex-start;
+    background: #2563eb;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 14px;
+    transition: background .15s, transform .15s, box-shadow .15s;
+    box-shadow: 0 2px 4px rgba(37,99,235,0.18);
+}
+.welow-conc-card__btn:hover {
+    background: #1d4ed8;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(37,99,235,0.28);
+}
+.welow-conc-card__btn span[aria-hidden] {
+    transition: transform .15s;
+}
+.welow-conc-card__btn:hover span[aria-hidden] {
+    transform: translateX(3px);
+}

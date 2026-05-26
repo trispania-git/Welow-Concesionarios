@@ -64,6 +64,7 @@ class Welow_Main {
         Welow_Shortcode_Header::init();            // v2.6.0
         Welow_Shortcode_Coches_Filtro::init();     // v2.8.0
         Welow_Shortcode_Concesionario_Ficha::init(); // v2.27.0
+        Welow_Shortcode_Concesionarios::init();      // v2.28.0
 
         // Permalinks personalizados de coches
         Welow_Coche_Permalinks::init();            // v2.5.0

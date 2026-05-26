@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.27.6
+ * Version:     2.28.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,28 @@
  *
  * CHANGELOG
  * ---------
+ * 2.28.0 — Nuevo shortcode [welow_concesionarios] (grid de fichas)
+ *
+ *   Listado tipo grid de los concesionarios publicados, una card por cada uno:
+ *   - Imagen principal (banner desktop → primera foto galería → thumbnail)
+ *   - Localidad (h3, grande) + dirección + CP (pequeño, debajo)
+ *   - Logos de las marcas que vende (filtrados de welow_marca._welow_marca_logo_negro)
+ *   - Botón "Ver concesionario" → permalink del CPT
+ *
+ *   Atributos: columnas (3/2/1) + max + texto_boton + orden.
+ *
+ *   Reutiliza el CSS de welow-concesionario-ficha para no duplicar estilos.
+ *   Añadido a la página de Ayuda y shortcodes.
+ *
+ *   ARCHIVOS NUEVOS:
+ *   - includes/shortcodes/class-welow-shortcode-concesionarios.php
+ *
+ *   ARCHIVOS MODIFICADOS:
+ *   - welow-concesionarios.php (require_once)
+ *   - includes/class-welow-main.php (init shortcode)
+ *   - includes/admin/class-welow-help.php (Ayuda)
+ *   - assets/css/concesionario-ficha.css (estilos card+grid)
+ *
  * 2.27.6 — Concesionario ficha: 3 fixes
  *   1) HORARIO: quitado white-space:pre-line porque doblaba los saltos
  *      junto a nl2br. Ahora se ven con la separación natural.
@@ -1237,7 +1259,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.27.6' );
+define( 'WELOW_CONC_VERSION', '2.28.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
@@ -1292,6 +1314,7 @@ require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coche-
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-header.php';            // v2.6.0
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coches-filtro.php';     // v2.8.0
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-concesionario-ficha.php'; // v2.27.0
+require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-concesionarios.php';      // v2.28.0
 
 // Permalinks de coches
 require_once WELOW_CONC_PATH . 'includes/class-welow-coche-permalinks.php';                       // v2.5.0

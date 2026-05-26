@@ -252,6 +252,24 @@ class Welow_Help {
                 ),
             ),
 
+            'welow_concesionarios' => array(
+                'titulo' => 'Grid de fichas de concesionarios (v2.28.0)',
+                'desc'   => 'Listado tipo grid con todos los concesionarios publicados. Cada card muestra la imagen principal, localidad (grande) + dirección (pequeña), iconos de las marcas que vende y un botón "Ver concesionario" enlazado a su ficha. Ideal para una página "Nuestros concesionarios".',
+                'params' => array(
+                    'columnas'        => array( 'def' => '3', 'desc' => 'Columnas en desktop' ),
+                    'columnas_tablet' => array( 'def' => '2', 'desc' => 'Columnas en tablet (≤980px)' ),
+                    'columnas_movil'  => array( 'def' => '1', 'desc' => 'Columnas en móvil (≤600px)' ),
+                    'max'             => array( 'def' => '-1', 'desc' => 'Máximo de concesionarios (-1 = todos)' ),
+                    'texto_boton'     => array( 'def' => 'Ver concesionario', 'desc' => 'Texto del botón principal' ),
+                    'orden'           => array( 'def' => 'menu_order', 'desc' => 'menu_order | title | date' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_concesionarios]',
+                    '[welow_concesionarios columnas="4" texto_boton="Ver más"]',
+                    '[welow_concesionarios orden="title" max="6"]',
+                ),
+            ),
+
             'welow_concesionario_ficha' => array(
                 'titulo' => 'Ficha pública del concesionario (v2.27.0)',
                 'desc'   => 'Renderiza la ficha de un concesionario combinando banner de portada, datos de contacto, marcas que representa, galería con lightbox, mapa y una sección de la biblioteca Divi. Ideal para usar en el Theme Builder de Divi en el template de single de welow_concesionario.',
