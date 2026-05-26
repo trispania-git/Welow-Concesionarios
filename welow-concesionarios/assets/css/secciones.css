@@ -126,12 +126,13 @@
 }
 
 .welow-precio-disclaimer {
+    /* v2.23.0 — Inmediatamente al lado del precio (sin margin-left:auto que lo empujaba al final del flex) */
     position: relative;
     display: inline-flex;
     align-items: center;
     cursor: help;
     color: #94a3b8;
-    margin-left: auto;
+    margin-left: 4px;
 }
 
 .welow-precio-disclaimer:hover,
@@ -460,29 +461,33 @@
     transform: translateX(2px);
 }
 
-/* v2.22.0 — Botón "¡Me interesa!" (parte inferior izquierda de la card) */
+/* v2.23.0 — Botón "¡Me interesa!" (centrado y legible) */
 .welow-modelo-card__interesa-wrap {
     display: flex;
-    justify-content: flex-start;
-    margin-top: 12px;
+    justify-content: center;
+    margin-top: 14px;
 }
 .welow-modelo-card__interesa {
     display: inline-block;
     background: #2563eb;
     color: #fff;
-    padding: 9px 18px;
+    padding: 12px 28px;
     border-radius: 999px;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
+    letter-spacing: 0.6px;
     text-decoration: none;
+    text-align: center;
     transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 6px rgba(37,99,235,0.18);
+    min-width: 180px;
 }
-.welow-modelo-card__interesa:hover {
+.welow-modelo-card__interesa:hover,
+.welow-modelo-card__interesa:focus {
     background: #1d4ed8;
     color: #fff;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(37,99,235,0.25);
+    box-shadow: 0 6px 16px rgba(37,99,235,0.32);
 }
 
 /* Modelos - Tablet */

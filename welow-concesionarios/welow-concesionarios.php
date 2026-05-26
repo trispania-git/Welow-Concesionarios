@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.22.0
+ * Version:     2.23.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,17 @@
  *
  * CHANGELOG
  * ---------
+ * 2.23.0 — Card de modelo: disclaimer junto al precio + botón "¡Me interesa!" centrado
+ *
+ *   1) ICONO DISCLAIMER: estaba con margin-left:auto, lo que lo empujaba al
+ *      final del flex del precio (apareciendo pegado a "Ver modelo"). Ahora
+ *      queda inmediatamente al lado del precio con margin-left de 4px.
+ *
+ *   2) BOTÓN "¡ME INTERESA!": antes alineado a la izquierda y compacto.
+ *      Ahora centrado en la card, con más padding (12×28), letter-spacing
+ *      de 0.6px, ancho mínimo de 180px y sombra más marcada. Más legible
+ *      y más destacado visualmente.
+ *
  * 2.22.0 — Card de modelo: enlaces opcionales + botón "¡Me interesa!"
  *
  *   CARD DE MODELO [welow_modelos]:
@@ -1059,7 +1070,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.22.0' );
+define( 'WELOW_CONC_VERSION', '2.23.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
