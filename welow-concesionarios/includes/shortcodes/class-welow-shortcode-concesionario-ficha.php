@@ -30,7 +30,7 @@ class Welow_Shortcode_Concesionario_Ficha {
     public static function render( $atts ) {
         $atts = shortcode_atts( array(
             'id'      => 'auto',
-            'mostrar' => 'banner,info,marcas,galeria,divi',
+            'mostrar' => 'banner,info,marcas,galeria,mapa,divi', // v2.27.2 — "mapa" añadido al default
         ), $atts );
 
         // Resolver concesionario
@@ -198,7 +198,7 @@ class Welow_Shortcode_Concesionario_Ficha {
         if ( ! is_array( $marca_ids ) || empty( $marca_ids ) ) return;
         ?>
         <section class="welow-conc-marcas">
-            <h2 class="welow-conc-section-title">Marcas que representamos</h2>
+            <h2 class="welow-conc-section-title">Nuestras Marcas</h2>
             <div class="welow-conc-marcas__grid">
                 <?php foreach ( $marca_ids as $mid ) :
                     $mid = intval( $mid );
@@ -270,11 +270,31 @@ class Welow_Shortcode_Concesionario_Ficha {
 
     private static function render_divi( $conc_id ) {
         $layout_id = intval( get_post_meta( $conc_id, '_welow_conc_divi_layout_id', true ) );
-        if ( ! $layout_id ) return;
-        $output = do_shortcode( '[welow_divi id="' . $layout_id . '"]' );
-        if ( $output ) {
-            echo '<section class="welow-conc-divi">' . $output . '</section>';
+        if ( ! $layout_id ) {
+            if ( current_user_can( 'manage_options' ) ) {
+                echo self::msg_admin( 'No hay layout Divi seleccionado en la ficha del concesionario. Ve a editar el concesionario → "Sección de biblioteca Divi" → elige uno.' );
+            }
+            return;
         }
+
+        // Verificar que el layout existe
+        $layout = get_post( $layout_id );
+        if ( ! $layout || 'et_pb_layout' !== $layout->post_type ) {
+            echo self::msg_admin( 'El layout Divi ID=' . $layout_id . ' no existe o no es de tipo et_pb_layout.' );
+            return;
+        }
+
+        // Render directo del contenido del layout sin pasar por otro shortcode
+        // (más fiable: do_shortcode aplicado al contenido del layout).
+        $contenido = $layout->post_content;
+        $contenido = do_shortcode( $contenido );
+
+        if ( '' === trim( wp_strip_all_tags( $contenido ) ) && empty( $contenido ) ) {
+            echo self::msg_admin( 'El layout "' . esc_html( $layout->post_title ) . '" (ID=' . $layout_id . ') está vacío o no devolvió contenido.' );
+            return;
+        }
+
+        echo '<section class="welow-conc-divi">' . $contenido . '</section>';
     }
 
     /* =====================================================================
