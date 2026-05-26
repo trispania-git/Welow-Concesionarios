@@ -82,7 +82,9 @@
 .welow-pos-bottom-right  { align-items: flex-end;    justify-content: flex-end; }
 
 /* ============== Título ============== */
-.welow-conc-ficha__titulo-wrap { margin: 0 0 28px; }
+/* v2.27.5 — NO usar shorthand "margin: 0 0 28px" porque resetea los
+   margin-left:auto / margin-right:auto que vienen del selector compartido. */
+.welow-conc-ficha__titulo-wrap { margin-top: 0; margin-bottom: 28px; }
 .welow-conc-ficha__titulo {
     font-size: clamp(26px, 4vw, 44px);
     font-weight: 800;

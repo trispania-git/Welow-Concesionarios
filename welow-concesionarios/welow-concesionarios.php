@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.27.4
+ * Version:     2.27.5
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,11 @@
  *
  * CHANGELOG
  * ---------
+ * 2.27.5 — Fix: título del concesionario pegado a la izquierda
+ *   Una regla "margin: 0 0 28px" sobre .welow-conc-ficha__titulo-wrap
+ *   reseteaba los margin-left:auto / margin-right:auto del selector
+ *   compartido. Cambiado a margin-top/bottom explícitos.
+ *
  * 2.27.4 — HOTFIX layout caótico de v2.27.3
  *
  *   PROBLEMA detectado: apply_filters('the_content') disparaba la cadena
@@ -1219,7 +1224,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.27.4' );
+define( 'WELOW_CONC_VERSION', '2.27.5' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
