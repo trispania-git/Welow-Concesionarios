@@ -252,6 +252,20 @@ class Welow_Help {
                 ),
             ),
 
+            'welow_concesionario_ficha' => array(
+                'titulo' => 'Ficha pública del concesionario (v2.27.0)',
+                'desc'   => 'Renderiza la ficha de un concesionario combinando banner de portada, datos de contacto, marcas que representa, galería con lightbox, mapa y una sección de la biblioteca Divi. Ideal para usar en el Theme Builder de Divi en el template de single de welow_concesionario.',
+                'params' => array(
+                    'id'      => array( 'def' => 'auto', 'desc' => 'ID, slug del concesionario o "auto" (detecta del contexto)' ),
+                    'mostrar' => array( 'def' => 'banner,info,marcas,galeria,divi', 'desc' => 'Bloques separados por coma: banner, info, marcas, galeria, mapa, divi' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_concesionario_ficha]',
+                    '[welow_concesionario_ficha id="chinares-jaecoo"]',
+                    '[welow_concesionario_ficha mostrar="banner,info,mapa,divi"]',
+                ),
+            ),
+
             'welow_coche_ficha' => array(
                 'titulo' => 'Ficha individual completa del coche',
                 'desc'   => 'Renderiza la ficha completa del coche actual o uno específico. Detecta automáticamente si es nuevo o de ocasión.',

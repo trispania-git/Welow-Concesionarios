@@ -63,6 +63,7 @@ class Welow_Main {
         Welow_Shortcode_Coche_Extras::init();      // v2.5.0
         Welow_Shortcode_Header::init();            // v2.6.0
         Welow_Shortcode_Coches_Filtro::init();     // v2.8.0
+        Welow_Shortcode_Concesionario_Ficha::init(); // v2.27.0
 
         // Permalinks personalizados de coches
         Welow_Coche_Permalinks::init();            // v2.5.0
@@ -141,6 +142,14 @@ class Welow_Main {
             WELOW_CONC_VERSION
         );
 
+        // v2.27.0 — Ficha de concesionario
+        wp_register_style(
+            'welow-concesionario-ficha',
+            WELOW_CONC_URL . 'assets/css/concesionario-ficha.css',
+            array(),
+            WELOW_CONC_VERSION
+        );
+
         // JS
         wp_register_script(
             'welow-slider',
@@ -178,6 +187,15 @@ class Welow_Main {
         wp_register_script(
             'welow-coches-filtro',
             WELOW_CONC_URL . 'assets/js/coches-filtro.js',
+            array(),
+            WELOW_CONC_VERSION,
+            true
+        );
+
+        // v2.27.0 — Ficha de concesionario (lightbox de galería)
+        wp_register_script(
+            'welow-concesionario-ficha',
+            WELOW_CONC_URL . 'assets/js/concesionario-ficha.js',
             array(),
             WELOW_CONC_VERSION,
             true

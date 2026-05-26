@@ -1,0 +1,243 @@
+/**
+ * Welow Concesionarios — Ficha de concesionario
+ * @since 2.27.0
+ */
+
+.welow-conc-ficha { max-width: 1280px; margin: 0 auto; }
+
+/* ============== Banner ============== */
+.welow-conc-banner {
+    width: 100%;
+    overflow: hidden;
+    border-radius: 8px;
+    margin: 0 0 28px;
+    background: #f1f5f9;
+}
+.welow-conc-banner--with-overlay { position: relative; }
+.welow-conc-banner__img { display: block; width: 100%; height: auto; }
+.welow-conc-banner__overlay {
+    position: absolute; inset: 0;
+    display: flex; padding: clamp(16px, 4vw, 48px); pointer-events: none;
+}
+.welow-conc-banner__overlay-inner {
+    pointer-events: auto;
+    background: rgba(0,0,0,0.45);
+    color: #fff;
+    padding: clamp(14px, 2.5vw, 28px) clamp(18px, 3vw, 36px);
+    border-radius: 6px;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    max-width: min(90%, 600px);
+}
+.welow-conc-banner__overlay-titulo {
+    color: #fff;
+    font-size: clamp(20px, 3.2vw, 40px);
+    font-weight: 800;
+    line-height: 1.15;
+    margin: 0 0 8px;
+}
+.welow-conc-banner__overlay-subtitulo {
+    color: #f1f5f9;
+    font-size: clamp(13px, 1.4vw, 17px);
+    line-height: 1.4;
+    margin: 0 0 14px;
+}
+.welow-conc-banner__overlay-boton {
+    display: inline-block;
+    background: #fff;
+    color: #0f172a;
+    padding: 10px 22px;
+    border-radius: 999px;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 14px;
+    transition: transform .15s, background .15s;
+}
+.welow-conc-banner__overlay-boton:hover {
+    background: #2563eb; color: #fff; transform: translateY(-1px);
+}
+
+/* Posicionamiento overlay (compartidas con marca-banner si ya existen) */
+.welow-pos-top-left      { align-items: flex-start;  justify-content: flex-start; }
+.welow-pos-top-center    { align-items: flex-start;  justify-content: center; }
+.welow-pos-top-right     { align-items: flex-start;  justify-content: flex-end; }
+.welow-pos-middle-left   { align-items: center;      justify-content: flex-start; }
+.welow-pos-middle-center { align-items: center;      justify-content: center; text-align: center; }
+.welow-pos-middle-right  { align-items: center;      justify-content: flex-end; }
+.welow-pos-bottom-left   { align-items: flex-end;    justify-content: flex-start; }
+.welow-pos-bottom-center { align-items: flex-end;    justify-content: center; text-align: center; }
+.welow-pos-bottom-right  { align-items: flex-end;    justify-content: flex-end; }
+
+/* ============== Título ============== */
+.welow-conc-ficha__titulo-wrap { margin: 0 0 28px; }
+.welow-conc-ficha__titulo {
+    font-size: clamp(26px, 4vw, 44px);
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 6px;
+    line-height: 1.1;
+}
+.welow-conc-ficha__ubicacion {
+    color: #64748b;
+    font-size: 16px;
+    margin: 0;
+}
+
+/* ============== Cuerpo ============== */
+.welow-conc-ficha__cuerpo {
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+}
+.welow-conc-section-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 18px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+/* ============== Info contacto ============== */
+.welow-conc-info__lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px 28px;
+    font-size: 15px;
+    color: #334155;
+}
+.welow-conc-info__lista li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
+}
+.welow-conc-info__icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    width: 24px;
+    text-align: center;
+}
+.welow-conc-info a { color: #2563eb; text-decoration: none; }
+.welow-conc-info a:hover { text-decoration: underline; }
+.welow-conc-info__horario { white-space: pre-line; }
+
+/* ============== Marcas ============== */
+.welow-conc-marcas__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+}
+.welow-conc-marca-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 18px 14px;
+    min-height: 90px;
+    transition: transform .15s, box-shadow .15s, border-color .15s;
+    text-decoration: none;
+}
+.welow-conc-marca-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    border-color: #2563eb;
+}
+.welow-conc-marca-item img {
+    max-width: 100%;
+    max-height: 60px;
+    object-fit: contain;
+}
+.welow-conc-marca-item__nombre {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 14px;
+}
+
+/* ============== Galería ============== */
+.welow-conc-galeria__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+@media (max-width: 760px) {
+    .welow-conc-galeria__grid { grid-template-columns: repeat(2, 1fr); }
+}
+.welow-conc-galeria__item {
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    border-radius: 8px;
+    cursor: zoom-in;
+    background: #f1f5f9;
+    border: none;
+    padding: 0;
+    transition: transform .2s;
+}
+.welow-conc-galeria__item:hover { transform: scale(1.02); }
+.welow-conc-galeria__item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Lightbox */
+.welow-conc-lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s;
+}
+.welow-conc-lightbox.is-open { opacity: 1; pointer-events: auto; }
+.welow-conc-lightbox__img {
+    max-width: 92vw;
+    max-height: 90vh;
+    object-fit: contain;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+}
+.welow-conc-lightbox__btn {
+    position: absolute;
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    font-size: 28px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+}
+.welow-conc-lightbox__btn:hover { background: rgba(255,255,255,0.25); }
+.welow-conc-lightbox__btn--close { top: 20px; right: 20px; }
+.welow-conc-lightbox__btn--prev  { left: 20px; top: 50%; transform: translateY(-50%); }
+.welow-conc-lightbox__btn--next  { right: 20px; top: 50%; transform: translateY(-50%); }
+.welow-conc-lightbox__counter {
+    position: absolute;
+    bottom: 20px; left: 50%; transform: translateX(-50%);
+    color: #fff; font-size: 13px;
+    background: rgba(0,0,0,0.5);
+    padding: 4px 12px; border-radius: 999px;
+}
+
+/* ============== Mapa ============== */
+.welow-conc-mapa__embed { display: block; }
+.welow-conc-mapa__link {
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+}
+.welow-conc-mapa__link:hover { text-decoration: underline; }
+
+/* ============== Sección Divi ============== */
+.welow-conc-divi { margin-top: 12px; }
