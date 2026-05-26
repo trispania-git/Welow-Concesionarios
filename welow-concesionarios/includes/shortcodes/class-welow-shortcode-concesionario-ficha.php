@@ -36,12 +36,12 @@ class Welow_Shortcode_Concesionario_Ficha {
         // Resolver concesionario
         $conc_id = self::resolver_id( $atts['id'] );
         if ( ! $conc_id ) {
-            return '<!-- [welow_concesionario_ficha]: no se detectó concesionario -->';
+            return self::msg_admin( 'No se pudo detectar el concesionario.<br>Estás usando <code>id="' . esc_html( $atts['id'] ) . '"</code>. Si la página NO es un single de concesionario ni un Theme Builder para <code>welow_concesionario</code>, pasa el slug o ID explícito:<br><code>[welow_concesionario_ficha id="chinares-jaecoo"]</code>' );
         }
 
         $post = get_post( $conc_id );
         if ( ! $post || 'welow_concesionario' !== $post->post_type ) {
-            return '<!-- [welow_concesionario_ficha]: ID inválido -->';
+            return self::msg_admin( 'El ID/slug "' . esc_html( $atts['id'] ) . '" no corresponde a un concesionario válido.' );
         }
 
         $bloques = array_map( 'trim', explode( ',', $atts['mostrar'] ) );
@@ -283,10 +283,16 @@ class Welow_Shortcode_Concesionario_Ficha {
 
     private static function resolver_id( $id ) {
         if ( 'auto' === $id || '' === $id ) {
+            // 1) Single de concesionario directo
             if ( is_singular( 'welow_concesionario' ) ) {
                 return get_queried_object_id();
             }
-            // Theme Builder context
+            // 2) Theme Builder / context: el queried object podría ser el concesionario
+            $qobj = get_queried_object();
+            if ( $qobj instanceof WP_Post && 'welow_concesionario' === $qobj->post_type ) {
+                return $qobj->ID;
+            }
+            // 3) Global $post
             global $post;
             if ( $post instanceof WP_Post && 'welow_concesionario' === $post->post_type ) {
                 return $post->ID;
@@ -297,5 +303,18 @@ class Welow_Shortcode_Concesionario_Ficha {
         // Slug
         $p = get_page_by_path( sanitize_title( $id ), OBJECT, 'welow_concesionario' );
         return $p ? $p->ID : 0;
+    }
+
+    /**
+     * Mensaje de error/diagnóstico visible SOLO a administradores logueados.
+     * Para todos los demás visitantes devuelve un comentario HTML invisible.
+     */
+    private static function msg_admin( $html ) {
+        if ( current_user_can( 'manage_options' ) ) {
+            return '<div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:12px 16px;margin:12px 0;border-radius:4px;font-family:system-ui;font-size:13px;color:#78350f;">'
+                . '<strong>[welow_concesionario_ficha]</strong> (visible solo a admins):<br>' . $html
+                . '</div>';
+        }
+        return '<!-- [welow_concesionario_ficha]: ' . wp_strip_all_tags( $html ) . ' -->';
     }
 }
