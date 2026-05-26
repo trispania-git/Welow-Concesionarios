@@ -364,10 +364,12 @@
 .welow-conc-card__localidad a:hover { color: #2563eb; }
 
 .welow-conc-card__direccion {
-    font-size: 13px;
-    color: #64748b;
+    /* v2.28.1 — Más grande y legible (antes 13px) */
+    font-size: 16px;
+    color: #475569;
     margin: 0 0 6px;
-    line-height: 1.4;
+    line-height: 1.45;
+    font-weight: 500;
 }
 
 .welow-conc-card__marcas {
@@ -380,8 +382,9 @@
     border-top: 1px solid #f1f5f9;
 }
 .welow-conc-card__marca-logo {
-    max-width: 60px;
-    max-height: 30px;
+    /* v2.28.1 — Triplicado el tamaño (antes 60×30) */
+    max-width: 180px;
+    max-height: 90px;
     width: auto;
     height: auto;
     object-fit: contain;

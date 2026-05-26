@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.28.0
+ * Version:     2.28.1
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,10 @@
  *
  * CHANGELOG
  * ---------
+ * 2.28.1 — Ajustes visuales card de concesionario
+ *   - Logos de marca: 60×30 → 180×90 (x3)
+ *   - Dirección: 13px → 16px, color más fuerte, weight 500
+ *
  * 2.28.0 — Nuevo shortcode [welow_concesionarios] (grid de fichas)
  *
  *   Listado tipo grid de los concesionarios publicados, una card por cada uno:
@@ -1259,7 +1263,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.28.0' );
+define( 'WELOW_CONC_VERSION', '2.28.1' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
