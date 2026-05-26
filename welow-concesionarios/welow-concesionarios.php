@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.23.0
+ * Version:     2.24.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,25 @@
  *
  * CHANGELOG
  * ---------
+ * 2.24.0 — Card de modelo: mini-slider de galería (hasta 5 imágenes)
+ *
+ *   - Si el modelo tiene 2+ imágenes (destacada + img_2..img_5), la card
+ *     muestra un mini-slider en el área de imagen.
+ *   - Scroll-snap nativo (CSS) para swipe móvil natural y rendimiento.
+ *   - Flechas prev/next visibles al hover (ocultas en táctil).
+ *   - Puntitos sincronizados con el scroll, clic para saltar a imagen.
+ *   - Si solo hay 1 imagen, se muestra como antes (sin slider).
+ *   - Lazy load de todas excepto la primera.
+ *
+ *   ARCHIVOS NUEVOS:
+ *   - assets/js/modelos-slider.js (~70 líneas, vanilla JS)
+ *
+ *   ARCHIVOS MODIFICADOS:
+ *   - templates/modelos-grid.php
+ *   - assets/css/secciones.css
+ *   - includes/class-welow-main.php (register script)
+ *   - includes/shortcodes/class-welow-shortcode-modelos.php (enqueue script)
+ *
  * 2.23.0 — Card de modelo: disclaimer junto al precio + botón "¡Me interesa!" centrado
  *
  *   1) ICONO DISCLAIMER: estaba con margin-left:auto, lo que lo empujaba al
@@ -1070,7 +1089,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.23.0' );
+define( 'WELOW_CONC_VERSION', '2.24.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

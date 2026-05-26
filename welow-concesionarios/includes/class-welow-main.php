@@ -149,6 +149,14 @@ class Welow_Main {
             WELOW_CONC_VERSION,
             true
         );
+        // v2.24.0 — Mini-slider de galería de modelos
+        wp_register_script(
+            'welow-modelos-slider',
+            WELOW_CONC_URL . 'assets/js/modelos-slider.js',
+            array(),
+            WELOW_CONC_VERSION,
+            true
+        );
         wp_register_script(
             'welow-coche-galeria',
             WELOW_CONC_URL . 'assets/js/coche-galeria.js',

@@ -45,6 +45,7 @@ class Welow_Shortcode_Modelos {
         }
 
         wp_enqueue_style( 'welow-secciones' );
+        wp_enqueue_script( 'welow-modelos-slider' ); // v2.24.0 — mini slider de galería
 
         ob_start();
         Welow_Helpers::get_template( 'modelos-grid.php', array(

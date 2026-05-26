@@ -68,12 +68,48 @@ $icono_disclaimer_url = $icono_disclaimer_id ? wp_get_attachment_image_url( $ico
     ?>
         <article class="welow-modelo-card<?php echo $rotulo ? ' welow-modelo-card--con-rotulo' : ''; ?>">
 
-            <?php // v2.22.0 — Imagen sin enlace ?>
-            <div class="welow-modelo-card__imagen">
-                <?php if ( $img_url ) : ?>
-                    <img src="<?php echo esc_url( $img_url ); ?>"
-                         alt="<?php echo esc_attr( $nombre ); ?>"
-                         loading="lazy" />
+            <?php
+            // v2.24.0 — Galería de hasta 5 imágenes (destacada + img_2..img_5) como slider scroll-snap
+            $galeria_urls = array();
+            if ( $img_url ) $galeria_urls[] = $img_url;
+            for ( $n = 2; $n <= 5; $n++ ) {
+                $img_id_n = get_post_meta( $modelo->ID, '_welow_modelo_img_' . $n, true );
+                if ( $img_id_n ) {
+                    $u = wp_get_attachment_image_url( $img_id_n, 'large' );
+                    if ( $u ) $galeria_urls[] = $u;
+                }
+            }
+            $hay_galeria = count( $galeria_urls ) > 1;
+            ?>
+            <div class="welow-modelo-card__imagen<?php echo $hay_galeria ? ' welow-modelo-card__imagen--slider' : ''; ?>">
+                <?php if ( ! empty( $galeria_urls ) ) : ?>
+                    <?php if ( $hay_galeria ) : ?>
+                        <div class="welow-modelo-slider" data-welow-slider>
+                            <div class="welow-modelo-slider__track">
+                                <?php foreach ( $galeria_urls as $idx => $u ) : ?>
+                                    <div class="welow-modelo-slider__slide">
+                                        <img src="<?php echo esc_url( $u ); ?>"
+                                             alt="<?php echo esc_attr( $nombre . ' — imagen ' . ( $idx + 1 ) ); ?>"
+                                             loading="<?php echo $idx === 0 ? 'eager' : 'lazy'; ?>" />
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                            <button type="button" class="welow-modelo-slider__nav welow-modelo-slider__nav--prev" aria-label="Anterior">‹</button>
+                            <button type="button" class="welow-modelo-slider__nav welow-modelo-slider__nav--next" aria-label="Siguiente">›</button>
+                            <div class="welow-modelo-slider__dots" role="tablist">
+                                <?php foreach ( $galeria_urls as $idx => $u ) : ?>
+                                    <button type="button"
+                                            class="welow-modelo-slider__dot<?php echo $idx === 0 ? ' is-active' : ''; ?>"
+                                            data-index="<?php echo intval( $idx ); ?>"
+                                            aria-label="Imagen <?php echo intval( $idx + 1 ); ?>"></button>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    <?php else : ?>
+                        <img src="<?php echo esc_url( $galeria_urls[0] ); ?>"
+                             alt="<?php echo esc_attr( $nombre ); ?>"
+                             loading="lazy" />
+                    <?php endif; ?>
                 <?php else : ?>
                     <div class="welow-modelo-card__placeholder">
                         <span class="dashicons dashicons-car"></span>
