@@ -211,8 +211,8 @@ class Welow_Main {
 
         if ( $necesita_media ) {
             wp_enqueue_media();
-            // jQuery UI sortable para galería del coche
-            if ( in_array( $screen->post_type, array( 'welow_coche_nuevo', 'welow_coche_ocasion' ), true ) ) {
+            // jQuery UI sortable para galería del coche y del concesionario (v2.26.0)
+            if ( in_array( $screen->post_type, array( 'welow_coche_nuevo', 'welow_coche_ocasion', 'welow_concesionario' ), true ) ) {
                 wp_enqueue_script( 'jquery-ui-sortable' );
             }
             // v2.10.0 — Color picker nativo de WP en pantalla de modelo

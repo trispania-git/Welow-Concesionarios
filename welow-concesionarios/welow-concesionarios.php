@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.25.1
+ * Version:     2.26.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,32 @@
  *
  * CHANGELOG
  * ---------
+ * 2.26.0 — Concesionarios: banner portada + galería (6 fotos) + sección Divi
+ *
+ *   FICHA DE CONCESIONARIO (admin), 3 metaboxes nuevos:
+ *
+ *   1) BANNER DE PORTADA con texto superpuesto opcional
+ *      - Imagen desktop + imagen móvil
+ *      - Overlay opcional: título, subtítulo, botón (texto + URL), posición
+ *        (9 anclas, igual que en marcas).
+ *      - Meta keys: _welow_conc_banner_desktop, _banner_movil,
+ *        _banner_overlay_titulo / _subtitulo / _btn_texto / _btn_url / _posicion
+ *
+ *   2) GALERÍA DE FOTOS (hasta 6)
+ *      - Selector WP Media + drag-reorder (sortable)
+ *      - Meta key: _welow_conc_galeria (array de IDs)
+ *
+ *   3) SECCIÓN DE BIBLIOTECA DIVI
+ *      - Selector dropdown con los layouts de et_pb_layout
+ *      - Meta key: _welow_conc_divi_layout_id (post ID o 0)
+ *
+ *   PRÓXIMO PASO: crear el shortcode [welow_concesionario_ficha] que
+ *   compondrá banner + galería + datos de contacto + sección Divi para
+ *   las páginas frontend de cada concesionario.
+ *
+ *   Assets admin: añadido welow_concesionario a la lista de CPTs que
+ *   cargan jquery-ui-sortable (necesario para reordenar la galería).
+ *
  * 2.25.1 — Ayuda: añadido /concesionarios al listado de endpoints REST API
  *
  * 2.25.0 — REST API: concesionario en cascada + endpoint /concesionarios + timestamps
@@ -1119,7 +1145,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.25.1' );
+define( 'WELOW_CONC_VERSION', '2.26.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
