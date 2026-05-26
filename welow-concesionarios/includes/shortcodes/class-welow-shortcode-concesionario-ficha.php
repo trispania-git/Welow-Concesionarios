@@ -57,15 +57,10 @@ class Welow_Shortcode_Concesionario_Ficha {
                 self::render_banner( $conc_id, $post );
             endif; ?>
 
-            <header class="welow-conc-ficha__titulo-wrap">
-                <h1 class="welow-conc-ficha__titulo"><?php echo esc_html( $post->post_title ); ?></h1>
-                <?php
-                $ciudad = get_post_meta( $conc_id, '_welow_conc_ciudad', true );
-                $prov   = get_post_meta( $conc_id, '_welow_conc_provincia', true );
-                if ( $ciudad ) :
-                    echo '<p class="welow-conc-ficha__ubicacion">📍 ' . esc_html( trim( $ciudad . ( $prov ? ' · ' . $prov : '' ) ) ) . '</p>';
-                endif; ?>
-            </header>
+            <?php // v2.27.5 — Título + ubicación quitados (ya se renderizan en
+                  // el Theme Builder de Divi mediante el módulo Title/Heading
+                  // del propio template). Si se quisieran recuperar, se puede
+                  // añadir un bloque opcional "titulo" al atributo mostrar. ?>
 
             <div class="welow-conc-ficha__cuerpo">
 

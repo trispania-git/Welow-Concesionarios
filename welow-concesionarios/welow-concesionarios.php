@@ -14,10 +14,10 @@
  *
  * CHANGELOG
  * ---------
- * 2.27.5 — Fix: título del concesionario pegado a la izquierda
- *   Una regla "margin: 0 0 28px" sobre .welow-conc-ficha__titulo-wrap
- *   reseteaba los margin-left:auto / margin-right:auto del selector
- *   compartido. Cambiado a margin-top/bottom explícitos.
+ * 2.27.5 — Quitado el título y ubicación del shortcode (redundante)
+ *   El bloque <h1>Nombre concesionario</h1> + 📍 ciudad provincia ya se
+ *   pinta desde el módulo Title/Heading del Theme Builder de Divi.
+ *   El shortcode ya no los duplica.
  *
  * 2.27.4 — HOTFIX layout caótico de v2.27.3
  *
