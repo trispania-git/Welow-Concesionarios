@@ -138,7 +138,8 @@
 }
 .welow-conc-info a { color: #2563eb; text-decoration: none; }
 .welow-conc-info a:hover { text-decoration: underline; }
-.welow-conc-info__horario { white-space: pre-line; }
+/* v2.27.6 — nl2br ya inserta <br>, no usar white-space:pre-line que doblaba los saltos */
+.welow-conc-info__horario { line-height: 1.5; }
 
 /* ============== Marcas ============== */
 .welow-conc-marcas__grid {
@@ -246,7 +247,25 @@
 }
 
 /* ============== Mapa ============== */
-.welow-conc-mapa__embed { display: block; }
+/* v2.27.6 — Bloque mapa fuera del wrapper central, ocupa ancho completo */
+.welow-conc-mapa {
+    width: 100%;
+    margin: 32px 0;
+}
+.welow-conc-mapa .welow-conc-section-title,
+.welow-conc-mapa > p {
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.welow-conc-mapa__embed {
+    display: block;
+    width: 100%;
+    height: 450px;
+    border: 0;
+}
 .welow-conc-mapa__link {
     color: #2563eb;
     font-weight: 600;

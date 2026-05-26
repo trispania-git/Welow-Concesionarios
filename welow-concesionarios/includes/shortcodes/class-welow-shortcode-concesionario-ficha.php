@@ -62,6 +62,7 @@ class Welow_Shortcode_Concesionario_Ficha {
                   // del propio template). Si se quisieran recuperar, se puede
                   // añadir un bloque opcional "titulo" al atributo mostrar. ?>
 
+            <?php // v2.27.6 — Cuerpo central (constrained 1280px): info + marcas + galería ?>
             <div class="welow-conc-ficha__cuerpo">
 
                 <?php if ( in_array( 'info', $bloques, true ) ) :
@@ -76,15 +77,16 @@ class Welow_Shortcode_Concesionario_Ficha {
                     self::render_galeria( $conc_id );
                 endif; ?>
 
-                <?php if ( in_array( 'mapa', $bloques, true ) ) :
-                    self::render_mapa( $conc_id );
-                endif; ?>
-
-                <?php if ( in_array( 'divi', $bloques, true ) ) :
-                    self::render_divi( $conc_id );
-                endif; ?>
-
             </div>
+
+            <?php // v2.27.6 — Mapa y sección Divi FUERA del cuerpo central → ancho completo ?>
+            <?php if ( in_array( 'mapa', $bloques, true ) ) :
+                self::render_mapa( $conc_id );
+            endif; ?>
+
+            <?php if ( in_array( 'divi', $bloques, true ) ) :
+                self::render_divi( $conc_id );
+            endif; ?>
 
         </article>
         <?php
@@ -252,7 +254,6 @@ class Welow_Shortcode_Concesionario_Ficha {
             <h2 class="welow-conc-section-title">Cómo llegar</h2>
             <iframe class="welow-conc-mapa__embed"
                     src="https://www.google.com/maps?q=<?php echo esc_attr( $q ); ?>&z=15&output=embed"
-                    width="100%" height="380" style="border:0;border-radius:8px;"
                     loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
             <p style="margin-top:8px;">
                 <a class="welow-conc-mapa__link" href="https://www.google.com/maps/dir/?api=1&destination=<?php echo esc_attr( $q ); ?>" target="_blank" rel="noopener">

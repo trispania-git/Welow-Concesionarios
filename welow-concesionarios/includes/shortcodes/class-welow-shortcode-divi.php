@@ -65,8 +65,18 @@ class Welow_Shortcode_Divi {
             return '<!-- [welow_divi]: layout vacío -->';
         }
 
+        // v2.27.6 — Procesar bloques de Divi 5 (Visual Builder) ANTES de shortcodes.
+        // Si el layout fue creado con Divi 5 (block-based, contiene "<!-- wp:..." )
+        // do_shortcode por sí solo devuelve vacío porque los bloques se ignoran.
+        // do_blocks expande los bloques a su HTML renderizado.
+        if ( function_exists( 'has_blocks' ) && has_blocks( $contenido ) ) {
+            $contenido_procesado = do_blocks( $contenido );
+        } else {
+            $contenido_procesado = $contenido;
+        }
+
         // Procesar shortcodes (incluidos los anidados de Divi)
-        $contenido_procesado = do_shortcode( $contenido );
+        $contenido_procesado = do_shortcode( $contenido_procesado );
 
         // Aplicar autop si Divi no lo hizo
         if ( false === strpos( $contenido_procesado, 'et_pb_' ) && false === strpos( $contenido_procesado, '<p>' ) ) {

@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.27.5
+ * Version:     2.27.6
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,19 @@
  *
  * CHANGELOG
  * ---------
+ * 2.27.6 — Concesionario ficha: 3 fixes
+ *   1) HORARIO: quitado white-space:pre-line porque doblaba los saltos
+ *      junto a nl2br. Ahora se ven con la separación natural.
+ *   2) MAPA FULL-WIDTH: sacado del wrapper central (que tiene max-width
+ *      1280px) hacia el contenedor exterior. El título y el enlace de
+ *      "Abrir en Maps" siguen centrados con max-width, pero el iframe
+ *      ocupa el ancho completo disponible (450px de alto).
+ *   3) SECCIÓN DIVI 5 RENDERIZA: el shortcode [welow_divi] ahora detecta
+ *      si el layout está en formato BLOQUES (Divi 5 Visual Builder) y
+ *      ejecuta do_blocks() antes de do_shortcode(). Sin esto, layouts
+ *      block-based devolvían cadena vacía porque do_shortcode ignora
+ *      los marcadores "<!-- wp:divi/section -->".
+ *
  * 2.27.5 — Quitado el título y ubicación del shortcode (redundante)
  *   El bloque <h1>Nombre concesionario</h1> + 📍 ciudad provincia ya se
  *   pinta desde el módulo Title/Heading del Theme Builder de Divi.
@@ -1224,7 +1237,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.27.5' );
+define( 'WELOW_CONC_VERSION', '2.27.6' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
