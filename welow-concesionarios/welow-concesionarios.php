@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.27.3
+ * Version:     2.27.4
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,26 @@
  *
  * CHANGELOG
  * ---------
+ * 2.27.4 — HOTFIX layout caótico de v2.27.3
+ *
+ *   PROBLEMA detectado: apply_filters('the_content') disparaba la cadena
+ *   completa de filtros, lo que en algunos entornos inyectaba footer/sidebar
+ *   en medio del shortcode. Y el truco "width:100vw + margin:calc(50%-50vw)"
+ *   provocaba que la galería se viese cortada por el menú y el orden
+ *   visual quedaba roto.
+ *
+ *   SOLUCIÓN:
+ *   - render_divi vuelve a usar el shortcode [welow_divi id="X"] ya existente,
+ *     que sí funciona sin disparar filtros recursivos.
+ *   - El wrapper .welow-conc-ficha ya no tiene max-width: deja que el banner
+ *     y la sección Divi ocupen el ancho natural del contenedor Divi padre.
+ *   - El max-width:1280px se aplica solo al título + cuerpo central de bloques
+ *     informativos (info, marcas, galeria, mapa), manteniendo legibilidad
+ *     sin romper el layout.
+ *
+ *   Si quieres que las secciones Divi vayan a ancho completo, configura los
+ *   módulos Divi como Fullwidth Section dentro de su propio Library item.
+ *
  * 2.27.3 — Concesionario ficha: banner + Divi a full-width, render Divi mejorado
  *   - Banner ahora rompe el max-width del wrapper y se muestra a 100vw
  *     (mismo truco CSS para la sección Divi, que suele necesitar el ancho
@@ -1199,7 +1219,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.27.3' );
+define( 'WELOW_CONC_VERSION', '2.27.4' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

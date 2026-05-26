@@ -3,19 +3,27 @@
  * @since 2.27.0
  */
 
-.welow-conc-ficha { max-width: 1280px; margin: 0 auto; }
+/* v2.27.4 — Wrapper sin max-width: que el banner y la sección Divi ocupen
+   el ancho natural que les dé el contenedor padre (Divi). El max-width se
+   aplica solo al cuerpo central para mantener legibilidad de texto. */
+.welow-conc-ficha { width: 100%; }
+
+/* Cuerpo central con ancho legible */
+.welow-conc-ficha__titulo-wrap,
+.welow-conc-ficha__cuerpo {
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 20px;
+    padding-right: 20px;
+    box-sizing: border-box;
+}
 
 /* ============== Banner ============== */
-/* v2.27.3 — Banner full-width: rompe el max-width del wrapper .welow-conc-ficha */
 .welow-conc-banner {
-    width: 100vw;
-    max-width: 100vw;
-    margin-left: calc(50% - 50vw);
-    margin-right: calc(50% - 50vw);
-    margin-top: 0;
-    margin-bottom: 28px;
+    width: 100%;
     overflow: hidden;
-    border-radius: 0;
+    margin: 0 0 28px;
     background: #f1f5f9;
 }
 .welow-conc-banner--with-overlay { position: relative; }
@@ -245,12 +253,10 @@
 .welow-conc-mapa__link:hover { text-decoration: underline; }
 
 /* ============== Sección Divi ============== */
-/* v2.27.3 — Sección Divi también full-width (los layouts Divi suelen necesitar
-   el ancho completo para sus secciones con fondo de color/imagen). */
+/* v2.27.4 — Sección Divi al ancho natural del contenedor. Si quieres
+   que los módulos Divi vayan a ancho completo, configúralos como Fullwidth
+   dentro del propio Divi Library item. */
 .welow-conc-divi {
-    width: 100vw;
-    max-width: 100vw;
-    margin-left: calc(50% - 50vw);
-    margin-right: calc(50% - 50vw);
-    margin-top: 12px;
+    width: 100%;
+    margin-top: 24px;
 }
