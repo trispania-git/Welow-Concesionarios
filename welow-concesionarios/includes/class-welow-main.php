@@ -71,7 +71,145 @@ class Welow_Main {
 
         // Enqueue assets
         add_action( 'wp_enqueue_scripts', array( $this, 'registrar_assets' ) );
+        // v2.29.0 — Estilos globales (overrides de color/tipografía) en <head>
+        add_action( 'wp_head', array( __CLASS__, 'inyectar_estilos_globales' ), 99 );
         add_action( 'admin_enqueue_scripts', array( $this, 'registrar_admin_assets' ) );
+    }
+
+    /**
+     * v2.29.0 — Inyecta los estilos globales del plugin (overrides de color +
+     * tipografía configurables desde Configuraciones → "Estilos generales").
+     * Solo escribe lo que tenga valor en Configuraciones; sin configurar = nada.
+     */
+    public static function inyectar_estilos_globales() {
+        if ( ! class_exists( 'Welow_Settings' ) ) return;
+        $options = get_option( 'welow_concesionarios_settings', array() );
+        $e = isset( $options['estilos'] ) && is_array( $options['estilos'] ) ? $options['estilos'] : array();
+
+        $color_principal       = $e['color_principal']       ?? '';
+        $color_principal_hover = $e['color_principal_hover'] ?? '';
+        $color_titulos         = $e['color_titulos']         ?? '';
+        $color_boton_texto     = $e['color_boton_texto']     ?? '';
+        $color_rotulo          = $e['color_rotulo']          ?? '';
+        $font_family           = $e['font_family']           ?? '';
+        $font_google           = ! empty( $e['font_google'] );
+
+        if ( ! $color_principal && ! $color_principal_hover && ! $color_titulos
+            && ! $color_boton_texto && ! $color_rotulo && ! $font_family ) {
+            return; // Nada que inyectar.
+        }
+
+        // Cargar Google Font si procede
+        if ( $font_family && $font_google ) {
+            $family = str_replace( ' ', '+', $font_family );
+            echo '<link rel="preconnect" href="https://fonts.googleapis.com">' . "\n";
+            echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
+            echo '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=' . esc_attr( $family ) . ':wght@400;500;600;700;800&display=swap">' . "\n";
+        }
+
+        // Rótulo usa color_principal si no se define explícitamente
+        $rotulo_efectivo = $color_rotulo ?: $color_principal;
+
+        $css = '';
+
+        // Color principal → botones, CTAs, hover
+        if ( $color_principal ) {
+            $css .= "
+            .welow-modelo-card__interesa,
+            .welow-modelo-card__cta,
+            .welow-conc-card__btn,
+            .welow-conc-card__btn:hover,
+            .welow-conc-marca-item:hover,
+            .welow-conc-banner__overlay-boton:hover,
+            .welow-modelo-card__caracteristicas {
+                background-color: $color_principal;
+            }
+            .welow-modelo-card__cta,
+            .welow-conc-info a,
+            .welow-conc-mapa__link,
+            .welow-modelo-card__nombre a:hover,
+            .welow-conc-card__localidad a:hover {
+                color: $color_principal;
+            }
+            .welow-conc-marca-item:hover,
+            .welow-conc-card:hover {
+                border-color: $color_principal;
+            }
+            .welow-modelo-card__cta {
+                background: transparent;
+            }
+            .welow-modelo-card__caracteristicas {
+                background: transparent;
+                border-left-color: $color_principal;
+            }
+            ";
+        }
+
+        if ( $color_principal_hover ) {
+            $css .= "
+            .welow-modelo-card__interesa:hover,
+            .welow-modelo-card__interesa:focus,
+            .welow-conc-card__btn:hover {
+                background-color: $color_principal_hover !important;
+            }
+            ";
+        }
+
+        if ( $color_titulos ) {
+            $css .= "
+            .welow-modelo-card__nombre,
+            .welow-modelo-card__nombre a,
+            .welow-conc-card__localidad,
+            .welow-conc-card__localidad a,
+            .welow-conc-section-title,
+            .welow-coche-resaltado__rotulo {
+                color: $color_titulos;
+            }
+            ";
+        }
+
+        if ( $color_boton_texto ) {
+            $css .= "
+            .welow-modelo-card__interesa,
+            .welow-conc-card__btn,
+            .welow-conc-banner__overlay-boton:hover {
+                color: $color_boton_texto;
+            }
+            ";
+        }
+
+        if ( $rotulo_efectivo ) {
+            $css .= "
+            .welow-modelo-card__rotulo {
+                background-color: $rotulo_efectivo;
+            }
+            ";
+        }
+
+        if ( $font_family ) {
+            // Comillas para nombres con espacios
+            $family_css = strpos( $font_family, ' ' ) !== false && strpos( $font_family, "'" ) === false && strpos( $font_family, '"' ) === false
+                ? '"' . $font_family . '"'
+                : $font_family;
+            $css .= "
+            .welow-modelo-card,
+            .welow-coche-card,
+            .welow-conc-card,
+            .welow-conc-ficha,
+            .welow-coche-ficha,
+            .welow-header,
+            .welow-conc-banner__overlay-inner,
+            .welow-marca-banner__overlay-inner {
+                font-family: $family_css, system-ui, sans-serif;
+            }
+            ";
+        }
+
+        if ( $css ) {
+            // Compactar espacios para html limpio
+            $css = preg_replace( '/\s+/', ' ', trim( $css ) );
+            echo "<style id=\"welow-estilos-globales\">$css</style>\n";
+        }
     }
 
     /**
@@ -235,7 +373,9 @@ class Welow_Main {
                 wp_enqueue_script( 'jquery-ui-sortable' );
             }
             // v2.10.0 — Color picker nativo de WP en pantalla de modelo
-            if ( 'welow_modelo' === $screen->post_type ) {
+            // v2.29.0 — También en la pantalla de Configuraciones (estilos generales)
+            $en_pantalla_settings = ( isset( $_GET['page'] ) && 'welow_settings' === $_GET['page'] );
+            if ( 'welow_modelo' === $screen->post_type || $en_pantalla_settings ) {
                 wp_enqueue_style( 'wp-color-picker' );
                 wp_enqueue_script( 'wp-color-picker' );
                 add_action( 'admin_print_footer_scripts', function() {

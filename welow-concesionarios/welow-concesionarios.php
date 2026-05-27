@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.28.1
+ * Version:     2.29.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,30 @@
  *
  * CHANGELOG
  * ---------
+ * 2.29.0 — Configuraciones: estilos generales del frontend (colores + tipografía)
+ *
+ *   NUEVA SECCIÓN en Concesionarios → Configuraciones:
+ *   "Estilos generales del frontend"
+ *
+ *   Campos:
+ *   - Color principal (botones, CTA, hover de enlaces)
+ *   - Color principal — hover (default #1d4ed8)
+ *   - Color de títulos (h2/h3 de cards)
+ *   - Color del texto sobre los botones (default blanco)
+ *   - Color de los rótulos destacados (si vacío usa color principal)
+ *   - Tipografía + opción "Cargar desde Google Fonts" con weights 400-800
+ *
+ *   FUNCIONAMIENTO:
+ *   Si rellenas cualquier campo, se inyectan reglas CSS en <head> que
+ *   sobrescriben los colores/tipos hardcoded del plugin. Si lo dejas
+ *   vacío, no se inyecta nada (compatibilidad 100% con lo anterior).
+ *
+ *   Aplica a: cards de modelo, cards de concesionario, fichas, banners,
+ *   buttons "¡Me interesa!", "Ver concesionario", overlays, etc.
+ *
+ *   Color picker nativo de WP ahora también en la pantalla de
+ *   Configuraciones (antes solo en la ficha de modelo).
+ *
  * 2.28.1 — Ajustes visuales card de concesionario
  *   - Logos de marca: 60×30 → 180×90 (x3)
  *   - Dirección: 13px → 16px, color más fuerte, weight 500
@@ -1263,7 +1287,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.28.1' );
+define( 'WELOW_CONC_VERSION', '2.29.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

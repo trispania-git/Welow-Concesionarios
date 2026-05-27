@@ -109,6 +109,20 @@ class Welow_Settings {
             $output['iconos'] = Welow_Icons::sanitize( $input['iconos'] );
         }
 
+        // v2.29.0 — Estilos generales del frontend
+        if ( isset( $input['estilos'] ) && is_array( $input['estilos'] ) ) {
+            $e = $input['estilos'];
+            $output['estilos'] = array(
+                'color_principal'    => isset( $e['color_principal'] ) ? sanitize_hex_color( $e['color_principal'] ) : '',
+                'color_principal_hover' => isset( $e['color_principal_hover'] ) ? sanitize_hex_color( $e['color_principal_hover'] ) : '',
+                'color_titulos'      => isset( $e['color_titulos'] ) ? sanitize_hex_color( $e['color_titulos'] ) : '',
+                'color_boton_texto'  => isset( $e['color_boton_texto'] ) ? sanitize_hex_color( $e['color_boton_texto'] ) : '',
+                'color_rotulo'       => isset( $e['color_rotulo'] ) ? sanitize_hex_color( $e['color_rotulo'] ) : '',
+                'font_family'        => isset( $e['font_family'] ) ? sanitize_text_field( $e['font_family'] ) : '',
+                'font_google'        => ! empty( $e['font_google'] ),
+            );
+        }
+
         // v2.6.0 — Cabecera (header)
         if ( isset( $input['header'] ) && is_array( $input['header'] ) ) {
             $h = $input['header'];
@@ -231,6 +245,9 @@ class Welow_Settings {
                     </tr>
                 </table>
 
+                <?php // v2.29.0 — Sección de Estilos generales (frontend) ?>
+                <?php self::render_section_estilos( $options ); ?>
+
                 <?php // v2.6.0 — Sección de Cabecera ?>
                 <?php self::render_section_header( $options ); ?>
 
@@ -305,6 +322,98 @@ class Welow_Settings {
                 });
             });
         </script>
+        <?php
+    }
+
+    /**
+     * v2.29.0 — Sección de estilos generales del frontend.
+     */
+    public static function render_section_estilos( $options ) {
+        $e = isset( $options['estilos'] ) && is_array( $options['estilos'] ) ? $options['estilos'] : array();
+        $color_principal       = $e['color_principal']       ?? '';
+        $color_principal_hover = $e['color_principal_hover'] ?? '';
+        $color_titulos         = $e['color_titulos']         ?? '';
+        $color_boton_texto     = $e['color_boton_texto']     ?? '';
+        $color_rotulo          = $e['color_rotulo']          ?? '';
+        $font_family           = $e['font_family']           ?? '';
+        $font_google           = ! empty( $e['font_google'] );
+
+        $base = self::OPTION_KEY . '[estilos]';
+        ?>
+        <h2 class="title">Estilos generales del frontend</h2>
+        <p>Personaliza colores y tipografía del plugin (cards, botones, rótulos, fichas...).
+            Deja vacío cualquier campo para usar el estilo por defecto.</p>
+
+        <table class="form-table">
+            <tr>
+                <th><label>Color principal (botones, CTA, rótulos)</label></th>
+                <td>
+                    <input type="text" class="welow-color-field" data-default-color="#2563eb"
+                           name="<?php echo esc_attr( $base ); ?>[color_principal]"
+                           value="<?php echo esc_attr( $color_principal ); ?>"
+                           placeholder="#2563eb" />
+                    <p class="description">Color principal de la marca del concesionario. Se aplica a botones "¡Me interesa!", "Ver concesionario", flecha "Ver modelo", hover de enlaces, etc.</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label>Color principal — hover</label></th>
+                <td>
+                    <input type="text" class="welow-color-field" data-default-color="#1d4ed8"
+                           name="<?php echo esc_attr( $base ); ?>[color_principal_hover]"
+                           value="<?php echo esc_attr( $color_principal_hover ); ?>"
+                           placeholder="#1d4ed8" />
+                    <p class="description">Color al pasar el ratón sobre botones del color principal. Si vacío, se usa #1d4ed8.</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label>Color de títulos</label></th>
+                <td>
+                    <input type="text" class="welow-color-field" data-default-color="#0f172a"
+                           name="<?php echo esc_attr( $base ); ?>[color_titulos]"
+                           value="<?php echo esc_attr( $color_titulos ); ?>"
+                           placeholder="#0f172a" />
+                    <p class="description">Color de h2/h3 de las cards (modelos, coches, concesionarios). Por defecto un negro azulado.</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label>Color del texto sobre los botones</label></th>
+                <td>
+                    <input type="text" class="welow-color-field" data-default-color="#ffffff"
+                           name="<?php echo esc_attr( $base ); ?>[color_boton_texto]"
+                           value="<?php echo esc_attr( $color_boton_texto ); ?>"
+                           placeholder="#ffffff" />
+                    <p class="description">Color del texto dentro de los botones principales. Casi siempre blanco.</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label>Color de los rótulos destacados</label></th>
+                <td>
+                    <input type="text" class="welow-color-field" data-default-color="#2563eb"
+                           name="<?php echo esc_attr( $base ); ?>[color_rotulo]"
+                           value="<?php echo esc_attr( $color_rotulo ); ?>"
+                           placeholder="(usa color principal)" />
+                    <p class="description">Color de fondo de las píldoras de rótulo (ej. "OFERTA", "NOVEDAD") en cards de modelo. Si vacío, se usa el color principal.</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="welow_estilos_font_family">Tipografía</label></th>
+                <td>
+                    <input type="text" id="welow_estilos_font_family"
+                           name="<?php echo esc_attr( $base ); ?>[font_family]"
+                           value="<?php echo esc_attr( $font_family ); ?>"
+                           class="regular-text" placeholder="Ej: Figtree, Inter, 'Helvetica Neue'" />
+                    <p>
+                        <label>
+                            <input type="checkbox"
+                                   name="<?php echo esc_attr( $base ); ?>[font_google]"
+                                   value="1" <?php checked( $font_google ); ?> />
+                            Cargar desde Google Fonts (si la fuente está en Google Fonts)
+                        </label>
+                    </p>
+                    <p class="description">Nombre exacto de la familia tipográfica. Ej: "Figtree", "Inter", "Roboto". Si la marcas como Google Font, se cargará automáticamente con weights 400/600/700/800.</p>
+                </td>
+            </tr>
+        </table>
         <?php
     }
 
