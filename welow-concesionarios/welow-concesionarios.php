@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.29.0
+ * Version:     2.29.1
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,12 @@
  *
  * CHANGELOG
  * ---------
+ * 2.29.1 — HOTFIX estilos globales: OPTION_KEY incorrecta + !important
+ *   - El inyector buscaba "welow_concesionarios_settings" pero la opción
+ *     real es "welow_conc_settings". Por eso no se cargaban los valores.
+ *   - Añadido !important a los overrides para ganar al shorthand background:
+ *     de los CSS originales y al CSS de Divi/tema.
+ *
  * 2.29.0 — Configuraciones: estilos generales del frontend (colores + tipografía)
  *
  *   NUEVA SECCIÓN en Concesionarios → Configuraciones:
@@ -1287,7 +1293,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.29.0' );
+define( 'WELOW_CONC_VERSION', '2.29.1' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

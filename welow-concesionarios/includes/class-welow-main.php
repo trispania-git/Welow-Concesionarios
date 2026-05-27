@@ -83,7 +83,8 @@ class Welow_Main {
      */
     public static function inyectar_estilos_globales() {
         if ( ! class_exists( 'Welow_Settings' ) ) return;
-        $options = get_option( 'welow_concesionarios_settings', array() );
+        // v2.29.1 — Fix: usar la OPTION_KEY real (welow_conc_settings)
+        $options = get_option( Welow_Settings::OPTION_KEY, array() );
         $e = isset( $options['estilos'] ) && is_array( $options['estilos'] ) ? $options['estilos'] : array();
 
         $color_principal       = $e['color_principal']       ?? '';
@@ -112,35 +113,30 @@ class Welow_Main {
 
         $css = '';
 
-        // Color principal → botones, CTAs, hover
+        // v2.29.1 — Usar !important para ganar al shorthand "background:" de los
+        // CSS originales y al posible CSS de Divi/tema.
+
+        // Color principal → fondos de botones primarios
         if ( $color_principal ) {
             $css .= "
             .welow-modelo-card__interesa,
-            .welow-modelo-card__cta,
             .welow-conc-card__btn,
-            .welow-conc-card__btn:hover,
-            .welow-conc-marca-item:hover,
-            .welow-conc-banner__overlay-boton:hover,
-            .welow-modelo-card__caracteristicas {
-                background-color: $color_principal;
+            .welow-conc-banner__overlay-boton:hover {
+                background: $color_principal !important;
             }
             .welow-modelo-card__cta,
             .welow-conc-info a,
             .welow-conc-mapa__link,
             .welow-modelo-card__nombre a:hover,
             .welow-conc-card__localidad a:hover {
-                color: $color_principal;
+                color: $color_principal !important;
             }
             .welow-conc-marca-item:hover,
             .welow-conc-card:hover {
-                border-color: $color_principal;
-            }
-            .welow-modelo-card__cta {
-                background: transparent;
+                border-color: $color_principal !important;
             }
             .welow-modelo-card__caracteristicas {
-                background: transparent;
-                border-left-color: $color_principal;
+                border-left-color: $color_principal !important;
             }
             ";
         }
@@ -150,7 +146,7 @@ class Welow_Main {
             .welow-modelo-card__interesa:hover,
             .welow-modelo-card__interesa:focus,
             .welow-conc-card__btn:hover {
-                background-color: $color_principal_hover !important;
+                background: $color_principal_hover !important;
             }
             ";
         }
@@ -163,7 +159,7 @@ class Welow_Main {
             .welow-conc-card__localidad a,
             .welow-conc-section-title,
             .welow-coche-resaltado__rotulo {
-                color: $color_titulos;
+                color: $color_titulos !important;
             }
             ";
         }
@@ -173,7 +169,7 @@ class Welow_Main {
             .welow-modelo-card__interesa,
             .welow-conc-card__btn,
             .welow-conc-banner__overlay-boton:hover {
-                color: $color_boton_texto;
+                color: $color_boton_texto !important;
             }
             ";
         }
@@ -181,7 +177,7 @@ class Welow_Main {
         if ( $rotulo_efectivo ) {
             $css .= "
             .welow-modelo-card__rotulo {
-                background-color: $rotulo_efectivo;
+                background: $rotulo_efectivo !important;
             }
             ";
         }
