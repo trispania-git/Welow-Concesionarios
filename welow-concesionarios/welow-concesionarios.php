@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.32.0
+ * Version:     2.33.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,24 @@
  *
  * CHANGELOG
  * ---------
+ * 2.33.0 — Me Interesa: campo URL del modelo eliminado + redirect a /contacto/
+ *
+ *   1) Quitado el campo "URL del botón ¡Me interesa!" del editor de modelo.
+ *      Ahora todos los modelos usan SIEMPRE la página global configurada en
+ *      Configuraciones → Formularios → "Página del botón Me Interesa".
+ *      Más simple y menos margen de error. (El meta antiguo se mantiene en BD,
+ *      pero ya no se lee ni se guarda. No se borra por seguridad.)
+ *
+ *   2) Si un visitante (NO admin) llega a la página "Me Interesa" SIN el
+ *      query param ?modelo=slug, ahora se redirige automáticamente a
+ *      /contacto/ con 302. Los admins siguen viendo el aviso amarillo para
+ *      poder testear con ?modelo= manualmente.
+ *
+ *   Filtro disponible para cambiar la URL fallback:
+ *      add_filter( 'welow_me_interesa_fallback_url', function() {
+ *          return home_url( '/otra-pagina/' );
+ *      } );
+ *
  * 2.32.0 — Página "¡Me interesa!" para cards de modelo
  *
  *   NUEVO SHORTCODE [welow_me_interesa]:
@@ -1418,7 +1436,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.32.0' );
+define( 'WELOW_CONC_VERSION', '2.33.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

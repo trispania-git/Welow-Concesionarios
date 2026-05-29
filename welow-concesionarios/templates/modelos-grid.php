@@ -42,11 +42,11 @@ $icono_disclaimer_url = $icono_disclaimer_id ? wp_get_attachment_image_url( $ico
         // (antes caía a get_permalink() y abría una ficha vacía del CPT).
         $enlace       = Welow_Helpers::get_modelo_meta( $modelo->ID, 'enlace' );
         $texto_enlace = Welow_Helpers::get_modelo_meta( $modelo->ID, 'texto_enlace', $texto_boton );
-        // v2.22.0 — Botón "¡Me interesa!" — URL opcional, configurable por modelo
-        // v2.32.0 — Si la URL propia del modelo está vacía, intentar la página
-        // configurada en Configuraciones → "Página del botón Me Interesa" + ?modelo=slug
-        $interesa_url = Welow_Helpers::get_modelo_meta( $modelo->ID, 'interesa_url' );
-        if ( ! $interesa_url && class_exists( 'Welow_Settings' ) ) {
+        // v2.33.0 — Botón "¡Me interesa!" — siempre usa la página configurada en
+        // Configuraciones → Formularios → "Página del botón Me Interesa"
+        // con ?modelo=slug. Si no hay página configurada, no se muestra el botón.
+        $interesa_url = '';
+        if ( class_exists( 'Welow_Settings' ) ) {
             $_opt = get_option( Welow_Settings::OPTION_KEY, array() );
             $_page_id = intval( $_opt['formularios']['me_interesa_page'] ?? 0 );
             if ( $_page_id ) {

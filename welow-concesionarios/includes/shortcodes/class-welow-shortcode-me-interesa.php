@@ -24,6 +24,31 @@ class Welow_Shortcode_Me_Interesa {
 
     public static function init() {
         add_shortcode( 'welow_me_interesa', array( __CLASS__, 'render' ) );
+        // v2.33.0 — Redirección a /contacto/ si visitan la página sin ?modelo=
+        add_action( 'template_redirect', array( __CLASS__, 'redirigir_si_sin_modelo' ) );
+    }
+
+    /**
+     * v2.33.0 — Si la página actual es la "página de Me Interesa" configurada
+     * en Configuraciones y NO viene con ?modelo=slug, redirige a /contacto/
+     * (excepto a admins logueados, para que puedan testear con ?modelo=).
+     */
+    public static function redirigir_si_sin_modelo() {
+        if ( is_admin() ) return;
+        if ( current_user_can( 'manage_options' ) ) return; // admins ven el aviso, no redirigen
+        if ( ! class_exists( 'Welow_Settings' ) ) return;
+
+        $options = get_option( Welow_Settings::OPTION_KEY, array() );
+        $page_id = intval( $options['formularios']['me_interesa_page'] ?? 0 );
+        if ( ! $page_id ) return;
+        if ( ! is_page( $page_id ) ) return;
+
+        if ( ! empty( $_GET['modelo'] ) ) return; // sí tiene modelo, no redirigir
+
+        // Permitir cambiar la URL de fallback vía filtro
+        $url = apply_filters( 'welow_me_interesa_fallback_url', home_url( '/contacto/' ) );
+        wp_safe_redirect( $url, 302 );
+        exit;
     }
 
     public static function render( $atts ) {
