@@ -349,3 +349,78 @@
     font-size: 15px;
     padding: 40px 20px;
 }
+
+/* ============================================================
+   v2.35.0 — Card de marca con foto de modelo al lado del logo
+   ============================================================ */
+
+/* Header en dos columnas: logo (izq) + foto de modelo (der) */
+.welow-marca-card-header--split {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 16px;
+    align-items: center;
+    padding: 20px 22px;
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+}
+.welow-marca-card-header--split .welow-marca-card-logo {
+    width: auto;
+    height: 80px;
+    margin-bottom: 0;
+}
+.welow-marca-card-foto-modelo {
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #f1f5f9;
+}
+.welow-marca-card-foto-modelo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+}
+.welow-marca-card:hover .welow-marca-card-foto-modelo img {
+    transform: scale(1.05);
+}
+
+/* Body re-centrado al haber sacado el título del header */
+.welow-marca-card-header--split + .welow-marca-card-body {
+    text-align: center;
+    padding-top: 16px;
+}
+
+/* Footer: enlace simple en lugar de botón grande */
+.welow-marca-card-footer .welow-marca-card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #2563eb;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 6px 0;
+    transition: gap 0.15s, color 0.15s;
+}
+.welow-marca-card-footer .welow-marca-card-link:hover {
+    color: #1d4ed8;
+    gap: 8px;
+}
+.welow-marca-card-footer .welow-marca-card-link span[aria-hidden] {
+    transition: transform 0.15s;
+}
+.welow-marca-card-footer .welow-marca-card-link:hover span[aria-hidden] {
+    transform: translateX(3px);
+}
+
+@media (max-width: 600px) {
+    .welow-marca-card-header--split {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    .welow-marca-card-header--split .welow-marca-card-logo {
+        height: 70px;
+        margin: 0 auto;
+    }
+}
