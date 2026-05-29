@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.29.1
+ * Version:     2.30.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,52 @@
  *
  * CHANGELOG
  * ---------
+ * 2.30.0 — FASE 1: Formularios + Leads (gestión de captación)
+ *
+ *   ⚙ CPT welow_formulario:
+ *      - Builder visual de campos (texto, email, teléfono, textarea,
+ *        select, radio, checkbox, oculto). Drag&drop con sortable.
+ *      - Configuración (botón, mensaje éxito, redirect, título).
+ *      - Notificaciones: lista de emails destinatarios (responsables,
+ *        comerciales) + asunto con comodines {sitio}/{formulario}/{nombre}.
+ *      - RGPD: texto de consentimiento + URL política de privacidad.
+ *      - Cada formulario tiene su shortcode listo para copiar.
+ *
+ *   📥 CPT welow_lead (no creable manualmente):
+ *      - Guarda datos del envío + contexto (coche/modelo/concesionario/marca
+ *        autodetectados) + UTMs + referrer + IP + user agent.
+ *      - Estados: nuevo / contactado / en_negociacion / ganado / perdido / descartado.
+ *      - Listado con columnas: nombre, formulario, email, tel, contexto, estado, fecha.
+ *      - Filtro por estado + columna ordenable. Badge contador en menú.
+ *
+ *   🎯 Shortcode [welow_formulario id="X" / slug="Y"]:
+ *      - Render responsive con validación nativa + AJAX submit.
+ *      - Honeypot + timing (≥2 seg) anti-spam.
+ *      - Consentimiento RGPD obligatorio si está configurado.
+ *      - Captura contexto del Theme Builder y de URL (UTMs).
+ *      - Envía email con tabla de datos + reply-to al email del cliente.
+ *
+ *   🗂 Menú Concesionarios → Formularios / Leads con contador de nuevos.
+ *
+ *   PRÓXIMAS FASES:
+ *   - v2.31.0 Lead management UI: filtros avanzados, export CSV, bulk-status
+ *   - v2.32.0 Auto-respuesta al cliente, plantillas, asignación por concesionario
+ *   - v2.33.0 reCAPTCHA v3 opcional, dashboard de estadísticas
+ *   - v2.34.0 Modal "¡Me interesa!", webhooks a CRM externo
+ *
+ *   ARCHIVOS NUEVOS:
+ *   - includes/cpt/class-welow-cpt-formulario.php
+ *   - includes/cpt/class-welow-cpt-lead.php
+ *   - includes/shortcodes/class-welow-shortcode-formulario.php
+ *   - assets/css/formulario.css
+ *   - assets/js/formulario.js
+ *
+ *   ARCHIVOS MODIFICADOS:
+ *   - welow-concesionarios.php (requires)
+ *   - includes/class-welow-main.php (init + assets)
+ *   - includes/admin/class-welow-admin-menu.php (submenús + contador leads)
+ *   - includes/admin/class-welow-help.php (entrada shortcode)
+ *
  * 2.29.1 — HOTFIX estilos globales: OPTION_KEY incorrecta + !important
  *   - El inyector buscaba "welow_concesionarios_settings" pero la opción
  *     real es "welow_conc_settings". Por eso no se cargaban los valores.
@@ -1293,7 +1339,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.29.1' );
+define( 'WELOW_CONC_VERSION', '2.30.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
@@ -1349,6 +1395,9 @@ require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-header
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-coches-filtro.php';     // v2.8.0
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-concesionario-ficha.php'; // v2.27.0
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-concesionarios.php';      // v2.28.0
+require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-formulario.php';                       // v2.30.0
+require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-lead.php';                             // v2.30.0
+require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-formulario.php';          // v2.30.0
 
 // Permalinks de coches
 require_once WELOW_CONC_PATH . 'includes/class-welow-coche-permalinks.php';                       // v2.5.0

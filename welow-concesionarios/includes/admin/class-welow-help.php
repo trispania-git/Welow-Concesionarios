@@ -252,6 +252,20 @@ class Welow_Help {
                 ),
             ),
 
+            'welow_formulario' => array(
+                'titulo' => 'Formulario de captación de leads (v2.30.0)',
+                'desc'   => 'Renderiza un formulario configurado en Concesionarios → Formularios. Captura automáticamente el contexto (coche/modelo/concesionario actual + UTMs + referrer) y guarda cada envío como lead en Concesionarios → Leads. Notifica por email a los responsables definidos en el formulario.',
+                'params' => array(
+                    'id'    => array( 'def' => '', 'desc' => 'ID numérico del formulario' ),
+                    'slug'  => array( 'def' => '', 'desc' => 'Slug del formulario (alternativa al ID)' ),
+                    'clase' => array( 'def' => '', 'desc' => 'Clase CSS adicional al <form>' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_formulario id="123"]',
+                    '[welow_formulario slug="contacto-coche"]',
+                ),
+            ),
+
             'welow_concesionarios' => array(
                 'titulo' => 'Grid de fichas de concesionarios (v2.28.0)',
                 'desc'   => 'Listado tipo grid con todos los concesionarios publicados. Cada card muestra la imagen principal, localidad (grande) + dirección (pequeña), iconos de las marcas que vende y un botón "Ver concesionario" enlazado a su ficha. Ideal para una página "Nuestros concesionarios".',

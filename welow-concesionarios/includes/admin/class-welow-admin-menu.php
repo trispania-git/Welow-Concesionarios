@@ -41,6 +41,51 @@ class Welow_Admin_Menu {
             self::SLUG,
             array( __CLASS__, 'render_dashboard' )
         );
+
+        // v2.30.0 — Formularios + Leads como submenús
+        if ( post_type_exists( 'welow_formulario' ) ) {
+            add_submenu_page(
+                self::SLUG,
+                'Formularios',
+                'Formularios',
+                'manage_options',
+                'edit.php?post_type=welow_formulario'
+            );
+        }
+        if ( post_type_exists( 'welow_lead' ) ) {
+            // Contador de leads "nuevo" en el menú
+            $nuevos = self::contar_leads_nuevos();
+            $etiqueta = 'Leads';
+            if ( $nuevos > 0 ) {
+                $etiqueta .= ' <span class="awaiting-mod">' . intval( $nuevos ) . '</span>';
+            }
+            add_submenu_page(
+                self::SLUG,
+                'Leads',
+                $etiqueta,
+                'manage_options',
+                'edit.php?post_type=welow_lead'
+            );
+        }
+    }
+
+    /**
+     * v2.30.0 — Cuenta leads en estado "nuevo" (incluye los sin meta).
+     */
+    private static function contar_leads_nuevos() {
+        if ( ! post_type_exists( 'welow_lead' ) ) return 0;
+        $q = new WP_Query( array(
+            'post_type'      => 'welow_lead',
+            'post_status'    => 'publish',
+            'posts_per_page' => 1,
+            'fields'         => 'ids',
+            'meta_query'     => array(
+                'relation' => 'OR',
+                array( 'key' => '_welow_lead_estado', 'value' => 'nuevo', 'compare' => '=' ),
+                array( 'key' => '_welow_lead_estado', 'compare' => 'NOT EXISTS' ),
+            ),
+        ) );
+        return intval( $q->found_posts );
     }
 
     /**

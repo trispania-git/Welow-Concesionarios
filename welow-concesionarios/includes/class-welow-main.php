@@ -65,6 +65,9 @@ class Welow_Main {
         Welow_Shortcode_Coches_Filtro::init();     // v2.8.0
         Welow_Shortcode_Concesionario_Ficha::init(); // v2.27.0
         Welow_Shortcode_Concesionarios::init();      // v2.28.0
+        Welow_CPT_Formulario::init();                // v2.30.0
+        Welow_CPT_Lead::init();                      // v2.30.0
+        Welow_Shortcode_Formulario::init();          // v2.30.0
 
         // Permalinks personalizados de coches
         Welow_Coche_Permalinks::init();            // v2.5.0
@@ -285,6 +288,14 @@ class Welow_Main {
             WELOW_CONC_VERSION
         );
 
+        // v2.30.0 — Formularios
+        wp_register_style(
+            'welow-formulario',
+            WELOW_CONC_URL . 'assets/css/formulario.css',
+            array(),
+            WELOW_CONC_VERSION
+        );
+
         // JS
         wp_register_script(
             'welow-slider',
@@ -335,6 +346,15 @@ class Welow_Main {
             WELOW_CONC_VERSION,
             true
         );
+
+        // v2.30.0 — Formularios (validación + AJAX submit)
+        wp_register_script(
+            'welow-formulario',
+            WELOW_CONC_URL . 'assets/js/formulario.js',
+            array(),
+            WELOW_CONC_VERSION,
+            true
+        );
     }
 
     /**
@@ -364,8 +384,8 @@ class Welow_Main {
 
         if ( $necesita_media ) {
             wp_enqueue_media();
-            // jQuery UI sortable para galería del coche y del concesionario (v2.26.0)
-            if ( in_array( $screen->post_type, array( 'welow_coche_nuevo', 'welow_coche_ocasion', 'welow_concesionario' ), true ) ) {
+            // jQuery UI sortable para galería del coche/concesionario y builder de formulario
+            if ( in_array( $screen->post_type, array( 'welow_coche_nuevo', 'welow_coche_ocasion', 'welow_concesionario', 'welow_formulario' ), true ) ) {
                 wp_enqueue_script( 'jquery-ui-sortable' );
             }
             // v2.10.0 — Color picker nativo de WP en pantalla de modelo
