@@ -424,25 +424,40 @@ class Welow_CPT_Formulario {
     }
 
     /**
-     * v2.30.2 — Recorre cada campo y repara cadenas con escapes Unicode literales
-     * como "Teléfono" → "Teléfono". Soporta hasta 3 capas de doble-codificación.
+     * v2.30.3 — Repara cadenas con escapes Unicode corruptos en formularios.
+     *
+     * Cubre 3 casos:
+     *   A) "Tel\\u00e9fono"  (literal con barra)          → "Teléfono"
+     *   B) "Telu00e9fono"    (barra perdida en POST/save) → "Teléfono"  ← bug v2.30.0/1/2
+     *   C) doble-codificados varias capas.
      */
     public static function reparar_campos( $arr ) {
         $repair_string = function( $v ) {
             if ( ! is_string( $v ) ) return $v;
+
+            // Caso B (más común) — orphan "uXXXX" sin barra invertida.
+            // Solo lo aplicamos si TODO el segmento "uXXXX" es válido hex.
+            // Esto NO afecta a texto legítimo porque "u00e9" en un nombre real
+            // sería extremadamente improbable.
+            if ( preg_match( '/u[0-9a-fA-F]{4}/', $v ) ) {
+                $reparado_b = preg_replace_callback( '/u([0-9a-fA-F]{4})/', function( $m ) {
+                    $codepoint = hexdec( $m[1] );
+                    // Solo decodificar caracteres latinos comunes (U+0080–U+024F)
+                    // para no afectar a texto inocente como "url" o "user".
+                    if ( $codepoint >= 0x80 && $codepoint <= 0x024F ) {
+                        return function_exists( 'mb_chr' ) ? mb_chr( $codepoint, 'UTF-8' ) : html_entity_decode( '&#' . $codepoint . ';', ENT_NOQUOTES, 'UTF-8' );
+                    }
+                    return $m[0];
+                }, $v );
+                if ( $reparado_b !== $v ) $v = $reparado_b;
+            }
+
+            // Casos A + C: con barras literales \u o \\u (varias pasadas)
             for ( $pass = 0; $pass < 3; $pass++ ) {
                 if ( false === strpos( $v, '\\u' ) ) break;
-                // Wrap como JSON string y decodificar
-                $reparado = json_decode( '"' . str_replace( array( '\\', '"' ), array( '\\\\', '\\"' ), $v ) . '"' );
-                // Restablecer los \\u literales que sí quería el usuario
-                // (improbable, pero por seguridad si pass produce mismo resultado, parar)
-                if ( ! is_string( $reparado ) || $reparado === $v ) {
-                    // Intento sin escapar backslashes (típico caso é → é)
-                    $alt = json_decode( '"' . str_replace( '"', '\\"', $v ) . '"' );
-                    if ( is_string( $alt ) && $alt !== $v ) { $v = $alt; continue; }
-                    break;
-                }
-                $v = $reparado;
+                $alt = json_decode( '"' . str_replace( '"', '\\"', $v ) . '"' );
+                if ( ! is_string( $alt ) || $alt === $v ) break;
+                $v = $alt;
             }
             return $v;
         };

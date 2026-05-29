@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.30.2
+ * Version:     2.30.3
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,15 @@
  *
  * CHANGELOG
  * ---------
+ * 2.30.3 — Fix de escapes Unicode HUÉRFANOS (barra invertida perdida)
+ *   El HTML del usuario revela el patrón "Telu00e9fono" SIN backslash.
+ *   En algún paso del flujo (sanitización/WP magic quotes/Divi) se está
+ *   stripeando la barra `\` antes del `é`, dejando texto literal.
+ *   reparar_campos ahora detecta también ese patrón orphan (`uXXXX`)
+ *   y lo decodifica al carácter correspondiente, acotado al rango
+ *   U+0080–U+024F (latín extendido) para no afectar texto inocente
+ *   como "url" o "user".
+ *
  * 2.30.2 — Fix completo de caracteres Unicode en formularios (auto-migración)
  *   - El fix de v2.30.1 reparaba el frontend pero no el admin: al abrir+
  *     guardar un formulario en el editor, los datos corruptos se persistían.
@@ -1356,7 +1365,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.30.2' );
+define( 'WELOW_CONC_VERSION', '2.30.3' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
