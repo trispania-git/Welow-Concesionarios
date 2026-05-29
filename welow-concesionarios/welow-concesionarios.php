@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.30.3
+ * Version:     2.31.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,30 @@
  *
  * CHANGELOG
  * ---------
+ * 2.31.0 — Unificación de formularios en fichas de coche
+ *
+ *   El sistema antiguo (Welow_Shortcode_Coche_Extras::render_formulario)
+ *   ahora delega automáticamente al sistema nuevo (welow_formulario CPT +
+ *   Welow_Shortcode_Formulario) si hay un formulario configurado.
+ *
+ *   NUEVO en Configuraciones → "Formularios por defecto en fichas de coche":
+ *      - Selector de formulario por defecto para coches NUEVOS
+ *      - Selector de formulario por defecto para coches OCASIÓN / KM0
+ *
+ *   COMPORTAMIENTO:
+ *   - Si seleccionas un formulario para un tipo → tanto el bloque
+ *     `formulario` de [welow_coche_ficha] como el shortcode legacy
+ *     [welow_coche_formulario] muestran ese formulario nuevo.
+ *   - Si dejas "Usar formulario clásico (legacy)" → comportamiento como antes.
+ *   - Atributo `forzar_legacy="si"` permite override por instancia.
+ *
+ *   BENEFICIOS:
+ *   - Un solo sistema para gestionar todos los formularios (CPT welow_formulario)
+ *   - Todos los envíos quedan como leads con contexto auto-detectado del coche
+ *     (marca, modelo, concesionario, UTMs, IP, referrer)
+ *   - RGPD configurable por formulario, no hardcoded
+ *   - Sin tocar las páginas Divi existentes — totalmente transparente
+ *
  * 2.30.3 — Fix de escapes Unicode HUÉRFANOS (barra invertida perdida)
  *   El HTML del usuario revela el patrón "Telu00e9fono" SIN backslash.
  *   En algún paso del flujo (sanitización/WP magic quotes/Divi) se está
@@ -1365,7 +1389,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.30.3' );
+define( 'WELOW_CONC_VERSION', '2.31.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

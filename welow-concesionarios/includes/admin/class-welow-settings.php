@@ -109,6 +109,15 @@ class Welow_Settings {
             $output['iconos'] = Welow_Icons::sanitize( $input['iconos'] );
         }
 
+        // v2.31.0 — Formularios por defecto en fichas de coche
+        if ( isset( $input['formularios'] ) && is_array( $input['formularios'] ) ) {
+            $f = $input['formularios'];
+            $output['formularios'] = array(
+                'coche_nuevo'   => isset( $f['coche_nuevo'] )   ? absint( $f['coche_nuevo'] )   : 0,
+                'coche_ocasion' => isset( $f['coche_ocasion'] ) ? absint( $f['coche_ocasion'] ) : 0,
+            );
+        }
+
         // v2.29.0 — Estilos generales del frontend
         if ( isset( $input['estilos'] ) && is_array( $input['estilos'] ) ) {
             $e = $input['estilos'];
@@ -245,6 +254,9 @@ class Welow_Settings {
                     </tr>
                 </table>
 
+                <?php // v2.31.0 — Sección de Formularios por defecto ?>
+                <?php self::render_section_formularios( $options ); ?>
+
                 <?php // v2.29.0 — Sección de Estilos generales (frontend) ?>
                 <?php self::render_section_estilos( $options ); ?>
 
@@ -322,6 +334,71 @@ class Welow_Settings {
                 });
             });
         </script>
+        <?php
+    }
+
+    /**
+     * v2.31.0 — Selector de formularios por defecto para fichas de coche.
+     */
+    public static function render_section_formularios( $options ) {
+        $f = isset( $options['formularios'] ) && is_array( $options['formularios'] ) ? $options['formularios'] : array();
+        $sel_nuevo   = intval( $f['coche_nuevo']   ?? 0 );
+        $sel_ocasion = intval( $f['coche_ocasion'] ?? 0 );
+
+        $base = self::OPTION_KEY . '[formularios]';
+
+        // Listar formularios disponibles
+        $forms = post_type_exists( 'welow_formulario' )
+            ? get_posts( array( 'post_type' => 'welow_formulario', 'post_status' => 'publish', 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC' ) )
+            : array();
+        ?>
+        <h2 class="title">Formularios por defecto en fichas de coche</h2>
+        <p>Selecciona qué formulario se muestra en el bloque <code>formulario</code> del shortcode
+            <code>[welow_coche_ficha]</code> según el tipo de coche. Crea formularios desde
+            <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=welow_formulario' ) ); ?>">Concesionarios → Formularios</a>.
+        </p>
+
+        <?php if ( empty( $forms ) ) : ?>
+            <p style="background:#fef3c7;border-left:3px solid #f59e0b;padding:10px 14px;">
+                <strong>Todavía no tienes formularios creados.</strong>
+                <a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=welow_formulario' ) ); ?>">Crear el primero →</a>
+            </p>
+        <?php else : ?>
+            <table class="form-table">
+                <tr>
+                    <th><label>Formulario para coches NUEVOS</label></th>
+                    <td>
+                        <select name="<?php echo esc_attr( $base ); ?>[coche_nuevo]" class="regular-text">
+                            <option value="0">— Usar formulario clásico (legacy) —</option>
+                            <?php foreach ( $forms as $form ) : ?>
+                                <option value="<?php echo intval( $form->ID ); ?>" <?php selected( $sel_nuevo, $form->ID ); ?>>
+                                    <?php echo esc_html( $form->post_title ); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <p class="description">Se muestra en la ficha de coches del catálogo (welow_coche_nuevo).</p>
+                    </td>
+                </tr>
+                <tr>
+                    <th><label>Formulario para coches OCASIÓN / KM0</label></th>
+                    <td>
+                        <select name="<?php echo esc_attr( $base ); ?>[coche_ocasion]" class="regular-text">
+                            <option value="0">— Usar formulario clásico (legacy) —</option>
+                            <?php foreach ( $forms as $form ) : ?>
+                                <option value="<?php echo intval( $form->ID ); ?>" <?php selected( $sel_ocasion, $form->ID ); ?>>
+                                    <?php echo esc_html( $form->post_title ); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <p class="description">Se muestra en la ficha de segunda mano y KM0 (welow_coche_ocasion).</p>
+                    </td>
+                </tr>
+            </table>
+            <p style="background:#eff6ff;border-left:3px solid #2271b1;padding:10px 14px;font-size:13px;">
+                💡 Cuando configuras un formulario aquí, también afecta al shortcode legacy <code>[welow_coche_formulario]</code>
+                — se redirige automáticamente al nuevo sistema. No hace falta cambiar nada en las páginas existentes.
+            </p>
+        <?php endif; ?>
         <?php
     }
 

@@ -290,6 +290,27 @@ class Welow_Shortcode_Coche_Extras {
         return ob_get_clean();
     }
 
+    /**
+     * v2.31.0 — Devuelve el ID del formulario configurado en Concesionarios →
+     * Configuraciones según el tipo de coche actual, o 0 si no hay nada
+     * configurado (en cuyo caso se cae al formulario legacy hardcoded).
+     */
+    public static function resolver_formulario_configurado( $coche_id ) {
+        $post = get_post( $coche_id );
+        if ( ! $post ) return 0;
+
+        $options = class_exists( 'Welow_Settings' ) ? get_option( Welow_Settings::OPTION_KEY, array() ) : array();
+        $forms   = isset( $options['formularios'] ) && is_array( $options['formularios'] ) ? $options['formularios'] : array();
+
+        if ( 'welow_coche_nuevo' === $post->post_type ) {
+            return intval( $forms['coche_nuevo'] ?? 0 );
+        }
+        if ( 'welow_coche_ocasion' === $post->post_type ) {
+            return intval( $forms['coche_ocasion'] ?? 0 );
+        }
+        return 0;
+    }
+
     /* ========================================================================
        FORMULARIO DE CONTACTO
        ======================================================================== */
@@ -297,9 +318,22 @@ class Welow_Shortcode_Coche_Extras {
         $atts = shortcode_atts( array(
             'titulo'      => '¿Te interesa este coche?',
             'mostrar_ref' => 'si',
+            'forzar_legacy' => 'no', // override de emergencia
         ), $atts );
 
         $coche_id = Welow_Helpers::get_current_coche_id();
+
+        // v2.31.0 — UNIFICACIÓN: si hay un formulario nuevo (welow_formulario)
+        // configurado en Configuraciones para el tipo de coche actual,
+        // delegamos al sistema nuevo. Así los leads quedan guardados con
+        // contexto y se usa el motor único de envío.
+        if ( 'no' === $atts['forzar_legacy'] && $coche_id && class_exists( 'Welow_Shortcode_Formulario' ) ) {
+            $form_id = self::resolver_formulario_configurado( $coche_id );
+            if ( $form_id ) {
+                return Welow_Shortcode_Formulario::render( array( 'id' => $form_id ) );
+            }
+        }
+
         $data = $coche_id ? Welow_Helpers::get_coche_completo_data( $coche_id ) : null;
 
         $titulo_coche = $data ? trim( $data['marca'] . ' ' . $data['modelo'] . ' ' . $data['version'] ) : '';
