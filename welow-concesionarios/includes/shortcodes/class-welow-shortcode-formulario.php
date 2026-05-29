@@ -103,7 +103,7 @@ class Welow_Shortcode_Formulario {
             <input type="hidden" name="welow_nonce"    value="<?php echo esc_attr( wp_create_nonce( self::NONCE_KEY ) ); ?>" />
             <input type="hidden" name="welow_ts"       value="<?php echo intval( time() ); ?>" />
             <input type="hidden" name="welow_url"      value="<?php echo esc_url( self::current_url() ); ?>" />
-            <input type="hidden" name="welow_contexto" value="<?php echo esc_attr( wp_json_encode( $contexto ) ); ?>" />
+            <input type="hidden" name="welow_contexto" value="<?php echo esc_attr( wp_json_encode( $contexto, JSON_UNESCAPED_UNICODE ) ); ?>" />
 
             <button type="submit" class="welow-form__submit">
                 <span class="welow-form__submit-text"><?php echo esc_html( $boton_texto ); ?></span>
@@ -279,8 +279,9 @@ class Welow_Shortcode_Formulario {
         $referrer   = wp_get_referer();
 
         update_post_meta( $lead_id, '_welow_lead_form_id',    $form_id );
-        update_post_meta( $lead_id, '_welow_lead_datos',      wp_json_encode( $datos ) );
-        update_post_meta( $lead_id, '_welow_lead_contexto',   wp_json_encode( $contexto ) );
+        // v2.33.1 — JSON_UNESCAPED_UNICODE para preservar acentos (é, ó, ñ, í...)
+        update_post_meta( $lead_id, '_welow_lead_datos',      wp_json_encode( $datos, JSON_UNESCAPED_UNICODE ) );
+        update_post_meta( $lead_id, '_welow_lead_contexto',   wp_json_encode( $contexto, JSON_UNESCAPED_UNICODE ) );
         update_post_meta( $lead_id, '_welow_lead_url_origen', $url_origen );
         update_post_meta( $lead_id, '_welow_lead_referrer',   $referrer ?: '' );
         update_post_meta( $lead_id, '_welow_lead_ip',         self::client_ip() );

@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.33.0
+ * Version:     2.33.1
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,16 @@
  *
  * CHANGELOG
  * ---------
+ * 2.33.1 — Fix acentos en datos de leads (López → Lu00f3pez)
+ *   - Las llamadas a wp_json_encode al guardar datos/contexto del lead ahora
+ *     usan JSON_UNESCAPED_UNICODE para evitar el bug de \uXXXX sin barra.
+ *   - Helper Welow_CPT_Lead::leer_meta_json centraliza la lectura con
+ *     reparación recursiva de strings (mismo patrón que en formularios).
+ *   - Aplicado en render_metabox_datos, render_metabox_contexto y
+ *     contenido_columnas del listado.
+ *
+ *   Los leads ya guardados con el bug se reparan automáticamente al verlos.
+ *
  * 2.33.0 — Me Interesa: campo URL del modelo eliminado + redirect a /contacto/
  *
  *   1) Quitado el campo "URL del botón ¡Me interesa!" del editor de modelo.
@@ -1436,7 +1446,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.33.0' );
+define( 'WELOW_CONC_VERSION', '2.33.1' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

@@ -93,8 +93,7 @@ class Welow_CPT_Lead {
 
     public static function render_metabox_datos( $post ) {
         wp_nonce_field( 'welow_lead_save', 'welow_lead_nonce' );
-        $datos_json = get_post_meta( $post->ID, self::META_PREFIX . 'datos', true );
-        $datos = $datos_json ? json_decode( $datos_json, true ) : array();
+        $datos = self::leer_meta_json( $post->ID, 'datos' );
         if ( ! is_array( $datos ) || empty( $datos ) ) {
             echo '<p>Sin datos.</p>';
             return;
@@ -117,8 +116,7 @@ class Welow_CPT_Lead {
         $referrer = get_post_meta( $id, self::META_PREFIX . 'referrer', true );
         $ip   = get_post_meta( $id, self::META_PREFIX . 'ip', true );
         $ua   = get_post_meta( $id, self::META_PREFIX . 'user_agent', true );
-        $contexto_json = get_post_meta( $id, self::META_PREFIX . 'contexto', true );
-        $contexto = $contexto_json ? json_decode( $contexto_json, true ) : array();
+        $contexto = self::leer_meta_json( $id, 'contexto' );
 
         $form_post = $form_id ? get_post( $form_id ) : null;
         ?>
@@ -234,8 +232,7 @@ class Welow_CPT_Lead {
     }
 
     public static function contenido_columnas( $column, $post_id ) {
-        $datos_json = get_post_meta( $post_id, self::META_PREFIX . 'datos', true );
-        $datos = $datos_json ? json_decode( $datos_json, true ) : array();
+        $datos = self::leer_meta_json( $post_id, 'datos' );
         switch ( $column ) {
             case 'welow_form':
                 $fid = intval( get_post_meta( $post_id, self::META_PREFIX . 'form_id', true ) );
@@ -251,8 +248,7 @@ class Welow_CPT_Lead {
                 echo $tel ? '<a href="tel:' . esc_attr( preg_replace( '/[^\d+]/', '', $tel ) ) . '">' . esc_html( $tel ) . '</a>' : '—';
                 break;
             case 'welow_ctx':
-                $ctx_json = get_post_meta( $post_id, self::META_PREFIX . 'contexto', true );
-                $ctx = $ctx_json ? json_decode( $ctx_json, true ) : array();
+                $ctx = self::leer_meta_json( $post_id, 'contexto' );
                 $bits = array();
                 foreach ( array( 'coche_id', 'modelo_id', 'concesionario_id' ) as $k ) {
                     if ( empty( $ctx[ $k ] ) ) continue;
@@ -317,5 +313,51 @@ class Welow_CPT_Lead {
             );
         }
         $query->set( 'meta_query', $meta );
+    }
+
+    /**
+     * v2.33.1 — Lee un meta JSON y repara escapes Unicode huérfanos (uXXXX
+     * sin barra) acotados a U+0080–U+024F. Cubre datos guardados antes del
+     * fix de v2.33.1 en el shortcode de formulario.
+     */
+    public static function leer_meta_json( $post_id, $key ) {
+        $raw = get_post_meta( $post_id, self::META_PREFIX . $key, true );
+        $arr = $raw ? json_decode( $raw, true ) : array();
+        if ( ! is_array( $arr ) ) return array();
+        return self::reparar_array_recursivo( $arr );
+    }
+
+    private static function reparar_array_recursivo( $arr ) {
+        foreach ( $arr as $k => $v ) {
+            if ( is_array( $v ) ) {
+                $arr[ $k ] = self::reparar_array_recursivo( $v );
+            } elseif ( is_string( $v ) ) {
+                $arr[ $k ] = self::reparar_string( $v );
+            }
+        }
+        return $arr;
+    }
+
+    private static function reparar_string( $v ) {
+        if ( ! is_string( $v ) ) return $v;
+        // Caso A: uXXXX huérfano (barra perdida)
+        if ( preg_match( '/u[0-9a-fA-F]{4}/', $v ) ) {
+            $reparado = preg_replace_callback( '/u([0-9a-fA-F]{4})/', function( $m ) {
+                $cp = hexdec( $m[1] );
+                if ( $cp >= 0x80 && $cp <= 0x024F ) {
+                    return function_exists( 'mb_chr' ) ? mb_chr( $cp, 'UTF-8' ) : html_entity_decode( '&#' . $cp . ';', ENT_NOQUOTES, 'UTF-8' );
+                }
+                return $m[0];
+            }, $v );
+            if ( $reparado !== $v ) $v = $reparado;
+        }
+        // Caso B: \u con barra (varias capas)
+        for ( $pass = 0; $pass < 3; $pass++ ) {
+            if ( false === strpos( $v, '\\u' ) ) break;
+            $alt = json_decode( '"' . str_replace( '"', '\\"', $v ) . '"' );
+            if ( ! is_string( $alt ) || $alt === $v ) break;
+            $v = $alt;
+        }
+        return $v;
     }
 }
