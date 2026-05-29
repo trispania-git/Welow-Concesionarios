@@ -77,6 +77,7 @@ class Welow_CPT_Formulario {
     public static function render_metabox_campos( $post ) {
         wp_nonce_field( 'welow_form_save', 'welow_form_nonce' );
         $campos_json = get_post_meta( $post->ID, self::META_PREFIX . 'campos', true );
+
         if ( ! $campos_json ) {
             // Plantilla por defecto razonable (UTF-8 literal, sin escapes \uXXXX)
             $campos_json = wp_json_encode( array(
@@ -85,6 +86,15 @@ class Welow_CPT_Formulario {
                 array( 'type' => 'telefono',       'label' => 'Teléfono',   'name' => 'telefono', 'required' => false ),
                 array( 'type' => 'textarea',       'label' => 'Mensaje',    'name' => 'mensaje',  'required' => false ),
             ), JSON_UNESCAPED_UNICODE );
+        } else {
+            // v2.30.2 — Si hay datos guardados con escapes Unicode literales (bug v2.30.0),
+            // los reparamos AQUÍ antes de que lleguen al builder JS. Así al guardar se
+            // persisten ya limpios y desaparece el problema para siempre.
+            $arr = json_decode( $campos_json, true );
+            if ( is_array( $arr ) ) {
+                $arr = self::reparar_campos( $arr );
+                $campos_json = wp_json_encode( $arr, JSON_UNESCAPED_UNICODE );
+            }
         }
         ?>
         <p style="background:#f0f6fc;border-left:3px solid #2271b1;padding:8px 12px;margin:0 0 14px;font-size:13px;">
@@ -338,6 +348,8 @@ class Welow_CPT_Formulario {
         $campos_raw = isset( $_POST['welow_form_campos'] ) ? wp_unslash( $_POST['welow_form_campos'] ) : '[]';
         $decoded = json_decode( $campos_raw, true );
         if ( ! is_array( $decoded ) ) $decoded = array();
+        // v2.30.2 — Reparar escapes Unicode literales si vienen de un guardado corrupto
+        $decoded = self::reparar_campos( $decoded );
         // Sanitizar cada campo
         $limpio = array();
         $allowed_types = array( 'texto', 'email', 'telefono', 'textarea', 'select', 'radio', 'checkbox', 'oculto' );
@@ -408,15 +420,38 @@ class Welow_CPT_Formulario {
         $json = get_post_meta( $form_id, self::META_PREFIX . 'campos', true );
         $arr  = $json ? json_decode( $json, true ) : array();
         if ( ! is_array( $arr ) ) return array();
+        return self::reparar_campos( $arr );
+    }
 
-        // v2.30.1 — Reparación defensiva: si alguna cadena tiene \uXXXX literal
-        // (no decodificado, como "Teléfono" en lugar de "Teléfono"),
-        // decodificarlo. Esto cubre formularios guardados con la v2.30.0.
+    /**
+     * v2.30.2 — Recorre cada campo y repara cadenas con escapes Unicode literales
+     * como "Teléfono" → "Teléfono". Soporta hasta 3 capas de doble-codificación.
+     */
+    public static function reparar_campos( $arr ) {
+        $repair_string = function( $v ) {
+            if ( ! is_string( $v ) ) return $v;
+            for ( $pass = 0; $pass < 3; $pass++ ) {
+                if ( false === strpos( $v, '\\u' ) ) break;
+                // Wrap como JSON string y decodificar
+                $reparado = json_decode( '"' . str_replace( array( '\\', '"' ), array( '\\\\', '\\"' ), $v ) . '"' );
+                // Restablecer los \\u literales que sí quería el usuario
+                // (improbable, pero por seguridad si pass produce mismo resultado, parar)
+                if ( ! is_string( $reparado ) || $reparado === $v ) {
+                    // Intento sin escapar backslashes (típico caso é → é)
+                    $alt = json_decode( '"' . str_replace( '"', '\\"', $v ) . '"' );
+                    if ( is_string( $alt ) && $alt !== $v ) { $v = $alt; continue; }
+                    break;
+                }
+                $v = $reparado;
+            }
+            return $v;
+        };
+
         foreach ( $arr as &$campo ) {
+            if ( ! is_array( $campo ) ) continue;
             foreach ( $campo as $k => $v ) {
-                if ( is_string( $v ) && false !== strpos( $v, '\\u' ) ) {
-                    $reparado = json_decode( '"' . str_replace( '"', '\\"', $v ) . '"' );
-                    if ( is_string( $reparado ) ) $campo[ $k ] = $reparado;
+                if ( is_string( $v ) ) {
+                    $campo[ $k ] = $repair_string( $v );
                 }
             }
         }
