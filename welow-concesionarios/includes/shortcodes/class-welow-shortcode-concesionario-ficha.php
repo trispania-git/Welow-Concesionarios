@@ -155,37 +155,56 @@ class Welow_Shortcode_Concesionario_Ficha {
         if ( ! $direccion && ! $telefono && ! $email && ! $horario ) return;
 
         $direccion_full = trim( $direccion . ( $cp ? ', ' . $cp : '' ) . ( $ciudad ? ' ' . $ciudad : '' ) );
+
+        // v2.36.0 — Formulario opcional al lado de los datos
+        $form_id = 0;
+        if ( class_exists( 'Welow_Settings' ) ) {
+            $opt = get_option( Welow_Settings::OPTION_KEY, array() );
+            $form_id = intval( $opt['formularios']['concesionario'] ?? 0 );
+        }
+        $hay_form = $form_id && class_exists( 'Welow_Shortcode_Formulario' );
         ?>
-        <section class="welow-conc-info">
+        <section class="welow-conc-info<?php echo $hay_form ? ' welow-conc-info--2col' : ''; ?>">
             <h2 class="welow-conc-section-title">Contacto y horario</h2>
-            <ul class="welow-conc-info__lista">
-                <?php if ( $direccion_full ) : ?>
-                    <li>
-                        <span class="welow-conc-info__icon">📍</span>
-                        <span><?php echo esc_html( $direccion_full ); ?></span>
-                    </li>
+
+            <div class="welow-conc-info__grid">
+                <div class="welow-conc-info__datos">
+                    <ul class="welow-conc-info__lista">
+                        <?php if ( $direccion_full ) : ?>
+                            <li>
+                                <span class="welow-conc-info__icon">📍</span>
+                                <span><?php echo esc_html( $direccion_full ); ?></span>
+                            </li>
+                        <?php endif; ?>
+                        <?php if ( $telefono ) : ?>
+                            <li>
+                                <span class="welow-conc-info__icon">📞</span>
+                                <a href="tel:<?php echo esc_attr( preg_replace( '/[^\d+]/', '', $telefono ) ); ?>">
+                                    <?php echo esc_html( $telefono ); ?>
+                                </a>
+                            </li>
+                        <?php endif; ?>
+                        <?php if ( $email ) : ?>
+                            <li>
+                                <span class="welow-conc-info__icon">✉️</span>
+                                <a href="mailto:<?php echo esc_attr( $email ); ?>"><?php echo esc_html( $email ); ?></a>
+                            </li>
+                        <?php endif; ?>
+                        <?php if ( $horario ) : ?>
+                            <li>
+                                <span class="welow-conc-info__icon">🕐</span>
+                                <span class="welow-conc-info__horario"><?php echo nl2br( esc_html( $horario ) ); ?></span>
+                            </li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
+
+                <?php if ( $hay_form ) : ?>
+                    <div class="welow-conc-info__form">
+                        <?php echo Welow_Shortcode_Formulario::render( array( 'id' => $form_id ) ); ?>
+                    </div>
                 <?php endif; ?>
-                <?php if ( $telefono ) : ?>
-                    <li>
-                        <span class="welow-conc-info__icon">📞</span>
-                        <a href="tel:<?php echo esc_attr( preg_replace( '/[^\d+]/', '', $telefono ) ); ?>">
-                            <?php echo esc_html( $telefono ); ?>
-                        </a>
-                    </li>
-                <?php endif; ?>
-                <?php if ( $email ) : ?>
-                    <li>
-                        <span class="welow-conc-info__icon">✉️</span>
-                        <a href="mailto:<?php echo esc_attr( $email ); ?>"><?php echo esc_html( $email ); ?></a>
-                    </li>
-                <?php endif; ?>
-                <?php if ( $horario ) : ?>
-                    <li>
-                        <span class="welow-conc-info__icon">🕐</span>
-                        <span class="welow-conc-info__horario"><?php echo nl2br( esc_html( $horario ) ); ?></span>
-                    </li>
-                <?php endif; ?>
-            </ul>
+            </div>
         </section>
         <?php
     }

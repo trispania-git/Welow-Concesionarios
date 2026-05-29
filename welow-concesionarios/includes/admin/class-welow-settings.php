@@ -117,6 +117,8 @@ class Welow_Settings {
                 'coche_ocasion' => isset( $f['coche_ocasion'] ) ? absint( $f['coche_ocasion'] ) : 0,
                 // v2.32.0 — Página destino del botón "¡Me interesa!" en cards de modelo
                 'me_interesa_page' => isset( $f['me_interesa_page'] ) ? absint( $f['me_interesa_page'] ) : 0,
+                // v2.36.0 — Formulario para ficha de concesionario
+                'concesionario'    => isset( $f['concesionario'] ) ? absint( $f['concesionario'] ) : 0,
             );
         }
 
@@ -393,6 +395,22 @@ class Welow_Settings {
                             <?php endforeach; ?>
                         </select>
                         <p class="description">Se muestra en la ficha de segunda mano y KM0 (welow_coche_ocasion).</p>
+                    </td>
+                </tr>
+                <?php // v2.36.0 — Formulario para ficha de concesionario
+                $sel_conc = intval( $f['concesionario'] ?? 0 ); ?>
+                <tr>
+                    <th><label>Formulario para ficha de CONCESIONARIO</label></th>
+                    <td>
+                        <select name="<?php echo esc_attr( $base ); ?>[concesionario]" class="regular-text">
+                            <option value="0">— No mostrar formulario —</option>
+                            <?php foreach ( $forms as $form ) : ?>
+                                <option value="<?php echo intval( $form->ID ); ?>" <?php selected( $sel_conc, $form->ID ); ?>>
+                                    <?php echo esc_html( $form->post_title ); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <p class="description">Se renderiza en la sección "Contacto y horario" de <code>[welow_concesionario_ficha]</code>, al lado derecho de los datos del concesionario. Si lo dejas en "No mostrar", esa sección sigue siendo solo de datos como antes.</p>
                     </td>
                 </tr>
             </table>

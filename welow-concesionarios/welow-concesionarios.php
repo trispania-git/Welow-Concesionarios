@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.35.1
+ * Version:     2.36.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,19 @@
  *
  * CHANGELOG
  * ---------
+ * 2.36.0 — Concesionario: formulario al lado de los datos en "Contacto y horario"
+ *
+ *   - Nuevo selector "Formulario para ficha de CONCESIONARIO" en
+ *     Configuraciones → Formularios.
+ *   - Si lo configuras, el bloque "info" de [welow_concesionario_ficha]
+ *     pasa a 2 columnas: izquierda los 4 datos (dirección/tel/email/horario),
+ *     derecha el formulario seleccionado.
+ *   - Si no lo configuras, el bloque sigue siendo una sola columna como antes.
+ *   - En móvil (≤820px) las dos columnas se apilan.
+ *
+ *   El formulario hereda el contexto del concesionario actual (concesionario_id)
+ *   en el lead generado.
+ *
  * 2.35.1 — Card de marca: quitar título + placeholder {marca} en el CTA
  *   - Eliminado el <h3> con el nombre de la marca (el logo ya identifica).
  *   - Default texto_boton: "Ver modelos" → "Ver modelos {marca}".
@@ -1478,7 +1491,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.35.1' );
+define( 'WELOW_CONC_VERSION', '2.36.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

@@ -114,6 +114,25 @@
 }
 
 /* ============== Info contacto ============== */
+/* v2.36.0 — Layout en 2 columnas cuando hay formulario al lado */
+.welow-conc-info__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+.welow-conc-info--2col .welow-conc-info__grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+    align-items: start;
+}
+@media (max-width: 820px) {
+    .welow-conc-info--2col .welow-conc-info__grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Cuando la lista no comparte fila con el form, mantiene la rejilla auto-fit.
+   Cuando sí comparte (2 columnas), pasa a una columna apilada. */
 .welow-conc-info__lista {
     list-style: none;
     margin: 0;
@@ -123,6 +142,19 @@
     gap: 14px 28px;
     font-size: 15px;
     color: #334155;
+}
+.welow-conc-info--2col .welow-conc-info__lista {
+    grid-template-columns: 1fr;
+}
+
+/* El form a la derecha mantiene compacto */
+.welow-conc-info__form .welow-form {
+    margin: 0;
+    padding: 22px 24px;
+}
+.welow-conc-info__form .welow-form__titulo {
+    font-size: 18px;
+    margin-bottom: 14px;
 }
 .welow-conc-info__lista li {
     display: flex;
