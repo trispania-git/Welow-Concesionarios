@@ -67,3 +67,24 @@
 .welow-mi__form .welow-form {
     margin: 0 auto;
 }
+
+/* v2.34.0 — Versión genérica (sin hero del modelo) */
+.welow-mi--generico .welow-mi__intro {
+    text-align: center;
+    margin: 0 0 32px;
+    padding: 24px 0;
+}
+.welow-mi__intro-titulo {
+    font-size: clamp(26px, 4vw, 40px);
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 10px;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+}
+.welow-mi__intro-texto {
+    font-size: 16px;
+    color: #475569;
+    margin: 0;
+    line-height: 1.5;
+}

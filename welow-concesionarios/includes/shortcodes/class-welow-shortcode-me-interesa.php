@@ -24,38 +24,15 @@ class Welow_Shortcode_Me_Interesa {
 
     public static function init() {
         add_shortcode( 'welow_me_interesa', array( __CLASS__, 'render' ) );
-        // v2.33.0 — Redirección a /contacto/ si visitan la página sin ?modelo=
-        add_action( 'template_redirect', array( __CLASS__, 'redirigir_si_sin_modelo' ) );
-    }
-
-    /**
-     * v2.33.0 — Si la página actual es la "página de Me Interesa" configurada
-     * en Configuraciones y NO viene con ?modelo=slug, redirige a /contacto/
-     * (excepto a admins logueados, para que puedan testear con ?modelo=).
-     */
-    public static function redirigir_si_sin_modelo() {
-        if ( is_admin() ) return;
-        if ( current_user_can( 'manage_options' ) ) return; // admins ven el aviso, no redirigen
-        if ( ! class_exists( 'Welow_Settings' ) ) return;
-
-        $options = get_option( Welow_Settings::OPTION_KEY, array() );
-        $page_id = intval( $options['formularios']['me_interesa_page'] ?? 0 );
-        if ( ! $page_id ) return;
-        if ( ! is_page( $page_id ) ) return;
-
-        if ( ! empty( $_GET['modelo'] ) ) return; // sí tiene modelo, no redirigir
-
-        // Permitir cambiar la URL de fallback vía filtro
-        $url = apply_filters( 'welow_me_interesa_fallback_url', home_url( '/contacto/' ) );
-        wp_safe_redirect( $url, 302 );
-        exit;
     }
 
     public static function render( $atts ) {
         $atts = shortcode_atts( array(
-            'modelo'        => '',
-            'form_id'       => '',
-            'mostrar_marca' => 'si',
+            'modelo'         => '',
+            'form_id'        => '',
+            'mostrar_marca'  => 'si',
+            'titulo_generico' => '¿En qué podemos ayudarte?',
+            'texto_generico'  => 'Déjanos tus datos y te contactaremos en breve.',
         ), $atts );
 
         // Resolver modelo: atributo del shortcode > ?modelo= de query
@@ -66,10 +43,6 @@ class Welow_Shortcode_Me_Interesa {
             $modelo = get_page_by_path( $slug, OBJECT, 'welow_modelo' );
         }
 
-        if ( ! $modelo ) {
-            return self::msg_admin( 'No se ha encontrado el modelo. Llega aquí desde un botón "¡Me interesa!" de una card de modelo, o pasa <code>?modelo=slug</code> en la URL.' );
-        }
-
         // Resolver formulario: atributo > config "coche_nuevo"
         $form_id = intval( $atts['form_id'] );
         if ( ! $form_id && class_exists( 'Welow_Settings' ) ) {
@@ -77,7 +50,14 @@ class Welow_Shortcode_Me_Interesa {
             $form_id = intval( $options['formularios']['coche_nuevo'] ?? 0 );
         }
 
-        // Datos del modelo
+        wp_enqueue_style( 'welow-me-interesa' );
+
+        // v2.34.0 — Si no hay modelo, renderizar versión genérica (sin hero)
+        if ( ! $modelo ) {
+            return self::render_generico( $form_id, $atts );
+        }
+
+        // Versión específica con hero del modelo
         $img_url = get_the_post_thumbnail_url( $modelo->ID, 'large' );
         $nombre  = $modelo->post_title;
 
@@ -91,8 +71,6 @@ class Welow_Shortcode_Me_Interesa {
                 }
             }
         }
-
-        wp_enqueue_style( 'welow-me-interesa' );
 
         ob_start();
         ?>
@@ -121,6 +99,35 @@ class Welow_Shortcode_Me_Interesa {
                 <?php endif; ?>
             </div>
 
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+
+    /**
+     * v2.34.0 — Versión genérica del shortcode cuando no hay modelo en la URL.
+     * Sin hero, solo título introductorio + formulario.
+     */
+    private static function render_generico( $form_id, $atts ) {
+        ob_start();
+        ?>
+        <div class="welow-mi welow-mi--generico">
+            <div class="welow-mi__intro">
+                <?php if ( ! empty( $atts['titulo_generico'] ) ) : ?>
+                    <h1 class="welow-mi__intro-titulo"><?php echo esc_html( $atts['titulo_generico'] ); ?></h1>
+                <?php endif; ?>
+                <?php if ( ! empty( $atts['texto_generico'] ) ) : ?>
+                    <p class="welow-mi__intro-texto"><?php echo esc_html( $atts['texto_generico'] ); ?></p>
+                <?php endif; ?>
+            </div>
+
+            <div class="welow-mi__form">
+                <?php if ( $form_id && class_exists( 'Welow_Shortcode_Formulario' ) ) : ?>
+                    <?php echo Welow_Shortcode_Formulario::render( array( 'id' => $form_id ) ); ?>
+                <?php else : ?>
+                    <?php echo self::msg_admin( 'No hay formulario configurado en <a href="' . esc_url( admin_url( 'admin.php?page=welow_settings' ) ) . '">Configuraciones → Formularios → "Formulario para coches NUEVOS"</a>.' ); ?>
+                <?php endif; ?>
+            </div>
         </div>
         <?php
         return ob_get_clean();
