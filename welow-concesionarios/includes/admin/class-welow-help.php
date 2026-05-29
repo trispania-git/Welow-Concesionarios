@@ -252,6 +252,21 @@ class Welow_Help {
                 ),
             ),
 
+            'welow_me_interesa' => array(
+                'titulo' => 'Página "¡Me interesa!" del modelo (v2.32.0)',
+                'desc'   => 'Página destino del botón "¡Me interesa!" de las cards de modelo. Detecta el modelo desde ?modelo=slug en la URL, muestra foto destacada + marca + nombre del modelo, y debajo el formulario configurado en Configuraciones para "coches nuevos". Recomendado: crear una página WP llamada "Me interesa" o similar, pegar este shortcode dentro, y seleccionarla en Configuraciones → Formularios → "Página del botón Me Interesa".',
+                'params' => array(
+                    'modelo'        => array( 'def' => '(query string)', 'desc' => 'Slug del modelo (override del ?modelo=)' ),
+                    'form_id'       => array( 'def' => '(config)', 'desc' => 'ID del formulario a usar (override)' ),
+                    'mostrar_marca' => array( 'def' => 'si', 'desc' => 'si | no' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_me_interesa]',
+                    '[welow_me_interesa modelo="omoda-7"]',
+                    '[welow_me_interesa mostrar_marca="no"]',
+                ),
+            ),
+
             'welow_formulario' => array(
                 'titulo' => 'Formulario de captación de leads (v2.30.0)',
                 'desc'   => 'Renderiza un formulario configurado en Concesionarios → Formularios. Captura automáticamente el contexto (coche/modelo/concesionario actual + UTMs + referrer) y guarda cada envío como lead en Concesionarios → Leads. Notifica por email a los responsables definidos en el formulario.',

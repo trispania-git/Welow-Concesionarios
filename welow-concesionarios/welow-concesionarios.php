@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.31.0
+ * Version:     2.32.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,35 @@
  *
  * CHANGELOG
  * ---------
+ * 2.32.0 — Página "¡Me interesa!" para cards de modelo
+ *
+ *   NUEVO SHORTCODE [welow_me_interesa]:
+ *      Renderiza una página tipo landing con:
+ *        - Hero con foto destacada del modelo + marca + nombre
+ *        - Formulario configurado en Configuraciones para "coches nuevos"
+ *      Detecta el modelo desde ?modelo=slug en la URL.
+ *
+ *   FLUJO:
+ *   1. Crear página WP "Me interesa" con shortcode [welow_me_interesa] dentro
+ *   2. Configuraciones → Formularios → seleccionar esa página en "Página del
+ *      botón Me Interesa"
+ *   3. Card de modelo: si no tiene URL propia en "URL del botón ¡Me interesa!",
+ *      el botón auto-genera URL → /pagina-me-interesa/?modelo=slug-del-modelo
+ *
+ *   El formulario hereda automáticamente el contexto del modelo (marca_id,
+ *   modelo_id, UTM, referrer) en el lead generado.
+ *
+ *   ARCHIVOS NUEVOS:
+ *   - includes/shortcodes/class-welow-shortcode-me-interesa.php
+ *   - assets/css/me-interesa.css
+ *
+ *   ARCHIVOS MODIFICADOS:
+ *   - welow-concesionarios.php (require + bootstrap)
+ *   - includes/class-welow-main.php (init + asset)
+ *   - includes/admin/class-welow-settings.php (page picker)
+ *   - includes/admin/class-welow-help.php (shortcode help)
+ *   - templates/modelos-grid.php (auto-URL si no hay interesa_url propia)
+ *
  * 2.31.0 — Unificación de formularios en fichas de coche
  *
  *   El sistema antiguo (Welow_Shortcode_Coche_Extras::render_formulario)
@@ -1389,7 +1418,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.31.0' );
+define( 'WELOW_CONC_VERSION', '2.32.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
@@ -1448,6 +1477,7 @@ require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-conces
 require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-formulario.php';                       // v2.30.0
 require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-lead.php';                             // v2.30.0
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-formulario.php';          // v2.30.0
+require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-me-interesa.php';         // v2.32.0
 
 // Permalinks de coches
 require_once WELOW_CONC_PATH . 'includes/class-welow-coche-permalinks.php';                       // v2.5.0

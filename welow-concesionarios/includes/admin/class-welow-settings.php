@@ -115,6 +115,8 @@ class Welow_Settings {
             $output['formularios'] = array(
                 'coche_nuevo'   => isset( $f['coche_nuevo'] )   ? absint( $f['coche_nuevo'] )   : 0,
                 'coche_ocasion' => isset( $f['coche_ocasion'] ) ? absint( $f['coche_ocasion'] ) : 0,
+                // v2.32.0 — Página destino del botón "¡Me interesa!" en cards de modelo
+                'me_interesa_page' => isset( $f['me_interesa_page'] ) ? absint( $f['me_interesa_page'] ) : 0,
             );
         }
 
@@ -398,6 +400,36 @@ class Welow_Settings {
                 💡 Cuando configuras un formulario aquí, también afecta al shortcode legacy <code>[welow_coche_formulario]</code>
                 — se redirige automáticamente al nuevo sistema. No hace falta cambiar nada en las páginas existentes.
             </p>
+
+            <?php // v2.32.0 — Página para el botón "¡Me interesa!" de los modelos ?>
+            <h3 style="margin-top:30px;">Página del botón "¡Me interesa!"</h3>
+            <p>Selecciona la página donde aparece el shortcode <code>[welow_me_interesa]</code>.
+                Al pulsar "¡Me interesa!" en la card de un modelo, se redirige a esa página añadiendo
+                <code>?modelo=slug-del-modelo</code>, y allí se renderiza la foto + nombre del modelo
+                + el formulario configurado arriba para "coches nuevos".
+            </p>
+            <table class="form-table">
+                <tr>
+                    <th><label>Página de destino</label></th>
+                    <td>
+                        <?php
+                        $sel_page = intval( $f['me_interesa_page'] ?? 0 );
+                        wp_dropdown_pages( array(
+                            'name'              => esc_attr( $base ) . '[me_interesa_page]',
+                            'selected'          => $sel_page,
+                            'show_option_none'  => '— Sin página configurada —',
+                            'option_none_value' => '0',
+                        ) );
+                        ?>
+                        <p class="description">
+                            Crea una página WordPress (ej. "Me interesa") y pega dentro
+                            <code>[welow_me_interesa]</code>. Luego selecciónala aquí.
+                            <br>Si el modelo tiene URL propia rellena en "URL del botón ¡Me interesa!"
+                            esa prevalece sobre esta página global.
+                        </p>
+                    </td>
+                </tr>
+            </table>
         <?php endif; ?>
         <?php
     }

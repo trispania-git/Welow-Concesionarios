@@ -1,0 +1,69 @@
+/**
+ * Welow Concesionarios — Página "Me interesa"
+ * @since 2.32.0
+ */
+
+.welow-mi {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.welow-mi__hero {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 32px;
+    align-items: center;
+    margin: 0 0 40px;
+    background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+    border-radius: 12px;
+    padding: 28px;
+}
+@media (max-width: 760px) {
+    .welow-mi__hero {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 16px;
+        padding: 20px;
+    }
+}
+
+.welow-mi__hero-img {
+    width: 100%;
+    aspect-ratio: 16/10;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #fff;
+}
+.welow-mi__hero-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.welow-mi__marca {
+    font-size: 14px;
+    color: #2563eb;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    margin: 0 0 6px;
+}
+
+.welow-mi__nombre {
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+}
+
+.welow-mi__form {
+    margin-top: 12px;
+}
+.welow-mi__form .welow-form {
+    margin: 0 auto;
+}
