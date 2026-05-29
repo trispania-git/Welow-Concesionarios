@@ -74,7 +74,7 @@ class Welow_Shortcode_Marcas {
             'orden'               => 'personalizado',
             'max'                 => '-1',
             'mostrar_descripcion' => 'si',
-            'texto_boton'         => 'Ver modelos', // v2.35.0 — antes "Ver marca"
+            'texto_boton'         => 'Ver modelos {marca}', // v2.35.1 — {marca} se reemplaza por el nombre
             'variante_logo'       => 'original',
         ), $atts );
 

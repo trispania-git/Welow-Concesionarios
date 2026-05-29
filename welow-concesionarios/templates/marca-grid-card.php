@@ -84,19 +84,25 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <?php endif; ?>
             </div>
 
-            <div class="welow-marca-card-body">
-                <h3 class="welow-marca-card-titulo"><?php echo esc_html( $nombre ); ?></h3>
-                <?php if ( $slogan ) : ?>
-                    <p class="welow-marca-card-slogan"><?php echo esc_html( $slogan ); ?></p>
-                <?php endif; ?>
-                <?php if ( $mostrar_descripcion && $desc_corta ) : ?>
-                    <p class="welow-marca-card-desc"><?php echo esc_html( $desc_corta ); ?></p>
-                <?php endif; ?>
-            </div>
+            <?php // v2.35.1 — Título de marca quitado (el logo ya identifica). Mantenemos slogan/descripción si los hay. ?>
+            <?php if ( ( $slogan || ( $mostrar_descripcion && $desc_corta ) ) ) : ?>
+                <div class="welow-marca-card-body">
+                    <?php if ( $slogan ) : ?>
+                        <p class="welow-marca-card-slogan"><?php echo esc_html( $slogan ); ?></p>
+                    <?php endif; ?>
+                    <?php if ( $mostrar_descripcion && $desc_corta ) : ?>
+                        <p class="welow-marca-card-desc"><?php echo esc_html( $desc_corta ); ?></p>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
 
             <div class="welow-marca-card-footer">
+                <?php
+                // v2.35.1 — El texto del CTA admite {marca} como placeholder
+                $texto_link = str_replace( '{marca}', $nombre, $texto_boton );
+                ?>
                 <a href="<?php echo esc_url( $link ); ?>" class="welow-marca-card-link">
-                    <?php echo esc_html( $texto_boton ); ?>
+                    <?php echo esc_html( $texto_link ); ?>
                     <span aria-hidden="true">→</span>
                 </a>
             </div>
