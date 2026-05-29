@@ -78,13 +78,13 @@ class Welow_CPT_Formulario {
         wp_nonce_field( 'welow_form_save', 'welow_form_nonce' );
         $campos_json = get_post_meta( $post->ID, self::META_PREFIX . 'campos', true );
         if ( ! $campos_json ) {
-            // Plantilla por defecto razonable
+            // Plantilla por defecto razonable (UTF-8 literal, sin escapes \uXXXX)
             $campos_json = wp_json_encode( array(
                 array( 'type' => 'texto',          'label' => 'Nombre',     'name' => 'nombre',   'required' => true ),
                 array( 'type' => 'email',          'label' => 'Email',      'name' => 'email',    'required' => true ),
                 array( 'type' => 'telefono',       'label' => 'Teléfono',   'name' => 'telefono', 'required' => false ),
                 array( 'type' => 'textarea',       'label' => 'Mensaje',    'name' => 'mensaje',  'required' => false ),
-            ) );
+            ), JSON_UNESCAPED_UNICODE );
         }
         ?>
         <p style="background:#f0f6fc;border-left:3px solid #2271b1;padding:8px 12px;margin:0 0 14px;font-size:13px;">
@@ -356,7 +356,8 @@ class Welow_CPT_Formulario {
             }
             $limpio[] = $item;
         }
-        update_post_meta( $post_id, self::META_PREFIX . 'campos', wp_json_encode( $limpio ) );
+        // v2.30.1 — Guardar con JSON_UNESCAPED_UNICODE para preservar "é/á/ñ..." literales
+        update_post_meta( $post_id, self::META_PREFIX . 'campos', wp_json_encode( $limpio, JSON_UNESCAPED_UNICODE ) );
 
         $map = array(
             'welow_form_titulo_publico'    => 'titulo_publico',
@@ -406,7 +407,21 @@ class Welow_CPT_Formulario {
     public static function get_campos( $form_id ) {
         $json = get_post_meta( $form_id, self::META_PREFIX . 'campos', true );
         $arr  = $json ? json_decode( $json, true ) : array();
-        return is_array( $arr ) ? $arr : array();
+        if ( ! is_array( $arr ) ) return array();
+
+        // v2.30.1 — Reparación defensiva: si alguna cadena tiene \uXXXX literal
+        // (no decodificado, como "Teléfono" en lugar de "Teléfono"),
+        // decodificarlo. Esto cubre formularios guardados con la v2.30.0.
+        foreach ( $arr as &$campo ) {
+            foreach ( $campo as $k => $v ) {
+                if ( is_string( $v ) && false !== strpos( $v, '\\u' ) ) {
+                    $reparado = json_decode( '"' . str_replace( '"', '\\"', $v ) . '"' );
+                    if ( is_string( $reparado ) ) $campo[ $k ] = $reparado;
+                }
+            }
+        }
+        unset( $campo );
+        return $arr;
     }
 
     public static function get_emails_notificacion( $form_id ) {
