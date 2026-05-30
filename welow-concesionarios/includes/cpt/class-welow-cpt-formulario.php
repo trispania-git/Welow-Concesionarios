@@ -303,8 +303,9 @@ class Welow_CPT_Formulario {
             <tr>
                 <th><label>Texto del consentimiento</label></th>
                 <td>
-                    <textarea name="welow_form_consent_texto" rows="3" class="large-text"><?php echo esc_textarea( $consent_texto ); ?></textarea>
-                    <p class="description">Se mostrará junto a un checkbox <strong>obligatorio</strong>. Usa <code>{politica}</code> donde quieras el link a la política de privacidad.</p>
+                    <textarea name="welow_form_consent_texto" rows="3" class="large-text"
+                              placeholder="(Vacío = usa el texto global de Configuraciones → RGPD)"><?php echo esc_textarea( $consent_texto ); ?></textarea>
+                    <p class="description">Se mostrará junto a un checkbox <strong>obligatorio</strong>. Usa <code>{politica}</code> donde quieras el link a la política de privacidad. <strong>Si lo dejas vacío</strong>, se usará el texto definido en <a href="<?php echo esc_url( admin_url( 'admin.php?page=welow_settings' ) ); ?>">Configuraciones → "Texto RGPD global"</a>.</p>
                 </td>
             </tr>
             <tr>

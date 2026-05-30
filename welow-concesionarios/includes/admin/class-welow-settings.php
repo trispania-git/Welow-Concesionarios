@@ -109,6 +109,15 @@ class Welow_Settings {
             $output['iconos'] = Welow_Icons::sanitize( $input['iconos'] );
         }
 
+        // v2.40.0 — Texto RGPD global (fallback de los formularios)
+        if ( isset( $input['rgpd'] ) && is_array( $input['rgpd'] ) ) {
+            $r = $input['rgpd'];
+            $output['rgpd'] = array(
+                'consent_texto' => isset( $r['consent_texto'] ) ? sanitize_textarea_field( $r['consent_texto'] ) : '',
+                'politica_url'  => isset( $r['politica_url'] )  ? esc_url_raw( $r['politica_url'] ) : '',
+            );
+        }
+
         // v2.31.0 — Formularios por defecto en fichas de coche
         if ( isset( $input['formularios'] ) && is_array( $input['formularios'] ) ) {
             $f = $input['formularios'];
@@ -492,7 +501,49 @@ class Welow_Settings {
                 </tr>
             </table>
         <?php endif; ?>
+
+        <?php // v2.40.0 — Texto RGPD global (fallback de todos los formularios) ?>
+        <h3 style="margin-top:30px;">Texto RGPD global (consentimiento)</h3>
+        <p>Si dejas vacío el campo "Texto del consentimiento" en cualquier formulario,
+            se usará este texto global. Útil para que todos los formularios muestren
+            la misma cláusula sin tener que copiarla en cada uno.</p>
         <?php
+        $rgpd_default_consent = 'He leído y acepto la <a href="{politica}" target="_blank" rel="noopener">Política de Privacidad</a>. El responsable del tratamiento es TALLERES CHINARES SA. La finalidad de la recogida de datos es la de poder atender sus cuestiones, sin ceder sus datos a terceros. Tiene derecho a saber qué información tenemos sobre usted, corregirla o eliminarla tal y como se explica en nuestra <a href="{politica}" target="_blank" rel="noopener">Política de Privacidad</a>.';
+        $r = isset( $options['rgpd'] ) && is_array( $options['rgpd'] ) ? $options['rgpd'] : array();
+        $rgpd_consent  = $r['consent_texto'] ?? '';
+        $rgpd_politica = $r['politica_url']  ?? '';
+        ?>
+        <table class="form-table">
+            <tr>
+                <th><label>Texto del consentimiento</label></th>
+                <td>
+                    <textarea name="<?php echo esc_attr( self::OPTION_KEY ); ?>[rgpd][consent_texto]"
+                              rows="5" class="large-text"
+                              placeholder="<?php echo esc_attr( $rgpd_default_consent ); ?>"><?php echo esc_textarea( $rgpd_consent ); ?></textarea>
+                    <p class="description">Usa <code>{politica}</code> donde quieras enlazar a la URL de política de privacidad. Si lo dejas vacío, se usará el texto que ves como placeholder.</p>
+                    <p>
+                        <button type="button" class="button" onclick="document.querySelector('textarea[name=&quot;<?php echo esc_attr( self::OPTION_KEY ); ?>[rgpd][consent_texto]&quot;]').value = <?php echo wp_json_encode( $rgpd_default_consent ); ?>; return false;">Usar texto recomendado</button>
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <th><label>URL Política de Privacidad</label></th>
+                <td>
+                    <input type="url" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[rgpd][politica_url]"
+                           value="<?php echo esc_url( $rgpd_politica ); ?>" class="large-text"
+                           placeholder="https://grupochinares.com/politica-privacidad/" />
+                    <p class="description">URL global. Si un formulario tiene su propia URL de política, esa prevalece.</p>
+                </td>
+            </tr>
+        </table>
+        <?php
+    }
+
+    /**
+     * v2.40.0 — Devuelve el texto de consentimiento por defecto (constante).
+     */
+    public static function get_rgpd_default_consent() {
+        return 'He leído y acepto la <a href="{politica}" target="_blank" rel="noopener">Política de Privacidad</a>. El responsable del tratamiento es TALLERES CHINARES SA. La finalidad de la recogida de datos es la de poder atender sus cuestiones, sin ceder sus datos a terceros. Tiene derecho a saber qué información tenemos sobre usted, corregirla o eliminarla tal y como se explica en nuestra <a href="{politica}" target="_blank" rel="noopener">Política de Privacidad</a>.';
     }
 
     /**

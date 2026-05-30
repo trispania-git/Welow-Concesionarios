@@ -63,6 +63,22 @@ class Welow_Shortcode_Formulario {
         $consent     = get_post_meta( $form_id, '_welow_form_consent_texto', true );
         $politica    = get_post_meta( $form_id, '_welow_form_politica_url', true );
 
+        // v2.40.0 — Fallback al RGPD global si el formulario no tiene texto/URL propios
+        if ( class_exists( 'Welow_Settings' ) ) {
+            $opt_rgpd = get_option( Welow_Settings::OPTION_KEY, array() );
+            $opt_rgpd = isset( $opt_rgpd['rgpd'] ) && is_array( $opt_rgpd['rgpd'] ) ? $opt_rgpd['rgpd'] : array();
+            if ( ! $consent ) {
+                $consent = $opt_rgpd['consent_texto'] ?? '';
+                // Si tampoco hay global guardado, usar el texto recomendado por defecto
+                if ( ! $consent && method_exists( 'Welow_Settings', 'get_rgpd_default_consent' ) ) {
+                    $consent = Welow_Settings::get_rgpd_default_consent();
+                }
+            }
+            if ( ! $politica ) {
+                $politica = $opt_rgpd['politica_url'] ?? '';
+            }
+        }
+
         // Sustituir {politica} en el texto de consentimiento
         if ( $politica ) {
             $consent = str_replace( '{politica}', esc_url( $politica ), $consent );
@@ -311,7 +327,15 @@ class Welow_Shortcode_Formulario {
         }
 
         // Consentimiento RGPD
+        // v2.40.0 — Considerar el texto global como fallback (siempre habrá consentimiento)
         $consent_texto = get_post_meta( $form_id, '_welow_form_consent_texto', true );
+        if ( ! $consent_texto && class_exists( 'Welow_Settings' ) ) {
+            $opt = get_option( Welow_Settings::OPTION_KEY, array() );
+            $consent_texto = $opt['rgpd']['consent_texto'] ?? '';
+            if ( ! $consent_texto && method_exists( 'Welow_Settings', 'get_rgpd_default_consent' ) ) {
+                $consent_texto = Welow_Settings::get_rgpd_default_consent();
+            }
+        }
         if ( $consent_texto && empty( $_POST['welow_consent'] ) ) {
             wp_send_json_error( array( 'mensaje' => 'Debes aceptar la política de privacidad.' ), 400 );
         }
