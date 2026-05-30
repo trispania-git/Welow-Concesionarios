@@ -34,17 +34,21 @@ class Welow_Shortcode_Formulario {
 
         $form_id = self::resolver_form_id( $atts );
         if ( ! $form_id ) {
-            return '<!-- [welow_formulario]: no se encontró formulario -->';
+            return self::msg_admin( 'No se ha encontrado el formulario. Has llamado con <code>id="' . esc_html( $atts['id'] ) . '" slug="' . esc_html( $atts['slug'] ) . '"</code>. Comprueba que el ID es correcto (cópialo desde el sidebar "Cómo usarlo" al editar el formulario) o pasa el slug exacto.' );
         }
 
         $form = get_post( $form_id );
         if ( ! $form || Welow_CPT_Formulario::POST_TYPE !== $form->post_type ) {
-            return '<!-- [welow_formulario]: ID inválido -->';
+            return self::msg_admin( 'El ID "' . intval( $form_id ) . '" no corresponde a un formulario válido. Quizá fue borrado o cambiaste el ID.' );
+        }
+
+        if ( 'publish' !== $form->post_status ) {
+            return self::msg_admin( 'El formulario "' . esc_html( $form->post_title ) . '" no está publicado (status: <code>' . esc_html( $form->post_status ) . '</code>). Publícalo desde Concesionarios → Formularios.' );
         }
 
         $campos = Welow_CPT_Formulario::get_campos( $form_id );
         if ( empty( $campos ) ) {
-            return '<!-- [welow_formulario]: sin campos definidos -->';
+            return self::msg_admin( 'El formulario "' . esc_html( $form->post_title ) . '" no tiene campos definidos. Edita el formulario y añade al menos 1 campo.' );
         }
 
         wp_enqueue_style( 'welow-formulario' );
@@ -516,5 +520,18 @@ class Welow_Shortcode_Formulario {
         $host   = $_SERVER['HTTP_HOST'] ?? '';
         $uri    = $_SERVER['REQUEST_URI'] ?? '';
         return $scheme . '://' . $host . $uri;
+    }
+
+    /**
+     * v2.38.1 — Mensaje de diagnóstico visible SOLO a administradores logueados.
+     * Para visitantes normales devuelve un comentario HTML invisible.
+     */
+    private static function msg_admin( $html ) {
+        if ( current_user_can( 'manage_options' ) ) {
+            return '<div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:12px 16px;margin:12px 0;border-radius:4px;font-family:system-ui;font-size:13px;color:#78350f;">'
+                . '<strong>[welow_formulario]</strong> (visible solo a admins):<br>' . $html
+                . '</div>';
+        }
+        return '<!-- [welow_formulario]: ' . wp_strip_all_tags( $html ) . ' -->';
     }
 }
