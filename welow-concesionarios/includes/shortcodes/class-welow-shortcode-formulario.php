@@ -178,6 +178,20 @@ class Welow_Shortcode_Formulario {
                     echo '</div>';
                 }
                 break;
+            case 'fecha':
+                // v2.37.0 — Fecha (HTML5 date picker nativo)
+                $min = date( 'Y-m-d' ); // por defecto, no permitir fechas pasadas
+                echo '<input type="date" name="' . esc_attr( $name ) . '" min="' . esc_attr( $min ) . '"' . $req_str . ' />';
+                break;
+            case 'hora':
+                // v2.37.0 — Hora (HTML5 time picker)
+                echo '<input type="time" name="' . esc_attr( $name ) . '"' . $req_str . ' />';
+                break;
+            case 'fecha_hora':
+                // v2.37.0 — Fecha y hora combinadas
+                $min = date( 'Y-m-d\TH:i' );
+                echo '<input type="datetime-local" name="' . esc_attr( $name ) . '" min="' . esc_attr( $min ) . '"' . $req_str . ' />';
+                break;
             case 'texto':
             default:
                 echo '<input type="text" name="' . esc_attr( $name ) . '"' . $req_str . ' />';

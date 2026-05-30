@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.36.0
+ * Version:     2.37.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,18 @@
  *
  * CHANGELOG
  * ---------
+ * 2.37.0 — Formularios: tipos de campo "fecha", "hora" y "fecha_hora"
+ *   - Nuevos tipos en el builder de welow_formulario (botones + en el admin).
+ *   - Render frontend con inputs HTML5 nativos:
+ *       fecha       → <input type="date">      (selector calendario)
+ *       hora        → <input type="time">      (selector hora)
+ *       fecha_hora  → <input type="datetime-local">
+ *   - fecha y fecha_hora bloquean por defecto fechas pasadas (min=hoy).
+ *   - Sanitización vía sanitize_text_field (formato ISO YYYY-MM-DD es seguro).
+ *
+ *   Pensado especialmente para formularios de cita previa (taller, prueba
+ *   de conducción, visita al concesionario...).
+ *
  * 2.36.0 — Concesionario: formulario al lado de los datos en "Contacto y horario"
  *
  *   - Nuevo selector "Formulario para ficha de CONCESIONARIO" en
@@ -1491,7 +1503,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.36.0' );
+define( 'WELOW_CONC_VERSION', '2.37.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

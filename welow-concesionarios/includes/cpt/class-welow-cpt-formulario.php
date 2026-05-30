@@ -115,6 +115,9 @@ class Welow_CPT_Formulario {
             <button type="button" class="button" data-welow-add-campo="select">+ Select</button>
             <button type="button" class="button" data-welow-add-campo="radio">+ Radio</button>
             <button type="button" class="button" data-welow-add-campo="checkbox">+ Checkbox</button>
+            <button type="button" class="button" data-welow-add-campo="fecha">+ Fecha</button>
+            <button type="button" class="button" data-welow-add-campo="hora">+ Hora</button>
+            <button type="button" class="button" data-welow-add-campo="fecha_hora">+ Fecha y hora</button>
             <button type="button" class="button" data-welow-add-campo="oculto">+ Oculto</button>
         </p>
 
@@ -352,7 +355,7 @@ class Welow_CPT_Formulario {
         $decoded = self::reparar_campos( $decoded );
         // Sanitizar cada campo
         $limpio = array();
-        $allowed_types = array( 'texto', 'email', 'telefono', 'textarea', 'select', 'radio', 'checkbox', 'oculto' );
+        $allowed_types = array( 'texto', 'email', 'telefono', 'textarea', 'select', 'radio', 'checkbox', 'oculto', 'fecha', 'hora', 'fecha_hora' );
         foreach ( $decoded as $c ) {
             $type = isset( $c['type'] ) && in_array( $c['type'], $allowed_types, true ) ? $c['type'] : 'texto';
             $label = isset( $c['label'] ) ? sanitize_text_field( $c['label'] ) : '';
