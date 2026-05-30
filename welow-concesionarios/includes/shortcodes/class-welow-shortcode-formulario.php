@@ -201,7 +201,82 @@ class Welow_Shortcode_Formulario {
     }
 
     private static function parsear_opciones( $raw ) {
+        // v2.38.0 — Sustituir tokens dinámicos por listas reales (alfabéticas)
+        $raw = self::expandir_tokens_dinamicos( $raw );
         return array_values( array_filter( array_map( 'trim', explode( '|', $raw ) ) ) );
+    }
+
+    /**
+     * v2.38.0 — Expande tokens dinámicos en el campo "opciones":
+     *   {marcas-oficiales}  → todas las welow_marca publicadas (alfabético)
+     *   {marcas-externas}   → todos los términos welow_marca_externa
+     *   {marcas-todas}      → unión sin duplicados
+     *   {concesionarios}    → welow_concesionario publicados
+     */
+    private static function expandir_tokens_dinamicos( $raw ) {
+        if ( false === strpos( $raw, '{' ) ) return $raw;
+
+        $cargar_lista = function( $token ) {
+            $items = array();
+            switch ( $token ) {
+                case 'marcas-oficiales':
+                    $posts = get_posts( array(
+                        'post_type'      => 'welow_marca',
+                        'post_status'    => 'publish',
+                        'posts_per_page' => -1,
+                        'orderby'        => 'title',
+                        'order'          => 'ASC',
+                    ) );
+                    foreach ( $posts as $p ) $items[] = $p->post_title;
+                    break;
+                case 'marcas-externas':
+                    if ( taxonomy_exists( 'welow_marca_externa' ) ) {
+                        $terms = get_terms( array(
+                            'taxonomy'   => 'welow_marca_externa',
+                            'hide_empty' => false,
+                            'orderby'    => 'name',
+                            'order'      => 'ASC',
+                        ) );
+                        if ( ! is_wp_error( $terms ) ) {
+                            foreach ( $terms as $t ) $items[] = $t->name;
+                        }
+                    }
+                    break;
+                case 'marcas-todas':
+                    $todas = array();
+                    foreach ( get_posts( array( 'post_type' => 'welow_marca', 'post_status' => 'publish', 'posts_per_page' => -1 ) ) as $p ) {
+                        $todas[ mb_strtolower( $p->post_title ) ] = $p->post_title;
+                    }
+                    if ( taxonomy_exists( 'welow_marca_externa' ) ) {
+                        $terms = get_terms( array( 'taxonomy' => 'welow_marca_externa', 'hide_empty' => false ) );
+                        if ( ! is_wp_error( $terms ) ) {
+                            foreach ( $terms as $t ) $todas[ mb_strtolower( $t->name ) ] = $t->name;
+                        }
+                    }
+                    ksort( $todas );
+                    $items = array_values( $todas );
+                    break;
+                case 'concesionarios':
+                    $posts = get_posts( array(
+                        'post_type'      => 'welow_concesionario',
+                        'post_status'    => 'publish',
+                        'posts_per_page' => -1,
+                        'orderby'        => 'title',
+                        'order'          => 'ASC',
+                    ) );
+                    foreach ( $posts as $p ) $items[] = $p->post_title;
+                    break;
+            }
+            return implode( '|', $items );
+        };
+
+        return preg_replace_callback(
+            '/\{(marcas-oficiales|marcas-externas|marcas-todas|concesionarios)\}/',
+            function( $m ) use ( $cargar_lista ) {
+                return $cargar_lista( $m[1] );
+            },
+            $raw
+        );
     }
 
     /* =====================================================================

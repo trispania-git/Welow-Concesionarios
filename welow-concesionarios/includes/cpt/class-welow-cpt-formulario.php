@@ -100,7 +100,10 @@ class Welow_CPT_Formulario {
         <p style="background:#f0f6fc;border-left:3px solid #2271b1;padding:8px 12px;margin:0 0 14px;font-size:13px;">
             Construye los campos uno a uno. El <strong>nombre</strong> (interno) se autogenera del label
             si lo dejas vacío. Para select/radio/checkbox, escribe las opciones separadas por <code>|</code>
-            (ejemplo: <code>SUV|Berlina|Compacto</code>).
+            (ejemplo: <code>SUV|Berlina|Compacto</code>).<br>
+            <strong>Tokens dinámicos</strong> en opciones (se sustituyen al renderizar, alfabético):
+            <code>{marcas-oficiales}</code>, <code>{marcas-externas}</code>, <code>{marcas-todas}</code>,
+            <code>{concesionarios}</code>. Puedes combinar: <code>Sin preferencia|{marcas-oficiales}</code>.
         </p>
 
         <input type="hidden" id="welow_form_campos_json" name="welow_form_campos" value='<?php echo esc_attr( $campos_json ); ?>' />
