@@ -119,6 +119,9 @@ class Welow_Settings {
                 'me_interesa_page' => isset( $f['me_interesa_page'] ) ? absint( $f['me_interesa_page'] ) : 0,
                 // v2.36.0 — Formulario para ficha de concesionario
                 'concesionario'    => isset( $f['concesionario'] ) ? absint( $f['concesionario'] ) : 0,
+                // v2.39.0 — Cita de taller
+                'cita_taller'      => isset( $f['cita_taller'] ) ? absint( $f['cita_taller'] ) : 0,
+                'cita_taller_page' => isset( $f['cita_taller_page'] ) ? absint( $f['cita_taller_page'] ) : 0,
             );
         }
 
@@ -418,6 +421,46 @@ class Welow_Settings {
                 💡 Cuando configuras un formulario aquí, también afecta al shortcode legacy <code>[welow_coche_formulario]</code>
                 — se redirige automáticamente al nuevo sistema. No hace falta cambiar nada en las páginas existentes.
             </p>
+
+            <?php // v2.39.0 — Cita de taller ?>
+            <h3 style="margin-top:30px;">Cita previa de taller</h3>
+            <p>Selecciona el formulario y la página donde aparece el shortcode
+                <code>[welow_cita_taller]</code>. Esa página renderiza el formulario
+                configurado aquí abajo, sin tener que pegar el ID a mano.</p>
+            <table class="form-table">
+                <tr>
+                    <th><label>Formulario de Cita Taller</label></th>
+                    <td>
+                        <?php $sel_taller = intval( $f['cita_taller'] ?? 0 ); ?>
+                        <select name="<?php echo esc_attr( $base ); ?>[cita_taller]" class="regular-text">
+                            <option value="0">— Sin formulario configurado —</option>
+                            <?php foreach ( $forms as $form ) : ?>
+                                <option value="<?php echo intval( $form->ID ); ?>" <?php selected( $sel_taller, $form->ID ); ?>>
+                                    <?php echo esc_html( $form->post_title ); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><label>Página de Cita Taller</label></th>
+                    <td>
+                        <?php
+                        $sel_taller_page = intval( $f['cita_taller_page'] ?? 0 );
+                        wp_dropdown_pages( array(
+                            'name'              => esc_attr( $base ) . '[cita_taller_page]',
+                            'selected'          => $sel_taller_page,
+                            'show_option_none'  => '— Sin página configurada —',
+                            'option_none_value' => '0',
+                        ) );
+                        ?>
+                        <p class="description">
+                            Crea una página WordPress y pega dentro <code>[welow_cita_taller]</code>.
+                            Luego selecciónala aquí (también la usamos para el enlace del botón del header).
+                        </p>
+                    </td>
+                </tr>
+            </table>
 
             <?php // v2.32.0 — Página para el botón "¡Me interesa!" de los modelos ?>
             <h3 style="margin-top:30px;">Página del botón "¡Me interesa!"</h3>

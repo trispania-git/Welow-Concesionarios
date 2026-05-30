@@ -252,6 +252,19 @@ class Welow_Help {
                 ),
             ),
 
+            'welow_cita_taller' => array(
+                'titulo' => 'Página de cita previa de taller (v2.39.0)',
+                'desc'   => 'Renderiza el formulario de cita de taller configurado en Concesionarios → Configuraciones → "Formulario de Cita Taller". Crea una página WP, pega este shortcode dentro y selecciónala en Configuraciones → "Página de Cita Taller". El header puede enlazar a esa página desde el botón.',
+                'params' => array(
+                    'titulo' => array( 'def' => 'Pide tu cita de taller', 'desc' => 'Título h1 sobre el formulario' ),
+                    'texto'  => array( 'def' => 'Reserva la fecha y hora que mejor te venga...', 'desc' => 'Texto introductorio' ),
+                ),
+                'ejemplos' => array(
+                    '[welow_cita_taller]',
+                    '[welow_cita_taller titulo="Reserva tu cita"]',
+                ),
+            ),
+
             'welow_me_interesa' => array(
                 'titulo' => 'Página "¡Me interesa!" del modelo (v2.32.0)',
                 'desc'   => 'Página destino del botón "¡Me interesa!" de las cards de modelo. Detecta el modelo desde ?modelo=slug en la URL, muestra foto destacada + marca + nombre del modelo, y debajo el formulario configurado en Configuraciones para "coches nuevos". Recomendado: crear una página WP llamada "Me interesa" o similar, pegar este shortcode dentro, y seleccionarla en Configuraciones → Formularios → "Página del botón Me Interesa".',

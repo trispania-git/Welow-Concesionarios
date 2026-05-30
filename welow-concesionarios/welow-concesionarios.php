@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.38.1
+ * Version:     2.39.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,28 @@
  *
  * CHANGELOG
  * ---------
+ * 2.39.0 — Cita previa de taller (consistencia UX con resto de forms)
+ *
+ *   NUEVO en Configuraciones → Formularios → "Cita previa de taller":
+ *      - Dropdown "Formulario de Cita Taller" (selector de welow_formulario)
+ *      - Dropdown "Página de Cita Taller" (page picker)
+ *
+ *   NUEVO SHORTCODE [welow_cita_taller]:
+ *      - Renderiza el formulario configurado, sin tener que pegar ID a mano
+ *      - Título y texto introductorios configurables (defaults razonables)
+ *      - Reusa el CSS de [welow_me_interesa] (mismo look visual)
+ *
+ *   FLUJO:
+ *   1. Crear formulario "Cita de taller" en Concesionarios → Formularios
+ *   2. Configuraciones → Formularios → "Cita previa de taller":
+ *      - Selecciona el formulario en el dropdown
+ *      - Selecciona la página donde lo mostrarás (o créala antes)
+ *   3. En esa página, pega [welow_cita_taller]
+ *   4. Botón del header → enlace a esa página
+ *
+ *   Mismo patrón consistente que [welow_me_interesa]: settings + shortcode
+ *   que usa lo configurado, sin tener que recordar IDs.
+ *
  * 2.38.1 — [welow_formulario]: diagnóstico visible a admin si falla la carga
  *   Antes los errores (ID inválido, formulario despublicado, sin campos)
  *   se devolvían como comentario HTML invisible. Ahora salen como aviso
@@ -1524,7 +1546,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.38.1' );
+define( 'WELOW_CONC_VERSION', '2.39.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
@@ -1584,6 +1606,7 @@ require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-formulario.php';   
 require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-lead.php';                             // v2.30.0
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-formulario.php';          // v2.30.0
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-me-interesa.php';         // v2.32.0
+require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-cita-taller.php';         // v2.39.0
 
 // Permalinks de coches
 require_once WELOW_CONC_PATH . 'includes/class-welow-coche-permalinks.php';                       // v2.5.0
