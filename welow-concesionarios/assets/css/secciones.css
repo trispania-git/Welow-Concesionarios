@@ -157,17 +157,22 @@
 }
 
 .welow-precio-disclaimer::before {
+    /* v2.40.1 — Alineado a la IZQUIERDA del icono (en vez de a la derecha) y
+       ancho responsive con clamp. Como el disclaimer está en la zona izquierda
+       del card, extender hacia la derecha rara vez se sale; y al haber quitado
+       el overflow:hidden del card, ya no hay riesgo de corte. */
     content: attr(data-tooltip);
     bottom: calc(100% + 10px);
-    right: 0;
+    left: 0;
+    right: auto;
     background: #1f2937;
     color: #fff;
     padding: 10px 12px;
     border-radius: 6px;
     font-size: 12px;
     line-height: 1.5;
-    width: 280px;
-    max-width: 90vw;
+    width: clamp(240px, 80vw, 320px);
+    max-width: 80vw;
     white-space: normal;
     font-weight: normal;
     text-align: left;
@@ -177,7 +182,8 @@
 .welow-precio-disclaimer::after {
     content: '';
     bottom: calc(100% + 4px);
-    right: 8px;
+    left: 8px;
+    right: auto;
     border: 6px solid transparent;
     border-top-color: #1f2937;
 }
@@ -191,8 +197,10 @@
 
 @media (max-width: 767px) {
     .welow-precio-disclaimer::before {
+        /* v2.40.1 — Móvil: mantenemos alineado a izq pero algo más estrecho */
         width: 220px;
-        right: -20px;
+        left: 0;
+        right: auto;
     }
     .welow-modelo-etiqueta {
         /* v2.14.0 — 70% (48→34px) */
@@ -313,7 +321,8 @@
     background: #ffffff;
     border: 1px solid #e8e8e8;
     border-radius: 16px;
-    overflow: hidden;
+    /* v2.40.1 — Quitado overflow:hidden para que el tooltip del disclaimer pueda
+       desbordarse sin cortarse. La imagen y el slider tienen sus propios overflows. */
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
@@ -330,6 +339,10 @@
     aspect-ratio: 16 / 10;
     overflow: hidden;
     background: #f8fafc;
+    /* v2.40.1 — Esquinas superiores redondeadas para conservar el look del card
+       ahora que el card ya no tiene overflow:hidden. */
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
 }
 
 .welow-modelo-card__imagen img {

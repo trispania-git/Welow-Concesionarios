@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.40.0
+ * Version:     2.40.1
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,15 @@
  *
  * CHANGELOG
  * ---------
+ * 2.40.1 — Fix: tooltip del disclaimer del precio se cortaba por el ancho del card
+ *   - Quitado overflow:hidden del .welow-modelo-card que recortaba el tooltip.
+ *   - Las esquinas superiores redondeadas se mantienen aplicándolas en
+ *     .welow-modelo-card__imagen (donde sí hay overflow:hidden).
+ *   - Tooltip ahora se ancla a la IZQUIERDA del icono (extendiéndose hacia
+ *     la derecha) en vez de a la derecha (extendiéndose hacia la izquierda),
+ *     ya que el disclaimer está en la zona izquierda del card.
+ *   - Ancho responsive con clamp(240px, 80vw, 320px) para que se adapte mejor.
+ *
  * 2.40.0 — Texto RGPD global (fallback de todos los formularios)
  *
  *   NUEVO en Configuraciones → Formularios → "Texto RGPD global":
@@ -1563,7 +1572,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.40.0' );
+define( 'WELOW_CONC_VERSION', '2.40.1' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
