@@ -1033,26 +1033,53 @@ class Welow_Helpers {
         $modelo = get_post( $modelo_id );
         if ( ! $modelo || 'welow_modelo' !== $modelo->post_type ) return null;
 
-        $marca_id = get_post_meta( $modelo_id, '_welow_modelo_marca', true );
-        $marca = $marca_id ? get_post( $marca_id ) : null;
+        $marca_id = intval( get_post_meta( $modelo_id, '_welow_modelo_marca', true ) );
+        $marca    = $marca_id ? get_post( $marca_id ) : null;
 
         $combustibles = wp_get_post_terms( $modelo_id, 'welow_combustible' );
         $carrocerias  = wp_get_post_terms( $modelo_id, 'welow_categoria_modelo' );
 
+        // v2.41.0 — Objeto marca completo (similar al de coches/concesionarios)
+        $marca_data = null;
+        if ( $marca ) {
+            // Logo: preferimos el "logo_negro" si existe, si no la imagen destacada
+            $logo_id  = intval( get_post_meta( $marca->ID, '_welow_marca_logo_negro', true ) );
+            $logo_url = $logo_id ? wp_get_attachment_image_url( $logo_id, 'medium' ) : get_the_post_thumbnail_url( $marca->ID, 'medium' );
+
+            $marca_data = array(
+                'id'     => $marca->ID,
+                'slug'   => $marca->post_name,
+                'nombre' => $marca->post_title,
+                'url'    => get_permalink( $marca->ID ),
+                'logo'   => $logo_url ?: '',
+                'web'    => self::get_marca_meta( $marca->ID, 'web' ),
+                'slogan' => self::get_marca_meta( $marca->ID, 'slogan' ),
+            );
+        }
+
         return array(
             'id'           => $modelo_id,
             'titulo'       => $modelo->post_title,
+            'slug'         => $modelo->post_name,
             'url'          => get_permalink( $modelo_id ),
             'descripcion'  => wp_strip_all_tags( $modelo->post_content ),
             'extracto'     => $modelo->post_excerpt,
+            // Marca: campos planos (compat hacia atrás) + objeto completo
             'marca'        => $marca ? $marca->post_title : '',
-            'marca_id'     => $marca ? $marca->ID : 0,
+            'marca_id'     => $marca_id,
+            'marca_slug'   => $marca ? $marca->post_name : '',
+            'marca_url'    => $marca ? get_permalink( $marca->ID ) : '',
+            'marca_logo'   => $marca_data['logo'] ?? '',
+            'marca_data'   => $marca_data, // objeto completo
             'precio_desde' => get_post_meta( $modelo_id, '_welow_modelo_precio_desde', true ) !== '' ? floatval( get_post_meta( $modelo_id, '_welow_modelo_precio_desde', true ) ) : null,
             'plazas'       => get_post_meta( $modelo_id, '_welow_modelo_plazas', true ) !== '' ? intval( get_post_meta( $modelo_id, '_welow_modelo_plazas', true ) ) : null,
             'combustibles' => array_map( function( $t ) { return $t->name; }, is_wp_error( $combustibles ) ? array() : $combustibles ),
             'carrocerias'  => array_map( function( $t ) { return $t->name; }, is_wp_error( $carrocerias ) ? array() : $carrocerias ),
             'enlace'       => get_post_meta( $modelo_id, '_welow_modelo_enlace', true ),
             'imagen'       => get_the_post_thumbnail_url( $modelo_id, 'large' ),
+            // v2.41.0 — timestamps para sync incremental
+            'fecha_alta'         => mysql2date( 'c', $modelo->post_date_gmt, false ),
+            'fecha_modificacion' => mysql2date( 'c', $modelo->post_modified_gmt, false ),
         );
     }
 

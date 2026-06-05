@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.40.1
+ * Version:     2.41.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,21 @@
  *
  * CHANGELOG
  * ---------
+ * 2.41.0 — API /modelos: marca enriquecida + timestamps
+ *
+ *   El endpoint /wp-json/welow/v1/modelos devolvía solo "marca" (string) y
+ *   "marca_id" (int). Ahora cada modelo incluye:
+ *     - marca       string (compat, igual que antes)
+ *     - marca_id    int (compat)
+ *     - marca_slug  string nuevo
+ *     - marca_url   string nuevo (permalink de la marca)
+ *     - marca_logo  string nuevo (URL del logo negro o thumbnail)
+ *     - marca_data  objeto completo: {id, slug, nombre, url, logo, web, slogan}
+ *     - slug        string del modelo (faltaba)
+ *     - fecha_alta + fecha_modificacion (ISO 8601 UTC) para sync incremental
+ *
+ *   Endpoint también disponible: /wp-json/welow/v1/modelos
+ *
  * 2.40.1 — Fix: tooltip del disclaimer del precio se cortaba por el ancho del card
  *   - Quitado overflow:hidden del .welow-modelo-card que recortaba el tooltip.
  *   - Las esquinas superiores redondeadas se mantienen aplicándolas en
@@ -1572,7 +1587,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.40.1' );
+define( 'WELOW_CONC_VERSION', '2.41.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
