@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.41.0
+ * Version:     2.42.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,38 @@
  *
  * CHANGELOG
  * ---------
+ * 2.42.0 — API /coches/*: objetos completos de marca y modelo
+ *
+ *   Antes /coches/nuevos y /coches/ocasion devolvían "marca" y "modelo"
+ *   solo como strings. El concesionario ya era un objeto completo desde
+ *   v2.25.0 (vía cascada coche→modelo→marca→concesionario).
+ *
+ *   Ahora cada coche también incluye:
+ *     "marca_data": {
+ *        "tipo": "oficial" | "externa",
+ *        "id": ...,
+ *        "slug": ...,
+ *        "nombre": ...,
+ *        "url": ...,         // permalink (vacío si externa)
+ *        "logo": ...,         // logo (vacío si externa)
+ *        "web": ...,          // solo oficial
+ *        "slogan": ...        // solo oficial
+ *     }
+ *     "modelo_data": {
+ *        "tipo": "catalogo" | "texto",
+ *        "id": ...,
+ *        "slug": ...,
+ *        "nombre": ...,
+ *        "url": ...,          // permalink del modelo (vacío si texto libre)
+ *        "imagen": ...        // imagen destacada del modelo
+ *     }
+ *
+ *   Campos planos "marca", "modelo", "marca_id" se mantienen para compat.
+ *
+ *   El concesionario sigue resolviéndose automáticamente vía la marca
+ *   oficial (cuando es coche nuevo). Para coches de ocasión, solo se
+ *   muestra concesionario si está explícitamente asignado en su meta.
+ *
  * 2.41.0 — API /modelos: marca enriquecida + timestamps
  *
  *   El endpoint /wp-json/welow/v1/modelos devolvía solo "marca" (string) y
@@ -1587,7 +1619,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.41.0' );
+define( 'WELOW_CONC_VERSION', '2.42.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

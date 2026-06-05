@@ -760,6 +760,85 @@ class Welow_Helpers {
     }
 
     /**
+     * v2.42.0 — Devuelve el OBJETO COMPLETO de la marca del coche.
+     *   Coches NUEVOS: marca oficial (welow_marca) con id/slug/url/logo/web/slogan.
+     *   Coches OCASIÓN: marca externa (taxonomía welow_marca_externa) con id/slug/nombre.
+     *
+     * Devuelve null si no hay marca asignable.
+     */
+    public static function get_coche_marca_data( $coche_id ) {
+        $es_nuevo = self::es_coche_nuevo( $coche_id );
+        if ( null === $es_nuevo ) return null;
+
+        if ( $es_nuevo ) {
+            $marca = self::get_coche_marca( $coche_id );
+            if ( ! $marca ) return null;
+            $logo_id  = intval( get_post_meta( $marca->ID, '_welow_marca_logo_negro', true ) );
+            $logo_url = $logo_id ? wp_get_attachment_image_url( $logo_id, 'medium' ) : get_the_post_thumbnail_url( $marca->ID, 'medium' );
+            return array(
+                'tipo'   => 'oficial',
+                'id'     => $marca->ID,
+                'slug'   => $marca->post_name,
+                'nombre' => $marca->post_title,
+                'url'    => get_permalink( $marca->ID ),
+                'logo'   => $logo_url ?: '',
+                'web'    => self::get_marca_meta( $marca->ID, 'web' ),
+                'slogan' => self::get_marca_meta( $marca->ID, 'slogan' ),
+            );
+        }
+
+        // Ocasión: taxonomía welow_marca_externa
+        $terms = wp_get_post_terms( $coche_id, 'welow_marca_externa' );
+        if ( empty( $terms ) || is_wp_error( $terms ) ) return null;
+        $t = $terms[0];
+        return array(
+            'tipo'   => 'externa',
+            'id'     => intval( $t->term_id ),
+            'slug'   => $t->slug,
+            'nombre' => $t->name,
+            'url'    => '',
+            'logo'   => '',
+        );
+    }
+
+    /**
+     * v2.42.0 — Devuelve el OBJETO COMPLETO del modelo del coche.
+     *   Coches NUEVOS: modelo del catálogo (welow_modelo) con id/slug/url/imagen.
+     *   Coches OCASIÓN: solo texto libre del modelo (no es CPT).
+     *
+     * Devuelve null si no hay modelo asignable.
+     */
+    public static function get_coche_modelo_data( $coche_id ) {
+        $es_nuevo = self::es_coche_nuevo( $coche_id );
+        if ( null === $es_nuevo ) return null;
+
+        if ( $es_nuevo ) {
+            $modelo = self::get_coche_modelo( $coche_id );
+            if ( ! $modelo ) return null;
+            return array(
+                'tipo'   => 'catalogo',
+                'id'     => $modelo->ID,
+                'slug'   => $modelo->post_name,
+                'nombre' => $modelo->post_title,
+                'url'    => get_permalink( $modelo->ID ),
+                'imagen' => get_the_post_thumbnail_url( $modelo->ID, 'large' ) ?: '',
+            );
+        }
+
+        // Ocasión: solo texto libre
+        $texto = self::get_coche_meta( $coche_id, 'modelo_texto', '' );
+        if ( ! $texto ) return null;
+        return array(
+            'tipo'   => 'texto',
+            'id'     => 0,
+            'slug'   => sanitize_title( $texto ),
+            'nombre' => $texto,
+            'url'    => '',
+            'imagen' => '',
+        );
+    }
+
+    /**
      * Devuelve el nombre legible del modelo según el CPT del coche.
      *
      * @since 2.1.0
@@ -842,6 +921,9 @@ class Welow_Helpers {
 
         $marca_nom  = self::get_coche_marca_nombre( $coche_id );
         $modelo_nom = self::get_coche_modelo_nombre( $coche_id );
+        // v2.42.0 — Objetos completos de marca y modelo (consistencia con concesionario)
+        $marca_data  = self::get_coche_marca_data( $coche_id );
+        $modelo_data = self::get_coche_modelo_data( $coche_id );
 
         $combustibles = wp_get_post_terms( $coche_id, 'welow_combustible' );
         $carrocerias  = wp_get_post_terms( $coche_id, 'welow_categoria_modelo' );
@@ -923,6 +1005,10 @@ class Welow_Helpers {
             'marca'             => $marca_nom,
             'modelo'            => $modelo_nom,
             'version'           => self::get_coche_meta( $coche_id, 'version' ),
+
+            // v2.42.0 — Objetos completos con id/slug/url/logo (oficiales y externas)
+            'marca_data'        => $marca_data,
+            'modelo_data'       => $modelo_data,
 
             // Datos básicos
             'mes_matriculacion' => $mes ? intval( $mes ) : null,
