@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.43.0
+ * Version:     2.43.1
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,11 @@
  *
  * CHANGELOG
  * ---------
+ * 2.43.1 — API /coches/nuevos retirado por completo
+ *   La ruta REST ya no se registra → devuelve 404 limpio en vez de respuesta
+ *   deprecated. Método endpoint_coches_nuevos() eliminado del controlador.
+ *   Usar /wp-json/welow/v1/modelos para consultar el catálogo oficial.
+ *
  * 2.43.0 — Soft remove del CPT welow_coche_nuevo
  *
  *   El CPT "Coches NUEVOS" no se usaba (el catálogo se gestiona a nivel
@@ -1644,7 +1649,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.43.0' );
+define( 'WELOW_CONC_VERSION', '2.43.1' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

@@ -5,12 +5,15 @@
  * Namespace: welow/v1
  *
  * Endpoints:
- *   GET /wp-json/welow/v1/coches/nuevos?max=100
  *   GET /wp-json/welow/v1/coches/ocasion?max=100&tipo=ocasion|km0
  *   GET /wp-json/welow/v1/coches/todos?max=100
+ *   GET /wp-json/welow/v1/coches/{id}
  *   GET /wp-json/welow/v1/modelos
  *   GET /wp-json/welow/v1/marcas
+ *   GET /wp-json/welow/v1/concesionarios
  *   GET /wp-json/welow/v1/info               (resumen del sitio)
+ *
+ * Retirado en v2.43.1: /coches/nuevos (CPT en soft-remove; usar /modelos).
  *
  * Todos públicos sin autenticación. Si en el futuro se quiere proteger,
  * se puede añadir un parámetro `?api_key=` configurable en Configuraciones.
@@ -45,12 +48,9 @@ class Welow_Rest_API {
             ),
         );
 
-        register_rest_route( self::NAMESPACE_API, '/coches/nuevos', array(
-            'methods'  => 'GET',
-            'callback' => array( __CLASS__, 'endpoint_coches_nuevos' ),
-            'permission_callback' => '__return_true',
-            'args' => $args_max,
-        ) );
+        // v2.43.1 — /coches/nuevos retirado del registro REST (404 limpio).
+        // El callback endpoint_coches_nuevos() se mantiene en la clase por
+        // referencia histórica pero ya no es accesible vía URL.
 
         register_rest_route( self::NAMESPACE_API, '/coches/ocasion', array(
             'methods'  => 'GET',
@@ -113,22 +113,8 @@ class Welow_Rest_API {
        ENDPOINTS
        ======================================================================== */
 
-    /**
-     * v2.43.0 — Endpoint /coches/nuevos marcado como deprecated.
-     * Devuelve respuesta vacía con nota de deprecación. El CPT welow_coche_nuevo
-     * sigue registrado en soft-remove pero no se gestiona. Usar /modelos para
-     * la información del catálogo oficial.
-     */
-    public static function endpoint_coches_nuevos( $request ) {
-        return rest_ensure_response( array(
-            'total'      => 0,
-            'tipo'       => 'coche_nuevo',
-            'coches'     => array(),
-            'deprecated' => true,
-            'aviso'      => 'El endpoint /coches/nuevos está deprecated. La información del catálogo oficial está disponible en /wp-json/welow/v1/modelos.',
-            'generado'   => current_time( 'c' ),
-        ) );
-    }
+    // v2.43.1 — endpoint_coches_nuevos() eliminado. El endpoint /coches/nuevos
+    // ya no está registrado en REST y devolverá 404 limpio. Usar /modelos.
 
     public static function endpoint_coches_ocasion( $request ) {
         $coches = Welow_Helpers::get_coches_ocasion( array(
