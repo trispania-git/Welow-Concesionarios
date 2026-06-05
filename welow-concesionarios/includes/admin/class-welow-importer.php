@@ -300,46 +300,9 @@ class Welow_Importer {
                     </form>
                 </div>
 
-                <!-- COCHES NUEVOS (v2.1.0) -->
-                <div class="welow-importer-card welow-importer-card--nuevos">
-                    <h2><span class="dashicons dashicons-car"></span> Coches NUEVOS</h2>
-                    <p>Coches del catálogo oficial (Toyota, Hyundai, JAECOO...). Requiere modelo_slug.</p>
-
-                    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin-bottom:14px;">
-                        <?php wp_nonce_field( 'welow_plantilla_coches_nuevos' ); ?>
-                        <input type="hidden" name="action" value="welow_descargar_plantilla">
-                        <input type="hidden" name="tipo" value="coches_nuevos">
-                        <button type="submit" class="button">
-                            <span class="dashicons dashicons-download" style="margin-top:4px;"></span>
-                            Plantilla CSV
-                        </button>
-                    </form>
-
-                    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" enctype="multipart/form-data">
-                        <?php wp_nonce_field( 'welow_importar_coches_nuevos' ); ?>
-                        <input type="hidden" name="action" value="welow_importar_csv">
-                        <input type="hidden" name="tipo" value="coches_nuevos">
-                        <p><input type="file" name="archivo_csv" accept=".csv" required></p>
-                        <p><label><input type="checkbox" name="actualizar" value="1" checked> Actualizar existentes</label></p>
-                        <p><label><input type="checkbox" name="descargar_imagenes" value="1" checked> Descargar imágenes desde URLs</label></p>
-                        <p>
-                            <button type="submit" class="button button-primary">
-                                <span class="dashicons dashicons-upload" style="margin-top:4px;"></span>
-                                Importar coches nuevos
-                            </button>
-                        </p>
-                    </form>
-
-                    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin-top:14px;">
-                        <?php wp_nonce_field( 'welow_exportar_coches_nuevos' ); ?>
-                        <input type="hidden" name="action" value="welow_exportar_csv">
-                        <input type="hidden" name="tipo" value="coches_nuevos">
-                        <button type="submit" class="button">
-                            <span class="dashicons dashicons-migrate" style="margin-top:4px;"></span>
-                            Exportar coches nuevos
-                        </button>
-                    </form>
-                </div>
+                <?php // v2.43.0 — Card "Coches NUEVOS" retirada (CPT en soft-remove,
+                      // catálogo se gestiona desde Modelos). El handler legacy del
+                      // importer se mantiene por compat por si alguien tiene CSV antiguo. ?>
 
                 <!-- COCHES DE OCASIÓN / KM0 (v2.1.0) -->
                 <div class="welow-importer-card welow-importer-card--ocasion">

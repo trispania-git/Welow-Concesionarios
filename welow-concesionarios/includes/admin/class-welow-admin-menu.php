@@ -99,14 +99,8 @@ class Welow_Admin_Menu {
 
             <div class="welow-dashboard-grid">
 
-                <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=welow_coche_nuevo' ) ); ?>" class="welow-card welow-card-highlight">
-                    <span class="dashicons dashicons-car"></span>
-                    <h3>Coches NUEVOS</h3>
-                    <p>Catálogo oficial. Vinculados a un modelo.</p>
-                    <span class="welow-count">
-                        <?php echo post_type_exists( 'welow_coche_nuevo' ) ? intval( wp_count_posts( 'welow_coche_nuevo' )->publish ) : 0; ?> publicados
-                    </span>
-                </a>
+                <?php // v2.43.0 — Card "Coches NUEVOS" retirada (CPT en soft-remove,
+                      // se gestiona desde Modelos directamente). ?>
 
                 <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=welow_coche_ocasion' ) ); ?>" class="welow-card welow-card-highlight">
                     <span class="dashicons dashicons-car"></span>

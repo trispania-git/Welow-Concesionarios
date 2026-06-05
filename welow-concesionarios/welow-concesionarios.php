@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.42.0
+ * Version:     2.43.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,31 @@
  *
  * CHANGELOG
  * ---------
+ * 2.43.0 — Soft remove del CPT welow_coche_nuevo
+ *
+ *   El CPT "Coches NUEVOS" no se usaba (el catálogo se gestiona a nivel
+ *   de welow_modelo). Cambios:
+ *
+ *   - CPT welow_coche_nuevo: sigue REGISTRADO internamente (para no perder
+ *     datos ni romper integraciones), pero se OCULTA del admin:
+ *       show_ui=false, show_in_menu=false, show_in_rest=false, public=false.
+ *   - Dashboard "Concesionarios → Panel": retirada la card "Coches NUEVOS".
+ *   - Importer: retirada la card "Coches NUEVOS" (handlers legacy se mantienen
+ *     por si alguien tiene CSV antiguo).
+ *   - Endpoint REST /coches/nuevos: marcado como deprecated, devuelve
+ *     {total:0, deprecated:true, aviso:"..."}.
+ *   - /info: retirado del listado de endpoints y de estadisticas.
+ *   - Settings: dropdown "Formulario para coches NUEVOS" renombrado a
+ *     "Formulario para 'Me Interesa' (modelos)" — el ajuste sigue usándose
+ *     por [welow_me_interesa] aunque ya no haya fichas de coche nuevo.
+ *
+ *   Lo que NO se toca:
+ *   - welow_modelo (catálogo del concesionario, sigue siendo el principal)
+ *   - welow_coche_ocasion (stock real de segunda mano, sin cambios)
+ *   - [welow_modelos], [welow_coche_ficha] para ocasión
+ *   - Endpoints /coches/ocasion, /coches/todos (que ahora solo devuelve ocasión),
+ *     /modelos, /marcas, /concesionarios
+ *
  * 2.42.0 — API /coches/*: objetos completos de marca y modelo
  *
  *   Antes /coches/nuevos y /coches/ocasion devolvían "marca" y "modelo"
@@ -1619,7 +1644,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.42.0' );
+define( 'WELOW_CONC_VERSION', '2.43.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

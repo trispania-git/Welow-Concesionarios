@@ -95,8 +95,17 @@ class Welow_CPT_Coche_Nuevo extends Welow_CPT_Coche_Base {
     }
 
     public static function get_args_extra() {
+        // v2.43.0 — Soft remove: el CPT sigue registrado para no perder datos
+        // existentes ni romper integraciones, pero se OCULTA del admin (no aparece
+        // en menús ni listados). Si se necesita reactivar, basta con quitar estos
+        // overrides. Los posts que hubiera siguen accesibles vía URL admin directa.
         return array(
-            'rewrite' => array( 'slug' => 'coche-nuevo', 'with_front' => false ),
+            'rewrite'      => array( 'slug' => 'coche-nuevo', 'with_front' => false ),
+            'show_ui'      => false,
+            'show_in_menu' => false,
+            'show_in_rest' => false,
+            'public'       => false,
+            'has_archive'  => false,
         );
     }
 

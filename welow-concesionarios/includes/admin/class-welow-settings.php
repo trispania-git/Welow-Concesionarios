@@ -382,17 +382,21 @@ class Welow_Settings {
         <?php else : ?>
             <table class="form-table">
                 <tr>
-                    <th><label>Formulario para coches NUEVOS</label></th>
+                    <?php // v2.43.0 — Renombrado: ya no es para fichas de coche nuevo
+                          // (CPT en soft-remove). Sigue siendo el formulario usado por
+                          // [welow_me_interesa] cuando alguien pulsa el botón en una
+                          // card de modelo. ?>
+                    <th><label>Formulario para "Me Interesa" (modelos)</label></th>
                     <td>
                         <select name="<?php echo esc_attr( $base ); ?>[coche_nuevo]" class="regular-text">
-                            <option value="0">— Usar formulario clásico (legacy) —</option>
+                            <option value="0">— Sin formulario configurado —</option>
                             <?php foreach ( $forms as $form ) : ?>
                                 <option value="<?php echo intval( $form->ID ); ?>" <?php selected( $sel_nuevo, $form->ID ); ?>>
                                     <?php echo esc_html( $form->post_title ); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <p class="description">Se muestra en la ficha de coches del catálogo (welow_coche_nuevo).</p>
+                        <p class="description">Se renderiza dentro del shortcode <code>[welow_me_interesa]</code> en la página que has configurado abajo como "Página del botón Me Interesa".</p>
                     </td>
                 </tr>
                 <tr>

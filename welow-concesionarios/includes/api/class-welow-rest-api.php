@@ -113,12 +113,21 @@ class Welow_Rest_API {
        ENDPOINTS
        ======================================================================== */
 
+    /**
+     * v2.43.0 — Endpoint /coches/nuevos marcado como deprecated.
+     * Devuelve respuesta vacía con nota de deprecación. El CPT welow_coche_nuevo
+     * sigue registrado en soft-remove pero no se gestiona. Usar /modelos para
+     * la información del catálogo oficial.
+     */
     public static function endpoint_coches_nuevos( $request ) {
-        $coches = Welow_Helpers::get_coches_nuevos( array(
-            'max'    => intval( $request['max'] ),
-            'estado' => $request['estado'],
+        return rest_ensure_response( array(
+            'total'      => 0,
+            'tipo'       => 'coche_nuevo',
+            'coches'     => array(),
+            'deprecated' => true,
+            'aviso'      => 'El endpoint /coches/nuevos está deprecated. La información del catálogo oficial está disponible en /wp-json/welow/v1/modelos.',
+            'generado'   => current_time( 'c' ),
         ) );
-        return self::respuesta_listado( $coches, 'coche_nuevo' );
     }
 
     public static function endpoint_coches_ocasion( $request ) {
@@ -234,14 +243,14 @@ class Welow_Rest_API {
                 'version' => WELOW_CONC_VERSION,
             ),
             'estadisticas' => array(
-                'coches_nuevos'    => intval( wp_count_posts( 'welow_coche_nuevo' )->publish ?? 0 ),
+                // v2.43.0 — coches_nuevos retirado del recuento (CPT en soft-remove)
                 'coches_ocasion'   => intval( wp_count_posts( 'welow_coche_ocasion' )->publish ?? 0 ),
                 'marcas_oficiales' => intval( wp_count_posts( 'welow_marca' )->publish ?? 0 ),
                 'modelos'          => intval( wp_count_posts( 'welow_modelo' )->publish ?? 0 ),
                 'concesionarios'   => intval( wp_count_posts( 'welow_concesionario' )->publish ?? 0 ),
             ),
             'endpoints'  => array(
-                'coches_nuevos'    => rest_url( self::NAMESPACE_API . '/coches/nuevos' ),
+                // v2.43.0 — coches_nuevos quitado de la lista oficial (deprecated)
                 'coches_ocasion'   => rest_url( self::NAMESPACE_API . '/coches/ocasion' ),
                 'coches_todos'     => rest_url( self::NAMESPACE_API . '/coches/todos' ),
                 'coche_individual' => rest_url( self::NAMESPACE_API . '/coches/{id}' ),
