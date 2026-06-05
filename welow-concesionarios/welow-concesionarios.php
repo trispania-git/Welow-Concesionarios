@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.43.1
+ * Version:     2.44.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,21 @@
  *
  * CHANGELOG
  * ---------
+ * 2.44.0 — API /modelos: concesionarios incluidos (via cascada marca→conc)
+ *
+ *   Cada modelo del endpoint /wp-json/welow/v1/modelos ahora incluye:
+ *     - concesionario        Objeto del concesionario primario (primero que
+ *                            vende esa marca, ordenado por menu_order/title)
+ *     - concesionarios       Array completo de TODOS los concesionarios que
+ *                            venden la marca de este modelo
+ *     - concesionarios_count Número de concesionarios
+ *
+ *   Cada objeto concesionario contiene id, slug, nombre, url, logo,
+ *   direccion, telefono, email, horario, lat, lng (igual que en /coches).
+ *
+ *   Nuevo helper público: Welow_Helpers::get_concesionarios_de_marca($marca_id)
+ *   que devuelve la lista de IDs de concesionarios que venden esa marca.
+ *
  * 2.43.1 — API /coches/nuevos retirado por completo
  *   La ruta REST ya no se registra → devuelve 404 limpio en vez de respuesta
  *   deprecated. Método endpoint_coches_nuevos() eliminado del controlador.
@@ -1649,7 +1664,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.43.1' );
+define( 'WELOW_CONC_VERSION', '2.44.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

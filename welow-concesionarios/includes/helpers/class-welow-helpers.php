@@ -1091,8 +1091,22 @@ class Welow_Helpers {
         $marca_id = get_post_meta( $modelo_id, '_welow_modelo_marca', true );
         if ( ! $marca_id ) return 0;
 
-        // Buscar concesionarios cuya meta '_welow_concesionario_marcas' (array de IDs)
-        // contenga este marca_id.
+        $lista = self::get_concesionarios_de_marca( intval( $marca_id ) );
+        return $lista ? intval( $lista[0] ) : 0;
+    }
+
+    /**
+     * v2.44.0 — Devuelve todos los concesionarios que venden una marca dada,
+     * ordenados por menu_order/title. Útil para enriquecer endpoints REST
+     * (un modelo de Dongfeng puede estar en varios concesionarios).
+     *
+     * @param int $marca_id ID de welow_marca
+     * @return int[] Lista de IDs de welow_concesionario (vacía si ninguno)
+     */
+    public static function get_concesionarios_de_marca( $marca_id ) {
+        $marca_id = intval( $marca_id );
+        if ( ! $marca_id ) return array();
+
         $concesionarios = get_posts( array(
             'post_type'      => 'welow_concesionario',
             'post_status'    => 'publish',
@@ -1101,13 +1115,14 @@ class Welow_Helpers {
             'order'          => 'ASC',
             'fields'         => 'ids',
         ) );
+        $out = array();
         foreach ( $concesionarios as $cid ) {
             $marcas = get_post_meta( $cid, '_welow_conc_marcas', true );
-            if ( is_array( $marcas ) && in_array( intval( $marca_id ), array_map( 'intval', $marcas ), true ) ) {
-                return intval( $cid );
+            if ( is_array( $marcas ) && in_array( $marca_id, array_map( 'intval', $marcas ), true ) ) {
+                $out[] = intval( $cid );
             }
         }
-        return 0;
+        return $out;
     }
 
     /**
@@ -1143,6 +1158,20 @@ class Welow_Helpers {
             );
         }
 
+        // v2.44.0 — Concesionarios que venden esta marca (todos)
+        $concesionarios_lista = array();
+        $concesionario_primario = null;
+        if ( $marca_id ) {
+            $conc_ids = self::get_concesionarios_de_marca( $marca_id );
+            foreach ( $conc_ids as $cid ) {
+                $cdata = self::get_concesionario_data( $cid );
+                if ( $cdata ) $concesionarios_lista[] = $cdata;
+            }
+            if ( ! empty( $concesionarios_lista ) ) {
+                $concesionario_primario = $concesionarios_lista[0];
+            }
+        }
+
         return array(
             'id'           => $modelo_id,
             'titulo'       => $modelo->post_title,
@@ -1163,6 +1192,12 @@ class Welow_Helpers {
             'carrocerias'  => array_map( function( $t ) { return $t->name; }, is_wp_error( $carrocerias ) ? array() : $carrocerias ),
             'enlace'       => get_post_meta( $modelo_id, '_welow_modelo_enlace', true ),
             'imagen'       => get_the_post_thumbnail_url( $modelo_id, 'large' ),
+
+            // v2.44.0 — Concesionarios donde se vende esta marca/modelo
+            'concesionario'        => $concesionario_primario, // el primario (compat con coches)
+            'concesionarios'       => $concesionarios_lista,   // todos los que venden la marca
+            'concesionarios_count' => count( $concesionarios_lista ),
+
             // v2.41.0 — timestamps para sync incremental
             'fecha_alta'         => mysql2date( 'c', $modelo->post_date_gmt, false ),
             'fecha_modificacion' => mysql2date( 'c', $modelo->post_modified_gmt, false ),
