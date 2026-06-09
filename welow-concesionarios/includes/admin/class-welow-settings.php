@@ -157,6 +157,9 @@ class Welow_Settings {
                 'logos_marca_variante' => isset( $fo['logos_marca_variante'] ) && in_array( $fo['logos_marca_variante'], array( 'original', 'negro', 'blanco' ), true ) ? $fo['logos_marca_variante'] : 'blanco',
                 // v2.46.0 — Título opcional para el bloque de ubicaciones
                 'ubicaciones_titulo' => isset( $fo['ubicaciones_titulo'] ) ? sanitize_text_field( $fo['ubicaciones_titulo'] ) : '',
+                // v2.47.0 — Toggles para mostrar/ocultar dirección y teléfono de cada ubicación
+                'ubicaciones_mostrar_direccion' => ! empty( $fo['ubicaciones_mostrar_direccion'] ),
+                'ubicaciones_mostrar_telefono'  => ! empty( $fo['ubicaciones_mostrar_telefono'] ),
                 'descripcion'       => isset( $fo['descripcion'] ) ? sanitize_textarea_field( $fo['descripcion'] ) : '',
                 'telefono'          => isset( $fo['telefono'] ) ? sanitize_text_field( $fo['telefono'] ) : '',
                 'email'             => isset( $fo['email'] ) ? sanitize_email( $fo['email'] ) : '',
@@ -820,7 +823,31 @@ class Welow_Settings {
                            placeholder="Nuestras ubicaciones" />
                     <p class="description">Las ubicaciones se cargan automáticamente desde
                         <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=welow_concesionario' ) ); ?>">Concesionarios físicos</a>
-                        (todos los publicados). Cada uno muestra nombre + dirección + teléfono.</p>
+                        (todos los publicados).</p>
+                </td>
+            </tr>
+            <?php
+            // v2.47.0 — Toggles. Por defecto activos en instalación nueva, pero respetan lo que haya guardado.
+            // Si NUNCA se ha guardado el campo (no existe la clave), interpretamos como true para no romper.
+            $mostrar_dir = array_key_exists( 'ubicaciones_mostrar_direccion', $f ) ? ! empty( $f['ubicaciones_mostrar_direccion'] ) : true;
+            $mostrar_tel = array_key_exists( 'ubicaciones_mostrar_telefono', $f )  ? ! empty( $f['ubicaciones_mostrar_telefono'] )  : true;
+            ?>
+            <tr>
+                <th><label>Información a mostrar</label></th>
+                <td>
+                    <p style="margin:0 0 6px;">
+                        <label>
+                            <input type="checkbox" name="<?php echo esc_attr( $base ); ?>[ubicaciones_mostrar_direccion]" value="1" <?php checked( $mostrar_dir ); ?> />
+                            Mostrar dirección
+                        </label>
+                    </p>
+                    <p style="margin:0;">
+                        <label>
+                            <input type="checkbox" name="<?php echo esc_attr( $base ); ?>[ubicaciones_mostrar_telefono]" value="1" <?php checked( $mostrar_tel ); ?> />
+                            Mostrar teléfono
+                        </label>
+                    </p>
+                    <p class="description">Si desactivas alguno, ese dato no aparece en el footer aunque esté rellenado en la ficha del concesionario. El nombre se muestra siempre.</p>
                 </td>
             </tr>
         </table>

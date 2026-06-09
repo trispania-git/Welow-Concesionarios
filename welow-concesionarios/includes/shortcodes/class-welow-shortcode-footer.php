@@ -68,6 +68,10 @@ class Welow_Shortcode_Footer {
         $ubic_titulo = $f['ubicaciones_titulo'] ?? '';
         if ( ! $ubic_titulo ) $ubic_titulo = 'Nuestras ubicaciones';
 
+        // v2.47.0 — Si las claves no existen aún (instalación previa al toggle), mostramos todo.
+        $mostrar_dir = array_key_exists( 'ubicaciones_mostrar_direccion', $f ) ? ! empty( $f['ubicaciones_mostrar_direccion'] ) : true;
+        $mostrar_tel = array_key_exists( 'ubicaciones_mostrar_telefono', $f )  ? ! empty( $f['ubicaciones_mostrar_telefono'] )  : true;
+
         // Datos para FILA 3
         $copyright = str_replace( '{year}', date( 'Y' ), $f['copyright'] ?? '' );
 
@@ -144,14 +148,15 @@ class Welow_Shortcode_Footer {
                                 ?>
                                     <li>
                                         <a class="welow-footer__ubicacion-nombre" href="<?php echo esc_url( $url_conc ); ?>">
-                                            <?php echo esc_html( $conc->post_title ); ?>
+                                            <span class="welow-footer__ubicacion-icon" aria-hidden="true">📍</span>
+                                            <span class="welow-footer__ubicacion-texto"><?php echo esc_html( $conc->post_title ); ?></span>
                                         </a>
-                                        <?php if ( $direccion || $ciudad ) : ?>
+                                        <?php if ( $mostrar_dir && ( $direccion || $ciudad ) ) : ?>
                                             <span class="welow-footer__ubicacion-dir">
                                                 <?php echo esc_html( trim( $direccion . ( $cp ? ', ' . $cp : '' ) . ( $ciudad ? ' ' . $ciudad : '' ) ) ); ?>
                                             </span>
                                         <?php endif; ?>
-                                        <?php if ( $telefono ) : ?>
+                                        <?php if ( $mostrar_tel && $telefono ) : ?>
                                             <a class="welow-footer__ubicacion-tel" href="tel:<?php echo esc_attr( preg_replace( '/[^\d+]/', '', $telefono ) ); ?>">
                                                 📞 <?php echo esc_html( $telefono ); ?>
                                             </a>

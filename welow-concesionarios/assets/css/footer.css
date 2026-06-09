@@ -150,8 +150,16 @@
     text-decoration: none;
     font-size: 14px;
     transition: color 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 .welow-footer__ubicacion-nombre:hover { color: var(--welow-f-link); }
+.welow-footer__ubicacion-icon {
+    font-size: 14px;
+    line-height: 1;
+    flex-shrink: 0;
+}
 .welow-footer__ubicacion-dir {
     font-size: 13px;
     opacity: 0.85;
