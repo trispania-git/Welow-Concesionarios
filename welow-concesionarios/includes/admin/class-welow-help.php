@@ -252,6 +252,15 @@ class Welow_Help {
                 ),
             ),
 
+            'welow_footer' => array(
+                'titulo' => 'Footer global del sitio (v2.45.0)',
+                'desc'   => 'Renderiza el footer configurado en Concesionarios → Configuraciones → Footer. Incluye logo, descripción, datos de contacto, 3 columnas de menús WP, redes sociales y pie legal. Pensado para meter en el template de footer del Theme Builder de Divi.',
+                'params' => array(),
+                'ejemplos' => array(
+                    '[welow_footer]',
+                ),
+            ),
+
             'welow_cita_taller' => array(
                 'titulo' => 'Página de cita previa de taller (v2.39.0)',
                 'desc'   => 'Renderiza el formulario de cita de taller configurado en Concesionarios → Configuraciones → "Formulario de Cita Taller". Crea una página WP, pega este shortcode dentro y selecciónala en Configuraciones → "Página de Cita Taller". El header puede enlazar a esa página desde el botón.',

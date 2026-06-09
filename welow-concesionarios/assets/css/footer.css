@@ -1,0 +1,162 @@
+/**
+ * Welow Concesionarios — Footer [welow_footer]
+ * @since 2.45.0
+ */
+
+.welow-footer {
+    --welow-f-bg: #0f172a;
+    --welow-f-color: #cbd5e1;
+    --welow-f-titulo: #ffffff;
+    --welow-f-link: #60a5fa;
+    background: var(--welow-f-bg);
+    color: var(--welow-f-color);
+    padding: 56px 24px 24px;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.6;
+}
+.welow-footer__inner {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+.welow-footer__main {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr;
+    gap: 36px;
+    align-items: start;
+}
+@media (max-width: 980px) {
+    .welow-footer__main { grid-template-columns: 1fr 1fr; gap: 28px; }
+}
+@media (max-width: 600px) {
+    .welow-footer__main { grid-template-columns: 1fr; gap: 24px; }
+    .welow-footer { padding: 36px 18px 18px; }
+}
+
+.welow-footer__col--brand .welow-footer__logo img {
+    max-width: 200px;
+    height: auto;
+    margin-bottom: 14px;
+    display: block;
+}
+.welow-footer__desc {
+    color: var(--welow-f-color);
+    margin: 0 0 18px;
+    font-size: 14px;
+    line-height: 1.5;
+    opacity: 0.9;
+}
+.welow-footer__contacto {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 13px;
+}
+.welow-footer__contacto li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.45;
+}
+.welow-footer__contacto a {
+    color: var(--welow-f-color);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+.welow-footer__contacto a:hover { color: var(--welow-f-link); }
+
+.welow-footer__col-titulo {
+    color: var(--welow-f-titulo);
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 16px;
+    letter-spacing: 0.02em;
+}
+
+.welow-footer__menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.welow-footer__menu li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.welow-footer__menu li::marker,
+.welow-footer__menu li::before {
+    content: none !important;
+    display: none !important;
+}
+.welow-footer__menu a {
+    color: var(--welow-f-color);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.15s, transform 0.15s;
+    display: inline-block;
+}
+.welow-footer__menu a:hover {
+    color: var(--welow-f-link);
+    transform: translateX(2px);
+}
+
+.welow-footer__redes {
+    display: flex;
+    gap: 14px;
+    justify-content: flex-start;
+    margin: 32px 0 0;
+    padding: 24px 0 0;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+.welow-footer__redes a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    color: var(--welow-f-color);
+    text-decoration: none;
+    font-size: 16px;
+    transition: background 0.15s, transform 0.15s, color 0.15s;
+}
+.welow-footer__redes a:hover {
+    background: var(--welow-f-link);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.welow-footer__legal {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    font-size: 13px;
+}
+.welow-footer__copyright,
+.welow-footer__legal-links {
+    margin: 0;
+    color: var(--welow-f-color);
+    opacity: 0.85;
+}
+.welow-footer__legal-links a {
+    color: var(--welow-f-color);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+.welow-footer__legal-links a:hover { color: var(--welow-f-link); }
+
+@media (max-width: 600px) {
+    .welow-footer__legal { flex-direction: column; }
+}

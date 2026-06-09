@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.44.0
+ * Version:     2.45.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,41 @@
  *
  * CHANGELOG
  * ---------
+ * 2.45.0 — Configuraciones organizadas en pestañas + Footer
+ *
+ *   PESTAÑAS EN CONFIGURACIONES:
+ *     - General      (disclaimer + moneda)
+ *     - Formularios  (selectores, RGPD, página Me Interesa, Cita Taller)
+ *     - Estilos      (colores + tipografía)
+ *     - Cabecera     (config header)
+ *     - Footer       (NUEVO — config completa del footer)
+ *     - Iconos       (sistema de iconos)
+ *
+ *   Las pestañas usan ?tab=X. Todas las secciones se renderizan en el DOM
+ *   (escondidas via CSS) para que al guardar no se pierda ningún campo.
+ *
+ *   NUEVO TAB "FOOTER" con todos los campos:
+ *     - Logo + descripción
+ *     - Contacto rápido (tel, email, dirección, horario)
+ *     - 3 columnas de menús WP (selector menu + título)
+ *     - Redes sociales (Facebook, Instagram, LinkedIn, YouTube, TikTok, X)
+ *     - Copyright (con placeholder {year}), URLs legales (privacidad, aviso, cookies)
+ *     - Estilos: color fondo/texto/títulos/link
+ *
+ *   NUEVO SHORTCODE [welow_footer]:
+ *     Renderiza el footer global del sitio. Pensado para meter en el template
+ *     de footer del Theme Builder de Divi.
+ *
+ *   ARCHIVOS NUEVOS:
+ *   - includes/shortcodes/class-welow-shortcode-footer.php
+ *   - assets/css/footer.css
+ *
+ *   ARCHIVOS MODIFICADOS:
+ *   - includes/admin/class-welow-settings.php (tabs + sanitize + render_section_footer)
+ *   - welow-concesionarios.php (require)
+ *   - includes/class-welow-main.php (init + asset)
+ *   - includes/admin/class-welow-help.php (entrada en Ayuda)
+ *
  * 2.44.0 — API /modelos: concesionarios incluidos (via cascada marca→conc)
  *
  *   Cada modelo del endpoint /wp-json/welow/v1/modelos ahora incluye:
@@ -1664,7 +1699,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.44.0' );
+define( 'WELOW_CONC_VERSION', '2.45.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
@@ -1725,6 +1760,7 @@ require_once WELOW_CONC_PATH . 'includes/cpt/class-welow-cpt-lead.php';         
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-formulario.php';          // v2.30.0
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-me-interesa.php';         // v2.32.0
 require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-cita-taller.php';         // v2.39.0
+require_once WELOW_CONC_PATH . 'includes/shortcodes/class-welow-shortcode-footer.php';              // v2.45.0
 
 // Permalinks de coches
 require_once WELOW_CONC_PATH . 'includes/class-welow-coche-permalinks.php';                       // v2.5.0

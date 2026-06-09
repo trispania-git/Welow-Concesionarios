@@ -148,6 +148,43 @@ class Welow_Settings {
             );
         }
 
+        // v2.45.0 — Footer (pie de página)
+        if ( isset( $input['footer'] ) && is_array( $input['footer'] ) ) {
+            $fo = $input['footer'];
+            $output['footer'] = array(
+                'logo_id'           => isset( $fo['logo_id'] ) ? absint( $fo['logo_id'] ) : 0,
+                'descripcion'       => isset( $fo['descripcion'] ) ? sanitize_textarea_field( $fo['descripcion'] ) : '',
+                'telefono'          => isset( $fo['telefono'] ) ? sanitize_text_field( $fo['telefono'] ) : '',
+                'email'             => isset( $fo['email'] ) ? sanitize_email( $fo['email'] ) : '',
+                'direccion'         => isset( $fo['direccion'] ) ? sanitize_textarea_field( $fo['direccion'] ) : '',
+                'horario'           => isset( $fo['horario'] ) ? sanitize_textarea_field( $fo['horario'] ) : '',
+                // Menús (3 columnas con sus IDs de menú WP + título)
+                'col1_titulo'       => isset( $fo['col1_titulo'] ) ? sanitize_text_field( $fo['col1_titulo'] ) : '',
+                'col1_menu_id'      => isset( $fo['col1_menu_id'] ) ? absint( $fo['col1_menu_id'] ) : 0,
+                'col2_titulo'       => isset( $fo['col2_titulo'] ) ? sanitize_text_field( $fo['col2_titulo'] ) : '',
+                'col2_menu_id'      => isset( $fo['col2_menu_id'] ) ? absint( $fo['col2_menu_id'] ) : 0,
+                'col3_titulo'       => isset( $fo['col3_titulo'] ) ? sanitize_text_field( $fo['col3_titulo'] ) : '',
+                'col3_menu_id'      => isset( $fo['col3_menu_id'] ) ? absint( $fo['col3_menu_id'] ) : 0,
+                // Redes sociales
+                'social_facebook'   => isset( $fo['social_facebook'] ) ? esc_url_raw( $fo['social_facebook'] ) : '',
+                'social_instagram'  => isset( $fo['social_instagram'] ) ? esc_url_raw( $fo['social_instagram'] ) : '',
+                'social_linkedin'   => isset( $fo['social_linkedin'] ) ? esc_url_raw( $fo['social_linkedin'] ) : '',
+                'social_youtube'    => isset( $fo['social_youtube'] ) ? esc_url_raw( $fo['social_youtube'] ) : '',
+                'social_tiktok'     => isset( $fo['social_tiktok'] ) ? esc_url_raw( $fo['social_tiktok'] ) : '',
+                'social_x'          => isset( $fo['social_x'] ) ? esc_url_raw( $fo['social_x'] ) : '',
+                // Legal
+                'copyright'         => isset( $fo['copyright'] ) ? sanitize_text_field( $fo['copyright'] ) : '',
+                'politica_url'      => isset( $fo['politica_url'] ) ? esc_url_raw( $fo['politica_url'] ) : '',
+                'aviso_url'         => isset( $fo['aviso_url'] ) ? esc_url_raw( $fo['aviso_url'] ) : '',
+                'cookies_url'       => isset( $fo['cookies_url'] ) ? esc_url_raw( $fo['cookies_url'] ) : '',
+                // Estilos
+                'color_fondo'       => isset( $fo['color_fondo'] ) ? sanitize_hex_color( $fo['color_fondo'] ) : '',
+                'color_texto'       => isset( $fo['color_texto'] ) ? sanitize_hex_color( $fo['color_texto'] ) : '',
+                'color_titulos'     => isset( $fo['color_titulos'] ) ? sanitize_hex_color( $fo['color_titulos'] ) : '',
+                'color_link'        => isset( $fo['color_link'] ) ? sanitize_hex_color( $fo['color_link'] ) : '',
+            );
+        }
+
         // v2.6.0 — Cabecera (header)
         if ( isset( $input['header'] ) && is_array( $input['header'] ) ) {
             $h = $input['header'];
@@ -202,89 +239,134 @@ class Welow_Settings {
         $moneda     = isset( $options['moneda_simbolo'] ) ? $options['moneda_simbolo'] : '€';
 
         $disclaimer_default = 'Aviso legal: Precio indicativo, sin incluir opciones ni gastos de matriculación, IVA incluido. Precio "desde" basado en el precio de venta al público recomendado por el fabricante. Oferta informativa y no contractual, reservada a clientes particulares. Los precios pueden variar según las actualizaciones de tarifas del fabricante.';
+
+        // v2.45.0 — Tab activa (de la URL ?tab= o "general" por defecto)
+        $active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'general';
+        $tabs = array(
+            'general'     => array( 'label' => 'General',     'icon' => 'dashicons-admin-generic' ),
+            'formularios' => array( 'label' => 'Formularios', 'icon' => 'dashicons-feedback' ),
+            'estilos'     => array( 'label' => 'Estilos',     'icon' => 'dashicons-art' ),
+            'cabecera'    => array( 'label' => 'Cabecera',    'icon' => 'dashicons-menu-alt' ),
+            'footer'      => array( 'label' => 'Footer',      'icon' => 'dashicons-arrow-down-alt2' ),
+            'iconos'      => array( 'label' => 'Iconos',      'icon' => 'dashicons-format-image' ),
+        );
+        if ( ! isset( $tabs[ $active_tab ] ) ) $active_tab = 'general';
+        $base_url = admin_url( 'admin.php?page=welow_settings' );
         ?>
-        <div class="wrap">
+        <div class="wrap welow-settings-wrap">
             <h1>Configuraciones <span style="font-size:14px;color:#666;">v<?php echo esc_html( WELOW_CONC_VERSION ); ?></span></h1>
 
-            <form method="post" action="options.php">
+            <nav class="nav-tab-wrapper welow-settings-tabs" style="margin-top:16px;">
+                <?php foreach ( $tabs as $key => $info ) :
+                    $url = $base_url . '&tab=' . $key;
+                    $class = 'nav-tab' . ( $active_tab === $key ? ' nav-tab-active' : '' );
+                ?>
+                    <a href="<?php echo esc_url( $url ); ?>" class="<?php echo esc_attr( $class ); ?>">
+                        <span class="dashicons <?php echo esc_attr( $info['icon'] ); ?>" style="vertical-align:middle;margin-top:-2px;"></span>
+                        <?php echo esc_html( $info['label'] ); ?>
+                    </a>
+                <?php endforeach; ?>
+            </nav>
+
+            <form method="post" action="options.php" style="margin-top:20px;">
                 <?php settings_fields( 'welow_settings_group' ); ?>
-
-                <h2 class="title">Disclaimer de precio</h2>
-                <p>Texto legal que aparecerá junto al precio "desde" de cada modelo. Puedes sobrescribirlo en cada modelo individualmente si es necesario.</p>
-
-                <table class="form-table">
-                    <tr>
-                        <th scope="row">
-                            <label for="welow_disclaimer_global">Texto del disclaimer global</label>
-                        </th>
-                        <td>
-                            <textarea id="welow_disclaimer_global"
-                                      name="<?php echo esc_attr( self::OPTION_KEY ); ?>[disclaimer_global]"
-                                      rows="6" class="large-text"
-                                      placeholder="<?php echo esc_attr( $disclaimer_default ); ?>"><?php echo esc_textarea( $disclaimer ); ?></textarea>
-                            <p class="description">Si lo dejas vacío, no se mostrará ningún disclaimer global.</p>
-                            <p>
-                                <button type="button" class="button" id="welow-usar-default">Usar texto por defecto</button>
-                            </p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row"><label>Icono del disclaimer</label></th>
-                        <td>
-                            <div class="welow-media-field">
-                                <input type="hidden" id="welow_disclaimer_icono"
-                                       name="<?php echo esc_attr( self::OPTION_KEY ); ?>[disclaimer_icono]"
-                                       value="<?php echo esc_attr( $icono_id ); ?>" />
-                                <div id="welow-icono-preview" class="welow-image-preview" style="max-width:80px;">
-                                    <?php if ( $icono_url ) : ?>
-                                        <img src="<?php echo esc_url( $icono_url ); ?>" alt="" style="max-width:60px;" />
-                                    <?php endif; ?>
-                                </div>
-                                <button type="button" class="button welow-upload-btn"
-                                        data-target="welow_disclaimer_icono"
-                                        data-preview="welow-icono-preview">
-                                    <?php echo $icono_id ? 'Cambiar icono' : 'Seleccionar icono'; ?>
-                                </button>
-                                <?php if ( $icono_id ) : ?>
-                                    <button type="button" class="button welow-remove-btn"
-                                            data-target="welow_disclaimer_icono"
-                                            data-preview="welow-icono-preview">Quitar</button>
-                                <?php endif; ?>
-                            </div>
-                            <p class="description">Icono ⓘ que aparece junto al precio. PNG transparente, recomendado 24×24px.</p>
-                        </td>
-                    </tr>
-                </table>
-
-                <h2 class="title">General</h2>
-                <table class="form-table">
-                    <tr>
-                        <th scope="row"><label for="welow_moneda">Símbolo de moneda</label></th>
-                        <td>
-                            <input type="text" id="welow_moneda"
-                                   name="<?php echo esc_attr( self::OPTION_KEY ); ?>[moneda_simbolo]"
-                                   value="<?php echo esc_attr( $moneda ); ?>"
-                                   class="small-text" maxlength="5" />
-                            <p class="description">Se muestra junto al precio (ej: €, $, £).</p>
-                        </td>
-                    </tr>
-                </table>
-
-                <?php // v2.31.0 — Sección de Formularios por defecto ?>
-                <?php self::render_section_formularios( $options ); ?>
-
-                <?php // v2.29.0 — Sección de Estilos generales (frontend) ?>
-                <?php self::render_section_estilos( $options ); ?>
-
-                <?php // v2.6.0 — Sección de Cabecera ?>
-                <?php self::render_section_header( $options ); ?>
+                <?php // Mantener pestaña activa al guardar (después del redirect de WP) ?>
+                <input type="hidden" name="_wp_http_referer" value="<?php echo esc_url( $base_url . '&tab=' . $active_tab . '&settings-updated=true' ); ?>" />
 
                 <?php
-                // v2.0.0 — Sección de iconos
-                if ( class_exists( 'Welow_Icons' ) ) {
-                    Welow_Icons::render_section();
-                }
+                // v2.45.0 — Renderizamos TODAS las pestañas en el DOM pero solo la activa visible.
+                // Así al guardar se envían todos los campos y no se pierde nada.
                 ?>
+
+                <div class="welow-tab-content" data-tab="general" <?php echo $active_tab !== 'general' ? 'style="display:none;"' : ''; ?>>
+                    <h2 class="title">Disclaimer de precio</h2>
+                    <p>Texto legal que aparecerá junto al precio "desde" de cada modelo. Puedes sobrescribirlo en cada modelo individualmente si es necesario.</p>
+
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row">
+                                <label for="welow_disclaimer_global">Texto del disclaimer global</label>
+                            </th>
+                            <td>
+                                <textarea id="welow_disclaimer_global"
+                                          name="<?php echo esc_attr( self::OPTION_KEY ); ?>[disclaimer_global]"
+                                          rows="6" class="large-text"
+                                          placeholder="<?php echo esc_attr( $disclaimer_default ); ?>"><?php echo esc_textarea( $disclaimer ); ?></textarea>
+                                <p class="description">Si lo dejas vacío, no se mostrará ningún disclaimer global.</p>
+                                <p>
+                                    <button type="button" class="button" id="welow-usar-default">Usar texto por defecto</button>
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label>Icono del disclaimer</label></th>
+                            <td>
+                                <div class="welow-media-field">
+                                    <input type="hidden" id="welow_disclaimer_icono"
+                                           name="<?php echo esc_attr( self::OPTION_KEY ); ?>[disclaimer_icono]"
+                                           value="<?php echo esc_attr( $icono_id ); ?>" />
+                                    <div id="welow-icono-preview" class="welow-image-preview" style="max-width:80px;">
+                                        <?php if ( $icono_url ) : ?>
+                                            <img src="<?php echo esc_url( $icono_url ); ?>" alt="" style="max-width:60px;" />
+                                        <?php endif; ?>
+                                    </div>
+                                    <button type="button" class="button welow-upload-btn"
+                                            data-target="welow_disclaimer_icono"
+                                            data-preview="welow-icono-preview">
+                                        <?php echo $icono_id ? 'Cambiar icono' : 'Seleccionar icono'; ?>
+                                    </button>
+                                    <?php if ( $icono_id ) : ?>
+                                        <button type="button" class="button welow-remove-btn"
+                                                data-target="welow_disclaimer_icono"
+                                                data-preview="welow-icono-preview">Quitar</button>
+                                    <?php endif; ?>
+                                </div>
+                                <p class="description">Icono ⓘ que aparece junto al precio. PNG transparente, recomendado 24×24px.</p>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <h2 class="title">General</h2>
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row"><label for="welow_moneda">Símbolo de moneda</label></th>
+                            <td>
+                                <input type="text" id="welow_moneda"
+                                       name="<?php echo esc_attr( self::OPTION_KEY ); ?>[moneda_simbolo]"
+                                       value="<?php echo esc_attr( $moneda ); ?>"
+                                       class="small-text" maxlength="5" />
+                                <p class="description">Se muestra junto al precio (ej: €, $, £).</p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="welow-tab-content" data-tab="formularios" <?php echo $active_tab !== 'formularios' ? 'style="display:none;"' : ''; ?>>
+                    <?php self::render_section_formularios( $options ); ?>
+                </div>
+
+                <div class="welow-tab-content" data-tab="estilos" <?php echo $active_tab !== 'estilos' ? 'style="display:none;"' : ''; ?>>
+                    <?php self::render_section_estilos( $options ); ?>
+                </div>
+
+                <div class="welow-tab-content" data-tab="cabecera" <?php echo $active_tab !== 'cabecera' ? 'style="display:none;"' : ''; ?>>
+                    <?php self::render_section_header( $options ); ?>
+                </div>
+
+                <div class="welow-tab-content" data-tab="footer" <?php echo $active_tab !== 'footer' ? 'style="display:none;"' : ''; ?>>
+                    <?php self::render_section_footer( $options ); ?>
+                </div>
+
+                <div class="welow-tab-content" data-tab="iconos" <?php echo $active_tab !== 'iconos' ? 'style="display:none;"' : ''; ?>>
+                    <?php
+                    // v2.0.0 — Sección de iconos
+                    if ( class_exists( 'Welow_Icons' ) ) {
+                        Welow_Icons::render_section();
+                    } else {
+                        echo '<p><em>Sistema de iconos no disponible.</em></p>';
+                    }
+                    ?>
+                </div>
 
                 <?php submit_button(); ?>
             </form>
@@ -639,6 +721,217 @@ class Welow_Settings {
                 </td>
             </tr>
         </table>
+        <?php
+    }
+
+    /**
+     * v2.45.0 — Sección de configuración del Footer.
+     */
+    public static function render_section_footer( $options ) {
+        $f = isset( $options['footer'] ) && is_array( $options['footer'] ) ? $options['footer'] : array();
+        $base = self::OPTION_KEY . '[footer]';
+
+        $logo_id    = intval( $f['logo_id'] ?? 0 );
+        $logo_url   = $logo_id ? wp_get_attachment_image_url( $logo_id, 'medium' ) : '';
+        $desc       = $f['descripcion'] ?? '';
+        $tel        = $f['telefono'] ?? '';
+        $email      = $f['email'] ?? '';
+        $dir        = $f['direccion'] ?? '';
+        $horario    = $f['horario'] ?? '';
+
+        // Menús WP disponibles
+        $menus = wp_get_nav_menus();
+        ?>
+        <h2 class="title">Footer (pie de página)</h2>
+        <p>Configura los campos del shortcode <code>[welow_footer]</code>. Pégalo en tu plantilla del Theme Builder de Divi (template global de Footer) para usarlo en todo el sitio.</p>
+
+        <h3>Logo y descripción</h3>
+        <table class="form-table">
+            <tr>
+                <th>Logo del footer</th>
+                <td>
+                    <div class="welow-media-field">
+                        <input type="hidden" id="welow_footer_logo_id"
+                               name="<?php echo esc_attr( $base ); ?>[logo_id]"
+                               value="<?php echo esc_attr( $logo_id ); ?>" />
+                        <div id="welow-footer-logo-preview" class="welow-image-preview" style="max-width:180px;background:#1f2937;padding:8px;border-radius:4px;">
+                            <?php if ( $logo_url ) : ?>
+                                <img src="<?php echo esc_url( $logo_url ); ?>" alt="" style="max-width:160px;" />
+                            <?php endif; ?>
+                        </div>
+                        <button type="button" class="button welow-upload-btn"
+                                data-target="welow_footer_logo_id"
+                                data-preview="welow-footer-logo-preview">
+                            <?php echo $logo_id ? 'Cambiar logo' : 'Seleccionar logo'; ?>
+                        </button>
+                        <?php if ( $logo_id ) : ?>
+                            <button type="button" class="button welow-remove-btn"
+                                    data-target="welow_footer_logo_id"
+                                    data-preview="welow-footer-logo-preview">Quitar</button>
+                        <?php endif; ?>
+                    </div>
+                    <p class="description">Recomendado: PNG transparente. Si el footer es oscuro, usa logo blanco.</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label>Texto descriptivo</label></th>
+                <td>
+                    <textarea name="<?php echo esc_attr( $base ); ?>[descripcion]" rows="3" class="large-text"
+                              placeholder="Tu concesionario multimarca de confianza en..."><?php echo esc_textarea( $desc ); ?></textarea>
+                    <p class="description">Texto corto bajo el logo (1-2 líneas).</p>
+                </td>
+            </tr>
+        </table>
+
+        <h3 style="margin-top:30px;">Contacto rápido</h3>
+        <table class="form-table">
+            <tr>
+                <th><label>Teléfono</label></th>
+                <td><input type="text" name="<?php echo esc_attr( $base ); ?>[telefono]" value="<?php echo esc_attr( $tel ); ?>" class="regular-text" placeholder="+34 91 234 56 78" /></td>
+            </tr>
+            <tr>
+                <th><label>Email</label></th>
+                <td><input type="email" name="<?php echo esc_attr( $base ); ?>[email]" value="<?php echo esc_attr( $email ); ?>" class="regular-text" placeholder="info@grupochinares.com" /></td>
+            </tr>
+            <tr>
+                <th><label>Dirección</label></th>
+                <td><textarea name="<?php echo esc_attr( $base ); ?>[direccion]" rows="2" class="large-text"><?php echo esc_textarea( $dir ); ?></textarea></td>
+            </tr>
+            <tr>
+                <th><label>Horario</label></th>
+                <td>
+                    <textarea name="<?php echo esc_attr( $base ); ?>[horario]" rows="2" class="large-text"
+                              placeholder="Lun-Vie 9:00-20:00&#10;Sáb 10:00-14:00"><?php echo esc_textarea( $horario ); ?></textarea>
+                    <p class="description">Una línea por horario, se respetan los saltos.</p>
+                </td>
+            </tr>
+        </table>
+
+        <h3 style="margin-top:30px;">Columnas de enlaces (menús WP)</h3>
+        <p class="description">Crea menús desde <a href="<?php echo esc_url( admin_url( 'nav-menus.php' ) ); ?>">Apariencia → Menús</a> y asigna uno por columna. Si dejas vacío, esa columna no aparece.</p>
+        <table class="form-table">
+            <?php for ( $i = 1; $i <= 3; $i++ ) :
+                $col_t = $f[ 'col' . $i . '_titulo' ] ?? '';
+                $col_m = intval( $f[ 'col' . $i . '_menu_id' ] ?? 0 );
+            ?>
+                <tr>
+                    <th><label>Columna <?php echo $i; ?></label></th>
+                    <td>
+                        <p style="margin:0 0 6px;">
+                            <input type="text" name="<?php echo esc_attr( $base ); ?>[col<?php echo $i; ?>_titulo]"
+                                   value="<?php echo esc_attr( $col_t ); ?>" class="regular-text"
+                                   placeholder="Título de la columna (ej: Nuestra empresa)" />
+                        </p>
+                        <p style="margin:0;">
+                            <select name="<?php echo esc_attr( $base ); ?>[col<?php echo $i; ?>_menu_id]">
+                                <option value="0">— Sin menú —</option>
+                                <?php foreach ( $menus as $m ) : ?>
+                                    <option value="<?php echo intval( $m->term_id ); ?>" <?php selected( $col_m, $m->term_id ); ?>>
+                                        <?php echo esc_html( $m->name ); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </p>
+                    </td>
+                </tr>
+            <?php endfor; ?>
+        </table>
+
+        <h3 style="margin-top:30px;">Redes sociales</h3>
+        <table class="form-table">
+            <?php
+            $redes = array(
+                'facebook'  => 'Facebook',
+                'instagram' => 'Instagram',
+                'linkedin'  => 'LinkedIn',
+                'youtube'   => 'YouTube',
+                'tiktok'    => 'TikTok',
+                'x'         => 'X (Twitter)',
+            );
+            foreach ( $redes as $key => $label ) :
+                $val = $f[ 'social_' . $key ] ?? '';
+            ?>
+                <tr>
+                    <th><label><?php echo esc_html( $label ); ?></label></th>
+                    <td>
+                        <input type="url" name="<?php echo esc_attr( $base ); ?>[social_<?php echo $key; ?>]"
+                               value="<?php echo esc_url( $val ); ?>" class="large-text"
+                               placeholder="https://..." />
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </table>
+
+        <h3 style="margin-top:30px;">Pie legal</h3>
+        <table class="form-table">
+            <tr>
+                <th><label>Copyright</label></th>
+                <td>
+                    <input type="text" name="<?php echo esc_attr( $base ); ?>[copyright]"
+                           value="<?php echo esc_attr( $f['copyright'] ?? '' ); ?>" class="large-text"
+                           placeholder="© {year} Talleres Chinares S.A. Todos los derechos reservados." />
+                    <p class="description">Usa <code>{year}</code> para que se reemplace por el año actual automáticamente.</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label>URL Política de Privacidad</label></th>
+                <td><input type="url" name="<?php echo esc_attr( $base ); ?>[politica_url]" value="<?php echo esc_url( $f['politica_url'] ?? '' ); ?>" class="large-text" placeholder="https://.../politica-privacidad/" /></td>
+            </tr>
+            <tr>
+                <th><label>URL Aviso Legal</label></th>
+                <td><input type="url" name="<?php echo esc_attr( $base ); ?>[aviso_url]" value="<?php echo esc_url( $f['aviso_url'] ?? '' ); ?>" class="large-text" placeholder="https://.../aviso-legal/" /></td>
+            </tr>
+            <tr>
+                <th><label>URL Política de Cookies</label></th>
+                <td><input type="url" name="<?php echo esc_attr( $base ); ?>[cookies_url]" value="<?php echo esc_url( $f['cookies_url'] ?? '' ); ?>" class="large-text" placeholder="https://.../cookies/" /></td>
+            </tr>
+        </table>
+
+        <h3 style="margin-top:30px;">Estilos</h3>
+        <table class="form-table">
+            <tr>
+                <th><label>Color de fondo</label></th>
+                <td>
+                    <input type="text" class="welow-color-field" data-default-color="#0f172a"
+                           name="<?php echo esc_attr( $base ); ?>[color_fondo]"
+                           value="<?php echo esc_attr( $f['color_fondo'] ?? '' ); ?>"
+                           placeholder="#0f172a" />
+                    <p class="description">Color de fondo del footer. Default: gris oscuro.</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label>Color del texto</label></th>
+                <td>
+                    <input type="text" class="welow-color-field" data-default-color="#cbd5e1"
+                           name="<?php echo esc_attr( $base ); ?>[color_texto]"
+                           value="<?php echo esc_attr( $f['color_texto'] ?? '' ); ?>"
+                           placeholder="#cbd5e1" />
+                </td>
+            </tr>
+            <tr>
+                <th><label>Color de títulos</label></th>
+                <td>
+                    <input type="text" class="welow-color-field" data-default-color="#ffffff"
+                           name="<?php echo esc_attr( $base ); ?>[color_titulos]"
+                           value="<?php echo esc_attr( $f['color_titulos'] ?? '' ); ?>"
+                           placeholder="#ffffff" />
+                </td>
+            </tr>
+            <tr>
+                <th><label>Color de enlaces (hover)</label></th>
+                <td>
+                    <input type="text" class="welow-color-field" data-default-color=""
+                           name="<?php echo esc_attr( $base ); ?>[color_link]"
+                           value="<?php echo esc_attr( $f['color_link'] ?? '' ); ?>"
+                           placeholder="(usa el color principal de Estilos)" />
+                    <p class="description">Si lo dejas vacío, usa el color principal definido en la pestaña "Estilos".</p>
+                </td>
+            </tr>
+        </table>
+
+        <p style="background:#eff6ff;border-left:3px solid #2271b1;padding:10px 14px;margin-top:18px;font-size:13px;">
+            💡 Para usar este footer: ve a <strong>Divi → Theme Builder</strong>, edita el template del footer global y mete el shortcode <code>[welow_footer]</code>.
+        </p>
         <?php
     }
 

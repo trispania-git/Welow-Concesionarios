@@ -70,6 +70,7 @@ class Welow_Main {
         Welow_Shortcode_Formulario::init();          // v2.30.0
         Welow_Shortcode_Me_Interesa::init();         // v2.32.0
         Welow_Shortcode_Cita_Taller::init();         // v2.39.0
+        Welow_Shortcode_Footer::init();              // v2.45.0
 
         // Permalinks personalizados de coches
         Welow_Coche_Permalinks::init();            // v2.5.0
@@ -294,6 +295,14 @@ class Welow_Main {
         wp_register_style(
             'welow-formulario',
             WELOW_CONC_URL . 'assets/css/formulario.css',
+            array(),
+            WELOW_CONC_VERSION
+        );
+
+        // v2.45.0 — Footer
+        wp_register_style(
+            'welow-footer',
+            WELOW_CONC_URL . 'assets/css/footer.css',
             array(),
             WELOW_CONC_VERSION
         );
