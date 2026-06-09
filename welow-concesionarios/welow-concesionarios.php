@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.45.0
+ * Version:     2.46.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,28 @@
  *
  * CHANGELOG
  * ---------
+ * 2.46.0 — Footer rediseñado en 3 filas (logos / ubicaciones+menús / legal)
+ *
+ *   ESTRUCTURA VISUAL:
+ *     FILA 1: Logo empresa (grande) + logos de TODAS las marcas publicadas
+ *             (en la variante elegida: original, negro o blanco)
+ *     ────── línea separadora ──────
+ *     FILA 2: Ubicaciones (automático desde welow_concesionario publicados)
+ *             | separador vertical | 3 columnas de menús WP
+ *     ────── línea separadora ──────
+ *     FILA 3: Copyright | redes sociales | enlaces legales
+ *
+ *   NUEVOS CAMPOS en Configuraciones → Footer:
+ *     - "Variante de logos de marca" (original / negro / blanco)
+ *     - "Título del bloque de ubicaciones" (default: "Nuestras ubicaciones")
+ *
+ *   Las ubicaciones se cargan automáticamente desde los CPT welow_concesionario
+ *   publicados. Cada una muestra: nombre + dirección/CP/ciudad + teléfono.
+ *
+ *   Los campos "Contacto rápido" (tel, email, dirección, horario) del v2.45.0
+ *   quedan ocultos en la UI (siguen guardándose por compat) — ahora la info
+ *   por ubicación viene de los propios concesionarios.
+ *
  * 2.45.0 — Configuraciones organizadas en pestañas + Footer
  *
  *   PESTAÑAS EN CONFIGURACIONES:
@@ -1699,7 +1721,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.45.0' );
+define( 'WELOW_CONC_VERSION', '2.46.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

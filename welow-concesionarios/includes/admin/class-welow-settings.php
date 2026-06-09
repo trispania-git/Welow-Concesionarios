@@ -153,6 +153,10 @@ class Welow_Settings {
             $fo = $input['footer'];
             $output['footer'] = array(
                 'logo_id'           => isset( $fo['logo_id'] ) ? absint( $fo['logo_id'] ) : 0,
+                // v2.46.0 — Variante usada para los logos de marca en FILA 1
+                'logos_marca_variante' => isset( $fo['logos_marca_variante'] ) && in_array( $fo['logos_marca_variante'], array( 'original', 'negro', 'blanco' ), true ) ? $fo['logos_marca_variante'] : 'blanco',
+                // v2.46.0 — Título opcional para el bloque de ubicaciones
+                'ubicaciones_titulo' => isset( $fo['ubicaciones_titulo'] ) ? sanitize_text_field( $fo['ubicaciones_titulo'] ) : '',
                 'descripcion'       => isset( $fo['descripcion'] ) ? sanitize_textarea_field( $fo['descripcion'] ) : '',
                 'telefono'          => isset( $fo['telefono'] ) ? sanitize_text_field( $fo['telefono'] ) : '',
                 'email'             => isset( $fo['email'] ) ? sanitize_email( $fo['email'] ) : '',
@@ -744,19 +748,25 @@ class Welow_Settings {
         ?>
         <h2 class="title">Footer (pie de página)</h2>
         <p>Configura los campos del shortcode <code>[welow_footer]</code>. Pégalo en tu plantilla del Theme Builder de Divi (template global de Footer) para usarlo en todo el sitio.</p>
+        <p style="background:#f0f6fc;border-left:3px solid #2271b1;padding:8px 12px;font-size:13px;">
+            <strong>Estructura visual del footer:</strong><br>
+            🔹 <strong>Fila 1</strong>: Logo empresa + logos de las marcas (todas las publicadas).<br>
+            🔹 <strong>Fila 2</strong>: Ubicaciones (todos los concesionarios físicos publicados, automático) | 3 columnas de menús.<br>
+            🔹 <strong>Fila 3</strong>: Copyright | redes sociales | enlaces legales.
+        </p>
 
-        <h3>Logo y descripción</h3>
+        <h3>FILA 1 — Logos</h3>
         <table class="form-table">
             <tr>
-                <th>Logo del footer</th>
+                <th>Logo de la empresa</th>
                 <td>
                     <div class="welow-media-field">
                         <input type="hidden" id="welow_footer_logo_id"
                                name="<?php echo esc_attr( $base ); ?>[logo_id]"
                                value="<?php echo esc_attr( $logo_id ); ?>" />
-                        <div id="welow-footer-logo-preview" class="welow-image-preview" style="max-width:180px;background:#1f2937;padding:8px;border-radius:4px;">
+                        <div id="welow-footer-logo-preview" class="welow-image-preview" style="max-width:240px;background:#1f2937;padding:8px;border-radius:4px;">
                             <?php if ( $logo_url ) : ?>
-                                <img src="<?php echo esc_url( $logo_url ); ?>" alt="" style="max-width:160px;" />
+                                <img src="<?php echo esc_url( $logo_url ); ?>" alt="" style="max-width:220px;" />
                             <?php endif; ?>
                         </div>
                         <button type="button" class="button welow-upload-btn"
@@ -770,44 +780,52 @@ class Welow_Settings {
                                     data-preview="welow-footer-logo-preview">Quitar</button>
                         <?php endif; ?>
                     </div>
-                    <p class="description">Recomendado: PNG transparente. Si el footer es oscuro, usa logo blanco.</p>
+                    <p class="description">Se muestra grande a la izquierda. Si el footer es oscuro (default), usa una versión blanca/clara.</p>
                 </td>
             </tr>
             <tr>
-                <th><label>Texto descriptivo</label></th>
+                <th><label>Variante de logos de marca</label></th>
                 <td>
-                    <textarea name="<?php echo esc_attr( $base ); ?>[descripcion]" rows="3" class="large-text"
-                              placeholder="Tu concesionario multimarca de confianza en..."><?php echo esc_textarea( $desc ); ?></textarea>
-                    <p class="description">Texto corto bajo el logo (1-2 líneas).</p>
+                    <?php $variante_sel = $f['logos_marca_variante'] ?? 'blanco'; ?>
+                    <select name="<?php echo esc_attr( $base ); ?>[logos_marca_variante]">
+                        <option value="original" <?php selected( $variante_sel, 'original' ); ?>>Original (a color)</option>
+                        <option value="negro" <?php selected( $variante_sel, 'negro' ); ?>>Negro</option>
+                        <option value="blanco" <?php selected( $variante_sel, 'blanco' ); ?>>Blanco</option>
+                    </select>
+                    <p class="description">A la derecha del logo empresa se muestran los logos de todas las marcas publicadas, ordenados según el orden definido en Marcas. Esta variante se aplica a todos.</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label>Texto descriptivo (opcional)</label></th>
+                <td>
+                    <textarea name="<?php echo esc_attr( $base ); ?>[descripcion]" rows="2" class="large-text"
+                              placeholder="(Opcional) Frase corta bajo el logo de empresa."><?php echo esc_textarea( $desc ); ?></textarea>
                 </td>
             </tr>
         </table>
 
-        <h3 style="margin-top:30px;">Contacto rápido</h3>
+        <?php // Campos de contacto rápido se mantienen ocultos por compat con instalaciones anteriores ?>
+        <input type="hidden" name="<?php echo esc_attr( $base ); ?>[telefono]"  value="<?php echo esc_attr( $tel ); ?>" />
+        <input type="hidden" name="<?php echo esc_attr( $base ); ?>[email]"     value="<?php echo esc_attr( $email ); ?>" />
+        <input type="hidden" name="<?php echo esc_attr( $base ); ?>[direccion]" value="<?php echo esc_attr( $dir ); ?>" />
+        <input type="hidden" name="<?php echo esc_attr( $base ); ?>[horario]"   value="<?php echo esc_attr( $horario ); ?>" />
+
+        <h3 style="margin-top:30px;">FILA 2 — Ubicaciones (automático)</h3>
         <table class="form-table">
             <tr>
-                <th><label>Teléfono</label></th>
-                <td><input type="text" name="<?php echo esc_attr( $base ); ?>[telefono]" value="<?php echo esc_attr( $tel ); ?>" class="regular-text" placeholder="+34 91 234 56 78" /></td>
-            </tr>
-            <tr>
-                <th><label>Email</label></th>
-                <td><input type="email" name="<?php echo esc_attr( $base ); ?>[email]" value="<?php echo esc_attr( $email ); ?>" class="regular-text" placeholder="info@grupochinares.com" /></td>
-            </tr>
-            <tr>
-                <th><label>Dirección</label></th>
-                <td><textarea name="<?php echo esc_attr( $base ); ?>[direccion]" rows="2" class="large-text"><?php echo esc_textarea( $dir ); ?></textarea></td>
-            </tr>
-            <tr>
-                <th><label>Horario</label></th>
+                <th><label>Título del bloque de ubicaciones</label></th>
                 <td>
-                    <textarea name="<?php echo esc_attr( $base ); ?>[horario]" rows="2" class="large-text"
-                              placeholder="Lun-Vie 9:00-20:00&#10;Sáb 10:00-14:00"><?php echo esc_textarea( $horario ); ?></textarea>
-                    <p class="description">Una línea por horario, se respetan los saltos.</p>
+                    <input type="text" name="<?php echo esc_attr( $base ); ?>[ubicaciones_titulo]"
+                           value="<?php echo esc_attr( $f['ubicaciones_titulo'] ?? '' ); ?>" class="regular-text"
+                           placeholder="Nuestras ubicaciones" />
+                    <p class="description">Las ubicaciones se cargan automáticamente desde
+                        <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=welow_concesionario' ) ); ?>">Concesionarios físicos</a>
+                        (todos los publicados). Cada uno muestra nombre + dirección + teléfono.</p>
                 </td>
             </tr>
         </table>
 
-        <h3 style="margin-top:30px;">Columnas de enlaces (menús WP)</h3>
+        <h3 style="margin-top:30px;">FILA 2 — Columnas de enlaces (menús WP)</h3>
         <p class="description">Crea menús desde <a href="<?php echo esc_url( admin_url( 'nav-menus.php' ) ); ?>">Apariencia → Menús</a> y asigna uno por columna. Si dejas vacío, esa columna no aparece.</p>
         <table class="form-table">
             <?php for ( $i = 1; $i <= 3; $i++ ) :
@@ -837,7 +855,7 @@ class Welow_Settings {
             <?php endfor; ?>
         </table>
 
-        <h3 style="margin-top:30px;">Redes sociales</h3>
+        <h3 style="margin-top:30px;">FILA 3 — Redes sociales</h3>
         <table class="form-table">
             <?php
             $redes = array(
@@ -862,7 +880,7 @@ class Welow_Settings {
             <?php endforeach; ?>
         </table>
 
-        <h3 style="margin-top:30px;">Pie legal</h3>
+        <h3 style="margin-top:30px;">FILA 3 — Pie legal</h3>
         <table class="form-table">
             <tr>
                 <th><label>Copyright</label></th>
