@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.50.0
+ * Version:     2.51.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,28 @@
  *
  * CHANGELOG
  * ---------
+ * 2.51.0 — Segundo consentimiento (marketing) opcional en formularios
+ *
+ *   CONFIGURACIONES → FORMULARIOS → "Segundo consentimiento (opcional)":
+ *     - Checkbox para activar/desactivar globalmente
+ *     - Textarea con el texto del consentimiento (default: "Doy mi
+ *       consentimiento para el tratamiento de mis datos personales con fines
+ *       de marketing y comerciales (Opcional).")
+ *     - Botón "Usar texto recomendado"
+ *
+ *   FORMULARIO (frontend):
+ *     - Aparece como segundo checkbox debajo del RGPD obligatorio (no required)
+ *     - Si está activo en Settings y hay texto, se muestra en TODOS los forms
+ *
+ *   LEAD GENERADO:
+ *     - Se guarda meta _welow_lead_marketing_consent = '1' o '0'
+ *     - Ficha del lead: banner verde "✓ Acepta marketing" o rojo "✗ NO acepta"
+ *     - Listado: nueva columna "Marketing" con ✓ verde / ✗ rojo / —
+ *     - Email de notificación al equipo: indica si acepta marketing o no
+ *
+ *   Útil para sync legal con tu CRM: solo los leads con consent_marketing=1
+ *   pueden recibir comunicaciones comerciales por email/SMS/WhatsApp.
+ *
  * 2.50.0 — Footer: marcas en 1 fila distribuidas + guion bajo decorativo en menús
  *   - Logos de marca: flex-wrap nowrap + justify-content space-between para que
  *     ocupen todo el ancho disponible en una única fila. Cada slot toma flex:1
@@ -1757,7 +1779,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.50.0' );
+define( 'WELOW_CONC_VERSION', '2.51.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

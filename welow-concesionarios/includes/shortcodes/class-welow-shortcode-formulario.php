@@ -64,6 +64,9 @@ class Welow_Shortcode_Formulario {
         $politica    = get_post_meta( $form_id, '_welow_form_politica_url', true );
 
         // v2.40.0 — Fallback al RGPD global si el formulario no tiene texto/URL propios
+        // v2.51.0 — Lectura del segundo consentimiento (marketing) opcional
+        $marketing_activo = false;
+        $marketing_texto  = '';
         if ( class_exists( 'Welow_Settings' ) ) {
             $opt_rgpd = get_option( Welow_Settings::OPTION_KEY, array() );
             $opt_rgpd = isset( $opt_rgpd['rgpd'] ) && is_array( $opt_rgpd['rgpd'] ) ? $opt_rgpd['rgpd'] : array();
@@ -76,6 +79,14 @@ class Welow_Shortcode_Formulario {
             }
             if ( ! $politica ) {
                 $politica = $opt_rgpd['politica_url'] ?? '';
+            }
+            // Segundo consentimiento (marketing)
+            $marketing_activo = ! empty( $opt_rgpd['marketing_activo'] );
+            if ( $marketing_activo ) {
+                $marketing_texto = $opt_rgpd['marketing_texto'] ?? '';
+                if ( ! $marketing_texto && method_exists( 'Welow_Settings', 'get_rgpd_default_marketing' ) ) {
+                    $marketing_texto = Welow_Settings::get_rgpd_default_marketing();
+                }
             }
         }
 
@@ -102,12 +113,22 @@ class Welow_Shortcode_Formulario {
                 <?php foreach ( $campos as $campo ) : self::render_campo( $campo ); endforeach; ?>
             </div>
 
-            <?php // Consentimiento RGPD ?>
+            <?php // Consentimiento RGPD (obligatorio) ?>
             <?php if ( $consent ) : ?>
                 <div class="welow-form__campo welow-form__campo--consent">
                     <label>
                         <input type="checkbox" name="welow_consent" required />
                         <span><?php echo wp_kses_post( $consent ); ?></span>
+                    </label>
+                </div>
+            <?php endif; ?>
+
+            <?php // v2.51.0 — Segundo consentimiento (marketing, opcional) ?>
+            <?php if ( $marketing_activo && $marketing_texto ) : ?>
+                <div class="welow-form__campo welow-form__campo--consent welow-form__campo--marketing">
+                    <label>
+                        <input type="checkbox" name="welow_marketing_consent" value="1" />
+                        <span><?php echo wp_kses_post( $marketing_texto ); ?></span>
                     </label>
                 </div>
             <?php endif; ?>
@@ -395,6 +416,10 @@ class Welow_Shortcode_Formulario {
         $url_origen = isset( $_POST['welow_url'] ) ? esc_url_raw( wp_unslash( $_POST['welow_url'] ) ) : '';
         $referrer   = wp_get_referer();
 
+        // v2.51.0 — Capturar consentimiento de marketing (opcional)
+        $marketing_consent = ! empty( $_POST['welow_marketing_consent'] );
+        update_post_meta( $lead_id, '_welow_lead_marketing_consent', $marketing_consent ? '1' : '0' );
+
         update_post_meta( $lead_id, '_welow_lead_form_id',    $form_id );
         // v2.33.1 — JSON_UNESCAPED_UNICODE para preservar acentos (é, ó, ñ, í...)
         update_post_meta( $lead_id, '_welow_lead_datos',      wp_json_encode( $datos, JSON_UNESCAPED_UNICODE ) );
@@ -499,6 +524,15 @@ class Welow_Shortcode_Formulario {
             $cuerpo .= '<tr><th align="left" style="background:#f5f5f5;">' . esc_html( $k ) . '</th><td>' . $val . '</td></tr>';
         }
         $cuerpo .= '</table>';
+
+        // v2.51.0 — Indicador de consentimiento marketing (si está activo el segundo checkbox)
+        $marketing_consent = get_post_meta( $lead_id, '_welow_lead_marketing_consent', true );
+        if ( '' !== $marketing_consent ) {
+            $tick = ( '1' === $marketing_consent )
+                ? '<span style="color:#16a34a;font-weight:700;">✓ SÍ acepta marketing</span>'
+                : '<span style="color:#94a3b8;">✗ NO acepta marketing</span>';
+            $cuerpo .= '<p style="margin-top:14px;"><strong>Marketing comercial:</strong> ' . $tick . '</p>';
+        }
 
         if ( $url_origen ) {
             $cuerpo .= '<p style="margin-top:18px;"><strong>Página de origen:</strong> <a href="' . esc_url( $url_origen ) . '">' . esc_html( $url_origen ) . '</a></p>';

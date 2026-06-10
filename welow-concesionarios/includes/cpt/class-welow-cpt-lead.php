@@ -94,6 +94,17 @@ class Welow_CPT_Lead {
     public static function render_metabox_datos( $post ) {
         wp_nonce_field( 'welow_lead_save', 'welow_lead_nonce' );
         $datos = self::leer_meta_json( $post->ID, 'datos' );
+
+        // v2.51.0 — Mostrar badge prominente del consentimiento de marketing
+        $mk_consent = get_post_meta( $post->ID, self::META_PREFIX . 'marketing_consent', true );
+        if ( '' !== $mk_consent ) {
+            if ( '1' === $mk_consent ) {
+                echo '<p style="background:#dcfce7;border-left:4px solid #16a34a;padding:10px 14px;margin:0 0 14px;font-size:13px;color:#14532d;"><strong>✓ Acepta marketing.</strong> Este lead ha consentido recibir comunicaciones comerciales.</p>';
+            } else {
+                echo '<p style="background:#fef2f2;border-left:4px solid #dc2626;padding:10px 14px;margin:0 0 14px;font-size:13px;color:#7f1d1d;"><strong>✗ NO acepta marketing.</strong> Solo puedes contactarle para la consulta concreta, no para enviarle promociones.</p>';
+            }
+        }
+
         if ( ! is_array( $datos ) || empty( $datos ) ) {
             echo '<p>Sin datos.</p>';
             return;
@@ -220,14 +231,15 @@ class Welow_CPT_Lead {
      * ===================================================================== */
     public static function columnas_admin( $columns ) {
         return array(
-            'cb'         => $columns['cb'] ?? '',
-            'title'      => 'Nombre / Asunto',
-            'welow_form' => 'Formulario',
-            'welow_email'=> 'Email',
-            'welow_tel'  => 'Teléfono',
-            'welow_ctx'  => 'Contexto',
-            'welow_estado' => 'Estado',
-            'date'       => 'Fecha',
+            'cb'             => $columns['cb'] ?? '',
+            'title'          => 'Nombre / Asunto',
+            'welow_form'     => 'Formulario',
+            'welow_email'    => 'Email',
+            'welow_tel'      => 'Teléfono',
+            'welow_marketing'=> 'Marketing',
+            'welow_ctx'      => 'Contexto',
+            'welow_estado'   => 'Estado',
+            'date'           => 'Fecha',
         );
     }
 
@@ -246,6 +258,17 @@ class Welow_CPT_Lead {
             case 'welow_tel':
                 $tel = $datos['telefono'] ?? '';
                 echo $tel ? '<a href="tel:' . esc_attr( preg_replace( '/[^\d+]/', '', $tel ) ) . '">' . esc_html( $tel ) . '</a>' : '—';
+                break;
+            case 'welow_marketing':
+                // v2.51.0 — Badge consentimiento de marketing
+                $mk = get_post_meta( $post_id, self::META_PREFIX . 'marketing_consent', true );
+                if ( '1' === $mk ) {
+                    echo '<span title="Acepta marketing" style="color:#16a34a;font-weight:700;font-size:16px;">✓</span>';
+                } elseif ( '0' === $mk ) {
+                    echo '<span title="No acepta marketing" style="color:#dc2626;font-weight:700;font-size:16px;">✗</span>';
+                } else {
+                    echo '<span style="color:#94a3b8;">—</span>';
+                }
                 break;
             case 'welow_ctx':
                 $ctx = self::leer_meta_json( $post_id, 'contexto' );

@@ -113,8 +113,11 @@ class Welow_Settings {
         if ( isset( $input['rgpd'] ) && is_array( $input['rgpd'] ) ) {
             $r = $input['rgpd'];
             $output['rgpd'] = array(
-                'consent_texto' => isset( $r['consent_texto'] ) ? sanitize_textarea_field( $r['consent_texto'] ) : '',
-                'politica_url'  => isset( $r['politica_url'] )  ? esc_url_raw( $r['politica_url'] ) : '',
+                'consent_texto'    => isset( $r['consent_texto'] ) ? sanitize_textarea_field( $r['consent_texto'] ) : '',
+                'politica_url'     => isset( $r['politica_url'] )  ? esc_url_raw( $r['politica_url'] ) : '',
+                // v2.51.0 — Segundo consentimiento (marketing) opcional
+                'marketing_activo' => ! empty( $r['marketing_activo'] ),
+                'marketing_texto'  => isset( $r['marketing_texto'] ) ? sanitize_textarea_field( $r['marketing_texto'] ) : '',
             );
         }
 
@@ -629,6 +632,40 @@ class Welow_Settings {
                 </td>
             </tr>
         </table>
+
+        <?php // v2.51.0 — Segundo consentimiento (marketing) opcional ?>
+        <h3 style="margin-top:30px;">Segundo consentimiento (opcional, marketing)</h3>
+        <p>Si lo activas, aparecerá un segundo checkbox <strong>no obligatorio</strong> debajo del consentimiento RGPD en todos los formularios. Su valor (sí/no) se guarda en cada lead para que sepas a quién puedes mandar comunicaciones comerciales.</p>
+
+        <?php
+        $mk_activo = ! empty( $r['marketing_activo'] );
+        $mk_texto  = $r['marketing_texto'] ?? '';
+        $mk_default = self::get_rgpd_default_marketing();
+        ?>
+        <table class="form-table">
+            <tr>
+                <th><label>Activar segundo consentimiento</label></th>
+                <td>
+                    <label>
+                        <input type="checkbox" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[rgpd][marketing_activo]" value="1" <?php checked( $mk_activo ); ?> />
+                        Mostrar el checkbox de marketing en todos los formularios
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <th><label>Texto del consentimiento de marketing</label></th>
+                <td>
+                    <textarea name="<?php echo esc_attr( self::OPTION_KEY ); ?>[rgpd][marketing_texto]"
+                              rows="3" class="large-text"
+                              placeholder="<?php echo esc_attr( $mk_default ); ?>"><?php echo esc_textarea( $mk_texto ); ?></textarea>
+                    <p class="description">Si lo dejas vacío, se usa el texto recomendado del placeholder.</p>
+                    <p>
+                        <button type="button" class="button"
+                                onclick="document.querySelector('textarea[name=&quot;<?php echo esc_attr( self::OPTION_KEY ); ?>[rgpd][marketing_texto]&quot;]').value = <?php echo wp_json_encode( $mk_default ); ?>; return false;">Usar texto recomendado</button>
+                    </p>
+                </td>
+            </tr>
+        </table>
         <?php
     }
 
@@ -637,6 +674,13 @@ class Welow_Settings {
      */
     public static function get_rgpd_default_consent() {
         return 'He leído y acepto la <a href="{politica}" target="_blank" rel="noopener">Política de Privacidad</a>. El responsable del tratamiento es TALLERES CHINARES SA. La finalidad de la recogida de datos es la de poder atender sus cuestiones, sin ceder sus datos a terceros. Tiene derecho a saber qué información tenemos sobre usted, corregirla o eliminarla tal y como se explica en nuestra <a href="{politica}" target="_blank" rel="noopener">Política de Privacidad</a>.';
+    }
+
+    /**
+     * v2.51.0 — Texto por defecto del segundo consentimiento (marketing).
+     */
+    public static function get_rgpd_default_marketing() {
+        return 'Doy mi consentimiento para el tratamiento de mis datos personales con fines de marketing y comerciales (Opcional).';
     }
 
     /**
