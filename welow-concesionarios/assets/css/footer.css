@@ -49,20 +49,27 @@
     width: auto;
     display: block;
 }
+/* v2.50.0 — Marcas en UNA sola fila distribuidas equitativamente
+   en todo el ancho disponible (space-between). Cada logo se permite
+   reducir un poco si hay muchos pero mantiene un alto consistente. */
 .welow-footer__marcas-logos {
     flex: 1;
     display: flex;
-    flex-wrap: wrap;
-    gap: 36px;
+    flex-wrap: nowrap;
+    gap: 20px;
     align-items: center;
-    justify-content: flex-start; /* logos empiezan justo después de la línea */
-    padding-left: 28px; /* mismo valor que el gap del padre → distancia simétrica */
+    justify-content: space-between;
+    padding-left: 28px;
     border-left: 1px solid var(--welow-f-sep);
     min-height: 80px;
+    overflow: hidden;
 }
 .welow-footer__marca-logo {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    flex: 1 1 0;
+    min-width: 0;
     transition: opacity 0.15s, transform 0.15s;
     opacity: 0.9;
 }
@@ -71,12 +78,21 @@
     transform: translateY(-2px);
 }
 .welow-footer__marca-logo img {
-    /* v2.49.0 — Logos de marca el doble: hasta 72px de alto, 200px de ancho */
+    /* v2.50.0 — Una fila: imagen ocupa el ancho del slot pero limitada en alto */
     max-height: 72px;
-    max-width: 200px;
+    max-width: 100%;
     width: auto;
     height: auto;
+    object-fit: contain;
     display: block;
+}
+@media (max-width: 760px) {
+    /* En móvil sí permitimos wrap para que no se aplaste */
+    .welow-footer__marcas-logos {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .welow-footer__marca-logo { flex: 0 0 auto; }
 }
 .welow-footer__empresa-desc {
     flex-basis: 100%;
@@ -222,12 +238,32 @@
     text-decoration: none;
     font-size: 16px;
     line-height: 1.55;
-    transition: color 0.15s, transform 0.15s;
-    display: inline-block;
+    transition: color 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
 }
 .welow-footer__menu a:hover {
     color: var(--welow-f-link);
-    transform: translateX(2px);
+}
+
+/* v2.50.0 — Pequeño guion bajo decorativo antes del texto del menú.
+   Le da más personalidad sin recurrir al clásico "–". En hover, se alarga. */
+.welow-footer__menu a::before {
+    content: "";
+    display: inline-block;
+    width: 14px;
+    height: 2px;
+    background: currentColor;
+    opacity: 0.7;
+    border-radius: 1px;
+    transition: width 0.18s ease, opacity 0.15s;
+    flex-shrink: 0;
+}
+.welow-footer__menu a:hover::before {
+    width: 22px;
+    opacity: 1;
+    background: var(--welow-f-link);
 }
 
 /* ============ FILA 3: Legal ============ */
