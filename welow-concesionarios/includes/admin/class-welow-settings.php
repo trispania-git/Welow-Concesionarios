@@ -1025,18 +1025,39 @@ class Welow_Settings {
                     <p class="description">Usa <code>{year}</code> para que se reemplace por el año actual automáticamente.</p>
                 </td>
             </tr>
-            <tr>
-                <th><label>URL Política de Privacidad</label></th>
-                <td><input type="url" name="<?php echo esc_attr( $base ); ?>[politica_url]" value="<?php echo esc_url( $f['politica_url'] ?? '' ); ?>" class="large-text" placeholder="https://.../politica-privacidad/" /></td>
-            </tr>
-            <tr>
-                <th><label>URL Aviso Legal</label></th>
-                <td><input type="url" name="<?php echo esc_attr( $base ); ?>[aviso_url]" value="<?php echo esc_url( $f['aviso_url'] ?? '' ); ?>" class="large-text" placeholder="https://.../aviso-legal/" /></td>
-            </tr>
-            <tr>
-                <th><label>URL Política de Cookies</label></th>
-                <td><input type="url" name="<?php echo esc_attr( $base ); ?>[cookies_url]" value="<?php echo esc_url( $f['cookies_url'] ?? '' ); ?>" class="large-text" placeholder="https://.../cookies/" /></td>
-            </tr>
+            <?php
+            // v2.54.0 — Selector de página de la web + URL manual.
+            // Si el admin elige una página, su URL se vuelca al input de la derecha.
+            $paginas = get_pages( array( 'sort_column' => 'post_title', 'sort_order' => 'ASC' ) );
+            $render_legal_url = function ( $label, $field_key, $valor_actual, $placeholder ) use ( $base, $paginas ) {
+                $input_id = esc_attr( $base . '_' . $field_key );
+                ?>
+                <tr>
+                    <th><label for="<?php echo $input_id; ?>"><?php echo esc_html( $label ); ?></label></th>
+                    <td>
+                        <select onchange="if(this.value){document.getElementById('<?php echo $input_id; ?>').value=this.value;} this.selectedIndex=0;"
+                                style="max-width:100%; margin-bottom:6px;">
+                            <option value="">— Seleccionar una página de la web —</option>
+                            <?php foreach ( $paginas as $p ) : ?>
+                                <option value="<?php echo esc_url( get_permalink( $p->ID ) ); ?>">
+                                    <?php echo esc_html( $p->post_title ); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <input type="url" id="<?php echo $input_id; ?>"
+                               name="<?php echo esc_attr( $base ); ?>[<?php echo esc_attr( $field_key ); ?>]"
+                               value="<?php echo esc_url( $valor_actual ); ?>"
+                               class="large-text"
+                               placeholder="<?php echo esc_attr( $placeholder ); ?>" />
+                        <p class="description">Elige una página del desplegable o pega una URL manual.</p>
+                    </td>
+                </tr>
+                <?php
+            };
+            $render_legal_url( 'URL Política de Privacidad', 'politica_url', $f['politica_url'] ?? '', 'https://.../politica-privacidad/' );
+            $render_legal_url( 'URL Aviso Legal',           'aviso_url',    $f['aviso_url']    ?? '', 'https://.../aviso-legal/' );
+            $render_legal_url( 'URL Política de Cookies',   'cookies_url',  $f['cookies_url']  ?? '', 'https://.../cookies/' );
+            ?>
         </table>
 
         <h3 style="margin-top:30px;">Estilos</h3>
