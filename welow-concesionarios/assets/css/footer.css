@@ -34,16 +34,18 @@
 }
 
 /* ============ FILA 1: Logos ============ */
-/* v2.48.0 — Reducida la distancia logo empresa ↔ marcas (separador a la izquierda
-   ahora más pegado y gap menor). */
+/* v2.49.0 — Logo empresa el doble (150px). Distancia simétrica
+   empresa ↔ línea ↔ marcas (mismo valor a cada lado). Logos de marca
+   ahora más grandes y empezando por la izquierda (después de la línea)
+   para que aprovechen el ancho disponible. */
 .welow-footer__row--logos {
     display: flex;
     align-items: center;
-    gap: 18px;
+    gap: 28px; /* distancia empresa → línea vertical */
     flex-wrap: wrap;
 }
 .welow-footer__empresa-logo img {
-    max-height: 75px;
+    max-height: 150px;
     width: auto;
     display: block;
 }
@@ -51,26 +53,27 @@
     flex: 1;
     display: flex;
     flex-wrap: wrap;
-    gap: 24px;
+    gap: 36px;
     align-items: center;
-    justify-content: flex-end;
-    padding-left: 18px;
+    justify-content: flex-start; /* logos empiezan justo después de la línea */
+    padding-left: 28px; /* mismo valor que el gap del padre → distancia simétrica */
     border-left: 1px solid var(--welow-f-sep);
-    min-height: 50px;
+    min-height: 80px;
 }
 .welow-footer__marca-logo {
     display: inline-flex;
     align-items: center;
     transition: opacity 0.15s, transform 0.15s;
-    opacity: 0.85;
+    opacity: 0.9;
 }
 .welow-footer__marca-logo:hover {
     opacity: 1;
     transform: translateY(-2px);
 }
 .welow-footer__marca-logo img {
-    max-height: 36px;
-    max-width: 120px;
+    /* v2.49.0 — Logos de marca el doble: hasta 72px de alto, 200px de ancho */
+    max-height: 72px;
+    max-width: 200px;
     width: auto;
     height: auto;
     display: block;
@@ -165,10 +168,11 @@
     display: inline-block;
 }
 .welow-footer__ubicacion-dir {
+    /* v2.49.0 — padding ajustado al nuevo icono SVG (22 + 8 = 30px) */
     font-size: 14px;
     opacity: 0.9;
     line-height: 1.5;
-    padding-left: 26px;
+    padding-left: 30px;
 }
 .welow-footer__ubicacion-tel {
     color: var(--welow-f-color);
@@ -176,7 +180,7 @@
     font-size: 14px;
     display: inline-block;
     margin-top: 2px;
-    padding-left: 26px;
+    padding-left: 30px;
     transition: color 0.15s;
 }
 .welow-footer__ubicacion-tel:hover { color: var(--welow-f-link); }

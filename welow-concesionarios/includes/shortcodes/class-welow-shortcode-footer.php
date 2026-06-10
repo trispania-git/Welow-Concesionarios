@@ -151,10 +151,11 @@ class Welow_Shortcode_Footer {
                                 ?>
                                     <li>
                                         <a class="welow-footer__ubicacion-nombre" href="<?php echo esc_url( $url_conc ); ?>">
-                                            <?php // v2.48.0 — SVG pin estilo línea (sustituye al emoji 📍) ?>
-                                            <svg class="welow-footer__ubicacion-icon" aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M12 22s8-8.5 8-14a8 8 0 1 0-16 0c0 5.5 8 14 8 14z"/>
-                                                <circle cx="12" cy="10" r="3"/>
+                                            <?php // v2.49.0 — SVG pin outline (vector, escalable, sin rasterizar).
+                                                  // Tamaño 22px y stroke 1.5 para que se vea limpio y proporcional al texto. ?>
+                                            <svg class="welow-footer__ubicacion-icon" aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M12 21.5c-3.5-4-7-7.5-7-12a7 7 0 0 1 14 0c0 4.5-3.5 8-7 12z"/>
+                                                <circle cx="12" cy="9.5" r="2.5"/>
                                             </svg>
                                             <span class="welow-footer__ubicacion-texto"><?php echo esc_html( $conc->post_title ); ?></span>
                                         </a>

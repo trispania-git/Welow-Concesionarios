@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.48.0
+ * Version:     2.49.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,15 @@
  *
  * CHANGELOG
  * ---------
+ * 2.49.0 — Footer: logo empresa x2 + logos marca x2 + distancia simétrica + pin más grande
+ *   - Logo empresa max-height 75px → 150px.
+ *   - Logos de marca max-height 36→72px, max-width 120→200px.
+ *   - Distancia simétrica: gap 28px a un lado de la línea vertical y
+ *     padding-left 28px al otro lado (antes asimétrico por justify-end).
+ *   - Logos de marca ahora justify-start (empiezan justo después de la línea)
+ *     para aprovechar el espacio.
+ *   - Pin SVG: 18→22px, stroke 1.6→1.5. Sigue siendo vector inline (no rasterizado).
+ *
  * 2.48.0 — Footer: 4 ajustes finos
  *   - Título de ubicaciones: si lo dejas vacío, no se renderiza nada (antes
  *     caía a "Nuestras ubicaciones" por defecto).
@@ -1739,7 +1748,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.48.0' );
+define( 'WELOW_CONC_VERSION', '2.49.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
