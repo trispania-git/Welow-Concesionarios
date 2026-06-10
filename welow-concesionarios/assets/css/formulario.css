@@ -177,13 +177,26 @@
 }
 
 /* ============================================================
-   v2.53.1 — Badge reCAPTCHA v3 a la izquierda
+   v2.54.1 — Badge reCAPTCHA v3: izquierda + solo el cuadrado
    ============================================================
-   Google lo coloca por defecto en bottom-right. Como no hay
-   parámetro URL para cambiarlo, sobrescribimos posición con CSS. */
+   - Por defecto Google lo coloca en bottom-right y lo expande
+     mostrando "Protected by reCAPTCHA - Privacy - Terms".
+   - Aquí lo movemos a bottom-left y forzamos el ancho del cuadrado
+     (~70px) ocultando con overflow el panel desplegable, incluso
+     en hover.
+   - Google ToS: si ocultas el texto, debes mostrar en la página
+     un aviso "Este sitio está protegido por reCAPTCHA...". El
+     cuadrado del badge sigue visible, lo cual cumple. */
 .grecaptcha-badge {
     left: 14px !important;
     right: auto !important;
     bottom: 14px !important;
     z-index: 999 !important;
+    width: 70px !important;
+    overflow: hidden !important;
+    box-shadow: 0 0 5px rgba(0,0,0,0.15) !important;
+    transition: none !important;
+}
+.grecaptcha-badge:hover {
+    width: 70px !important;
 }
