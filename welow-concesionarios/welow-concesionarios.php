@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.53.0
+ * Version:     2.53.1
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,11 @@
  *
  * CHANGELOG
  * ---------
+ * 2.53.1 — Badge reCAPTCHA reposicionado a la izquierda (bottom-left)
+ *   Google v3 lo coloca por defecto en bottom-right y no expone un parámetro
+ *   URL para cambiarlo. Override CSS en formulario.css:
+ *     .grecaptcha-badge { left: 14px; right: auto; bottom: 14px; }
+ *
  * 2.53.0 — Antispam: Google reCAPTCHA v3 (invisible)
  *
  *   CONFIGURACIONES → FORMULARIOS → "Antispam — Google reCAPTCHA v3":
@@ -1825,7 +1830,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.53.0' );
+define( 'WELOW_CONC_VERSION', '2.53.1' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );

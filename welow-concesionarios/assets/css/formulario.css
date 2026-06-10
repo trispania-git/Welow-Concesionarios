@@ -175,3 +175,15 @@
     border-color: #dc2626;
     background: #fef2f2;
 }
+
+/* ============================================================
+   v2.53.1 — Badge reCAPTCHA v3 a la izquierda
+   ============================================================
+   Google lo coloca por defecto en bottom-right. Como no hay
+   parámetro URL para cambiarlo, sobrescribimos posición con CSS. */
+.grecaptcha-badge {
+    left: 14px !important;
+    right: auto !important;
+    bottom: 14px !important;
+    z-index: 999 !important;
+}
