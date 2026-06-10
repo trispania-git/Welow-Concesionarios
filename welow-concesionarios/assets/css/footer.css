@@ -34,10 +34,12 @@
 }
 
 /* ============ FILA 1: Logos ============ */
+/* v2.48.0 — Reducida la distancia logo empresa ↔ marcas (separador a la izquierda
+   ahora más pegado y gap menor). */
 .welow-footer__row--logos {
     display: flex;
     align-items: center;
-    gap: 32px;
+    gap: 18px;
     flex-wrap: wrap;
 }
 .welow-footer__empresa-logo img {
@@ -49,10 +51,10 @@
     flex: 1;
     display: flex;
     flex-wrap: wrap;
-    gap: 28px;
+    gap: 24px;
     align-items: center;
     justify-content: flex-end;
-    padding-left: 32px;
+    padding-left: 18px;
     border-left: 1px solid var(--welow-f-sep);
     min-height: 50px;
 }
@@ -114,10 +116,11 @@
 }
 
 .welow-footer__col-titulo {
+    /* v2.48.0 — más cuerpo */
     color: var(--welow-f-titulo);
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 700;
-    margin: 0 0 14px;
+    margin: 0 0 16px;
     letter-spacing: 0.04em;
     text-transform: uppercase;
 }
@@ -144,33 +147,36 @@
     content: none !important;
     display: none !important;
 }
+/* v2.48.0 — Más cuerpo en ubicaciones (nombre, dirección, tel) */
 .welow-footer__ubicacion-nombre {
     color: var(--welow-f-titulo);
     font-weight: 700;
     text-decoration: none;
-    font-size: 14px;
+    font-size: 16px;
     transition: color 0.15s;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 .welow-footer__ubicacion-nombre:hover { color: var(--welow-f-link); }
 .welow-footer__ubicacion-icon {
-    font-size: 14px;
-    line-height: 1;
     flex-shrink: 0;
+    color: currentColor;
+    display: inline-block;
 }
 .welow-footer__ubicacion-dir {
-    font-size: 13px;
-    opacity: 0.85;
-    line-height: 1.4;
+    font-size: 14px;
+    opacity: 0.9;
+    line-height: 1.5;
+    padding-left: 26px;
 }
 .welow-footer__ubicacion-tel {
     color: var(--welow-f-color);
     text-decoration: none;
-    font-size: 13px;
+    font-size: 14px;
     display: inline-block;
     margin-top: 2px;
+    padding-left: 26px;
     transition: color 0.15s;
 }
 .welow-footer__ubicacion-tel:hover { color: var(--welow-f-link); }
@@ -207,9 +213,11 @@
     display: none !important;
 }
 .welow-footer__menu a {
+    /* v2.48.0 — Más cuerpo */
     color: var(--welow-f-color);
     text-decoration: none;
-    font-size: 14px;
+    font-size: 16px;
+    line-height: 1.55;
     transition: color 0.15s, transform 0.15s;
     display: inline-block;
 }

@@ -65,8 +65,9 @@ class Welow_Shortcode_Footer {
             'orderby'        => 'menu_order title',
             'order'          => 'ASC',
         ) );
-        $ubic_titulo = $f['ubicaciones_titulo'] ?? '';
-        if ( ! $ubic_titulo ) $ubic_titulo = 'Nuestras ubicaciones';
+        // v2.48.0 — Si el título está vacío, no se renderiza ningún h3 (antes
+        // caía a "Nuestras ubicaciones"). Da más libertad de diseño.
+        $ubic_titulo = trim( $f['ubicaciones_titulo'] ?? '' );
 
         // v2.47.0 — Si las claves no existen aún (instalación previa al toggle), mostramos todo.
         $mostrar_dir = array_key_exists( 'ubicaciones_mostrar_direccion', $f ) ? ! empty( $f['ubicaciones_mostrar_direccion'] ) : true;
@@ -136,7 +137,9 @@ class Welow_Shortcode_Footer {
 
                     <?php if ( ! empty( $ubicaciones ) ) : ?>
                         <div class="welow-footer__ubicaciones">
-                            <h3 class="welow-footer__col-titulo"><?php echo esc_html( $ubic_titulo ); ?></h3>
+                            <?php if ( $ubic_titulo ) : ?>
+                                <h3 class="welow-footer__col-titulo"><?php echo esc_html( $ubic_titulo ); ?></h3>
+                            <?php endif; ?>
                             <ul class="welow-footer__ubicaciones-lista">
                                 <?php foreach ( $ubicaciones as $conc ) :
                                     $cid       = $conc->ID;
@@ -148,7 +151,11 @@ class Welow_Shortcode_Footer {
                                 ?>
                                     <li>
                                         <a class="welow-footer__ubicacion-nombre" href="<?php echo esc_url( $url_conc ); ?>">
-                                            <span class="welow-footer__ubicacion-icon" aria-hidden="true">📍</span>
+                                            <?php // v2.48.0 — SVG pin estilo línea (sustituye al emoji 📍) ?>
+                                            <svg class="welow-footer__ubicacion-icon" aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M12 22s8-8.5 8-14a8 8 0 1 0-16 0c0 5.5 8 14 8 14z"/>
+                                                <circle cx="12" cy="10" r="3"/>
+                                            </svg>
                                             <span class="welow-footer__ubicacion-texto"><?php echo esc_html( $conc->post_title ); ?></span>
                                         </a>
                                         <?php if ( $mostrar_dir && ( $direccion || $ciudad ) ) : ?>
