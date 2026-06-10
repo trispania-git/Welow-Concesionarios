@@ -109,6 +109,17 @@ class Welow_Settings {
             $output['iconos'] = Welow_Icons::sanitize( $input['iconos'] );
         }
 
+        // v2.53.0 — Antispam (reCAPTCHA v3)
+        if ( isset( $input['antispam'] ) && is_array( $input['antispam'] ) ) {
+            $a = $input['antispam'];
+            $output['antispam'] = array(
+                'recaptcha_activo'      => ! empty( $a['recaptcha_activo'] ),
+                'recaptcha_site_key'    => isset( $a['recaptcha_site_key'] ) ? sanitize_text_field( $a['recaptcha_site_key'] ) : '',
+                'recaptcha_secret_key'  => isset( $a['recaptcha_secret_key'] ) ? sanitize_text_field( $a['recaptcha_secret_key'] ) : '',
+                'recaptcha_score_min'   => isset( $a['recaptcha_score_min'] ) ? max( 0.0, min( 1.0, floatval( $a['recaptcha_score_min'] ) ) ) : 0.5,
+            );
+        }
+
         // v2.40.0 — Texto RGPD global (fallback de los formularios)
         if ( isset( $input['rgpd'] ) && is_array( $input['rgpd'] ) ) {
             $r = $input['rgpd'];
@@ -663,6 +674,58 @@ class Welow_Settings {
                         <button type="button" class="button"
                                 onclick="document.querySelector('textarea[name=&quot;<?php echo esc_attr( self::OPTION_KEY ); ?>[rgpd][marketing_texto]&quot;]').value = <?php echo wp_json_encode( $mk_default ); ?>; return false;">Usar texto recomendado</button>
                     </p>
+                </td>
+            </tr>
+        </table>
+
+        <?php // v2.53.0 — Antispam reCAPTCHA v3 ?>
+        <h3 style="margin-top:30px;">Antispam — Google reCAPTCHA v3</h3>
+        <p>Protección invisible (sin captchas visibles para el usuario). Funciona en segundo plano y rechaza envíos sospechosos. Puedes consultar / obtener las claves en
+            <a href="https://www.google.com/recaptcha/admin/create" target="_blank" rel="noopener">https://www.google.com/recaptcha/admin/create</a>
+            registrando tu dominio como <strong>reCAPTCHA v3</strong>.
+        </p>
+        <?php
+        $a = isset( $options['antispam'] ) && is_array( $options['antispam'] ) ? $options['antispam'] : array();
+        $rc_activo = ! empty( $a['recaptcha_activo'] );
+        $rc_site   = $a['recaptcha_site_key'] ?? '';
+        $rc_secret = $a['recaptcha_secret_key'] ?? '';
+        $rc_score  = $a['recaptcha_score_min'] ?? 0.5;
+        ?>
+        <table class="form-table">
+            <tr>
+                <th><label>Activar reCAPTCHA v3</label></th>
+                <td>
+                    <label>
+                        <input type="checkbox" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[antispam][recaptcha_activo]" value="1" <?php checked( $rc_activo ); ?> />
+                        Validar todos los formularios con reCAPTCHA v3
+                    </label>
+                    <p class="description">Si lo activas, las claves de abajo son obligatorias. Si lo dejas desactivado, sigue funcionando el honeypot + timing.</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label>Site key (clave del sitio)</label></th>
+                <td>
+                    <input type="text" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[antispam][recaptcha_site_key]"
+                           value="<?php echo esc_attr( $rc_site ); ?>" class="large-text" autocomplete="off"
+                           placeholder="6LdXXXXXXXXXXXXXXXXXXXXXXXXXXXX" />
+                    <p class="description">Empieza por <code>6L</code>. Se incrusta en el HTML del frontend.</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label>Secret key (clave secreta)</label></th>
+                <td>
+                    <input type="password" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[antispam][recaptcha_secret_key]"
+                           value="<?php echo esc_attr( $rc_secret ); ?>" class="large-text" autocomplete="new-password"
+                           placeholder="6LdXXXXXXXXXXXXXXXXXXXXXXXXXXXX" />
+                    <p class="description">Nunca se expone al frontend. Solo se usa servidor-a-servidor para verificar el token con Google.</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label>Score mínimo aceptado</label></th>
+                <td>
+                    <input type="number" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[antispam][recaptcha_score_min]"
+                           value="<?php echo esc_attr( $rc_score ); ?>" min="0" max="1" step="0.1" style="width:80px;" />
+                    <p class="description">Google devuelve un score de 0 (bot) a 1 (humano). Recomendado: <strong>0.5</strong>. Si recibes muchos falsos positivos, baja a 0.3. Si recibes spam, sube a 0.7.</p>
                 </td>
             </tr>
         </table>

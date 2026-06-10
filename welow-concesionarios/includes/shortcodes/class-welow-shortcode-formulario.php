@@ -53,9 +53,27 @@ class Welow_Shortcode_Formulario {
 
         wp_enqueue_style( 'welow-formulario' );
         wp_enqueue_script( 'welow-formulario' );
+
+        // v2.53.0 — Cargar reCAPTCHA v3 si está configurado
+        $recaptcha_site_key = '';
+        if ( class_exists( 'Welow_Settings' ) ) {
+            $opt_as = get_option( Welow_Settings::OPTION_KEY, array() );
+            $opt_as = isset( $opt_as['antispam'] ) && is_array( $opt_as['antispam'] ) ? $opt_as['antispam'] : array();
+            if ( ! empty( $opt_as['recaptcha_activo'] ) && ! empty( $opt_as['recaptcha_site_key'] ) ) {
+                $recaptcha_site_key = $opt_as['recaptcha_site_key'];
+                wp_enqueue_script(
+                    'google-recaptcha-v3',
+                    'https://www.google.com/recaptcha/api.js?render=' . urlencode( $recaptcha_site_key ),
+                    array(), null, true
+                );
+            }
+        }
+
         wp_localize_script( 'welow-formulario', 'welowFormCfg', array(
-            'ajax_url' => admin_url( 'admin-ajax.php' ),
-            'action'   => self::AJAX_ACTION,
+            'ajax_url'           => admin_url( 'admin-ajax.php' ),
+            'action'             => self::AJAX_ACTION,
+            'recaptcha_site_key' => $recaptcha_site_key,
+            'recaptcha_action'   => 'welow_form',
         ) );
 
         $titulo      = get_post_meta( $form_id, '_welow_form_titulo_publico', true );
@@ -340,6 +358,22 @@ class Welow_Shortcode_Formulario {
             wp_send_json_error( array( 'mensaje' => 'Envío demasiado rápido.' ), 400 );
         }
 
+        // v2.53.0 — reCAPTCHA v3 (si está configurado)
+        if ( class_exists( 'Welow_Settings' ) ) {
+            $opt_as = get_option( Welow_Settings::OPTION_KEY, array() );
+            $opt_as = isset( $opt_as['antispam'] ) && is_array( $opt_as['antispam'] ) ? $opt_as['antispam'] : array();
+            if ( ! empty( $opt_as['recaptcha_activo'] ) && ! empty( $opt_as['recaptcha_secret_key'] ) ) {
+                $rc_check = self::verificar_recaptcha(
+                    $_POST['welow_recaptcha_token'] ?? '',
+                    $opt_as['recaptcha_secret_key'],
+                    floatval( $opt_as['recaptcha_score_min'] ?? 0.5 )
+                );
+                if ( is_wp_error( $rc_check ) ) {
+                    wp_send_json_error( array( 'mensaje' => $rc_check->get_error_message() ), 400 );
+                }
+            }
+        }
+
         // Formulario
         $form_id = intval( $_POST['welow_form_id'] ?? 0 );
         $form    = $form_id ? get_post( $form_id ) : null;
@@ -578,6 +612,40 @@ class Welow_Shortcode_Formulario {
         $host   = $_SERVER['HTTP_HOST'] ?? '';
         $uri    = $_SERVER['REQUEST_URI'] ?? '';
         return $scheme . '://' . $host . $uri;
+    }
+
+    /**
+     * v2.53.0 — Verifica un token de reCAPTCHA v3 contra Google.
+     *
+     * @return true|WP_Error true si pasa, WP_Error con mensaje si falla
+     */
+    private static function verificar_recaptcha( $token, $secret_key, $score_min ) {
+        $token = sanitize_text_field( wp_unslash( $token ) );
+        if ( ! $token ) {
+            return new WP_Error( 'recaptcha_missing', 'Falta token reCAPTCHA. Recarga la página e inténtalo de nuevo.' );
+        }
+
+        $response = wp_remote_post( 'https://www.google.com/recaptcha/api/siteverify', array(
+            'timeout' => 8,
+            'body'    => array(
+                'secret'   => $secret_key,
+                'response' => $token,
+                'remoteip' => self::client_ip(),
+            ),
+        ) );
+        if ( is_wp_error( $response ) ) {
+            return new WP_Error( 'recaptcha_connect', 'No se pudo verificar reCAPTCHA. Inténtalo de nuevo.' );
+        }
+
+        $body = json_decode( wp_remote_retrieve_body( $response ), true );
+        if ( ! is_array( $body ) || empty( $body['success'] ) ) {
+            return new WP_Error( 'recaptcha_failed', 'Verificación reCAPTCHA fallida. Recarga e inténtalo de nuevo.' );
+        }
+        $score = isset( $body['score'] ) ? floatval( $body['score'] ) : 0;
+        if ( $score < $score_min ) {
+            return new WP_Error( 'recaptcha_low_score', 'Detectado tráfico sospechoso. Si eres una persona real, contáctanos por teléfono.' );
+        }
+        return true;
     }
 
     /**

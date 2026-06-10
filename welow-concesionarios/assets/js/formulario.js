@@ -25,10 +25,33 @@
             form.classList.add( 'is-loading' );
             submitBtn.disabled = true;
 
-            var fd = new FormData( form );
-            fd.append( 'action', welowFormCfg.action );
+            // v2.53.0 — Si hay reCAPTCHA v3 configurado, pedir token antes de enviar
+            getRecaptchaToken().then( function ( token ) {
+                enviar( form, msgEl, submitBtn, token );
+            } ).catch( function () {
+                // Si falla obtener token (ej. usuario sin red, bloqueador), enviamos sin él
+                // y el backend lo rechazará si está obligado.
+                enviar( form, msgEl, submitBtn, '' );
+            } );
+        } );
 
-            fetch( welowFormCfg.ajax_url, {
+        // Quitar marca de error al modificar el campo
+        form.querySelectorAll( 'input, textarea, select' ).forEach( function ( el ) {
+            el.addEventListener( 'input', function () {
+                var campo = el.closest( '.welow-form__campo' );
+                if ( campo ) campo.classList.remove( 'has-error' );
+            } );
+        } );
+    }
+
+    function enviar( form, msgEl, submitBtn, recaptchaToken ) {
+        var fd = new FormData( form );
+        fd.append( 'action', welowFormCfg.action );
+        if ( recaptchaToken ) {
+            fd.append( 'welow_recaptcha_token', recaptchaToken );
+        }
+
+        fetch( welowFormCfg.ajax_url, {
                 method: 'POST',
                 body:   fd,
                 credentials: 'same-origin',
@@ -56,13 +79,21 @@
                 msgEl.className = 'welow-form__mensaje is-error';
                 msgEl.textContent = 'Error de conexión. Comprueba tu red.';
             } );
-        } );
+    }
 
-        // Quitar marca de error al modificar el campo
-        form.querySelectorAll( 'input, textarea, select' ).forEach( function ( el ) {
-            el.addEventListener( 'input', function () {
-                var campo = el.closest( '.welow-form__campo' );
-                if ( campo ) campo.classList.remove( 'has-error' );
+    function getRecaptchaToken() {
+        // v2.53.0 — Devuelve una Promise con el token de reCAPTCHA v3 o '' si no procede
+        return new Promise( function ( resolve, reject ) {
+            var siteKey = welowFormCfg && welowFormCfg.recaptcha_site_key;
+            var action  = ( welowFormCfg && welowFormCfg.recaptcha_action ) || 'welow_form';
+            if ( ! siteKey || typeof grecaptcha === 'undefined' ) {
+                resolve( '' );
+                return;
+            }
+            grecaptcha.ready( function () {
+                grecaptcha.execute( siteKey, { action: action } )
+                    .then( function ( token ) { resolve( token || '' ); } )
+                    .catch( function () { reject(); } );
             } );
         } );
     }

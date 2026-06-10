@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.52.0
+ * Version:     2.53.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,30 @@
  *
  * CHANGELOG
  * ---------
+ * 2.53.0 — Antispam: Google reCAPTCHA v3 (invisible)
+ *
+ *   CONFIGURACIONES → FORMULARIOS → "Antispam — Google reCAPTCHA v3":
+ *     - Checkbox para activar
+ *     - Site key (clave del sitio)
+ *     - Secret key (clave secreta, type=password)
+ *     - Score mínimo aceptado (0-1, default 0.5)
+ *
+ *   FLUJO:
+ *     1. Obtén claves v3 en https://www.google.com/recaptcha/admin/create
+ *     2. Pega Site key + Secret key en Configuraciones
+ *     3. Guarda. Listo.
+ *
+ *   FUNCIONAMIENTO:
+ *     - Frontend: se carga api.js?render=SITE_KEY al renderizar el form.
+ *     - Al enviar, grecaptcha.execute() pide un token con action='welow_form'.
+ *     - El token viaja como welow_recaptcha_token en el AJAX submit.
+ *     - El backend hace POST a https://www.google.com/recaptcha/api/siteverify
+ *       con el secret + token + IP del cliente.
+ *     - Si success=false o score < min, se rechaza con error.
+ *
+ *   Funciona junto al honeypot + timing (los 3 a la vez). Si está desactivado,
+ *   sigue valiendo solo honeypot + timing como antes.
+ *
  * 2.52.0 — Estilos globales: cubrir TODO el plugin (formularios, footer, etc)
  *
  *   PROBLEMA: el inyector de "Estilos generales" solo cubría cards de modelo
@@ -1801,7 +1825,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.52.0' );
+define( 'WELOW_CONC_VERSION', '2.53.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
