@@ -119,44 +119,120 @@ class Welow_Main {
 
         $css = '';
 
-        // v2.29.1 — Usar !important para ganar al shorthand "background:" de los
-        // CSS originales y al posible CSS de Divi/tema.
+        // v2.52.0 — Selectores ampliados para que TODO el plugin respete los estilos
+        // configurados (incluidos formularios, footer, Me Interesa, etc).
+        // !important garantiza victoria sobre los hardcoded y el CSS de Divi/tema.
 
-        // Color principal → fondos de botones primarios
+        // Convertimos color_principal a rgba para sombras/focus box-shadow
+        $rgba_focus = '';
+        if ( $color_principal && preg_match( '/^#([a-fA-F0-9]{6})$/', $color_principal, $m ) ) {
+            $r = hexdec( substr( $m[1], 0, 2 ) );
+            $g = hexdec( substr( $m[1], 2, 2 ) );
+            $b = hexdec( substr( $m[1], 4, 2 ) );
+            $rgba_focus = "rgba($r,$g,$b,0.15)";
+        }
+
+        // ===========================================================
+        // BACKGROUND con color_principal → botones primarios
+        // ===========================================================
         if ( $color_principal ) {
             $css .= "
             .welow-modelo-card__interesa,
             .welow-conc-card__btn,
-            .welow-conc-banner__overlay-boton:hover {
+            .welow-conc-banner__overlay-boton:hover,
+            .welow-form__submit,
+            .welow-coche-formulario__submit,
+            .welow-conc-galeria__lightbox .welow-conc-galeria__close:hover,
+            .welow-coche-extras__compartir-btn:hover {
                 background: $color_principal !important;
             }
+            ";
+
+            // COLOR (texto) — enlaces, CTA texto, hover de títulos
+            $css .= "
             .welow-modelo-card__cta,
             .welow-conc-info a,
+            .welow-conc-info__lista a,
             .welow-conc-mapa__link,
             .welow-modelo-card__nombre a:hover,
-            .welow-conc-card__localidad a:hover {
+            .welow-conc-card__localidad a:hover,
+            .welow-marca-card-link,
+            .welow-form a,
+            .welow-form__campo--consent a,
+            .welow-footer__menu a:hover,
+            .welow-footer__ubicacion-nombre:hover,
+            .welow-footer__ubicacion-tel:hover,
+            .welow-footer__legal-links a:hover,
+            .welow-coche-formulario a {
                 color: $color_principal !important;
             }
+            ";
+
+            // BORDER-COLOR → hover de cards, focus de inputs, separadores destacados
+            $css .= "
             .welow-conc-marca-item:hover,
-            .welow-conc-card:hover {
+            .welow-conc-card:hover,
+            .welow-modelo-card:hover {
                 border-color: $color_principal !important;
             }
-            .welow-modelo-card__caracteristicas {
+            .welow-modelo-card__caracteristicas,
+            .welow-form__campo--consent {
                 border-left-color: $color_principal !important;
             }
+            .welow-form input:focus,
+            .welow-form textarea:focus,
+            .welow-form select:focus,
+            .welow-coche-formulario input:focus,
+            .welow-coche-formulario textarea:focus {
+                border-color: $color_principal !important;
+                ";
+            if ( $rgba_focus ) {
+                $css .= "box-shadow: 0 0 0 3px $rgba_focus !important;";
+            }
+            $css .= "
+            }
+            ";
+
+            // ACCENT-COLOR para checkboxes/radios nativos (HTML5)
+            $css .= "
+            .welow-form,
+            .welow-form input[type=checkbox],
+            .welow-form input[type=radio],
+            .welow-form__opciones input,
+            .welow-form__campo--consent input[type=checkbox] {
+                accent-color: $color_principal !important;
+            }
+            ";
+
+            // FOOTER — color del link hover (variable CSS)
+            $css .= "
+            .welow-footer { --welow-f-link: $color_principal !important; }
+            ";
+
+            // Asterisco campo obligatorio
+            $css .= "
+            .welow-form__req { color: $color_principal !important; }
             ";
         }
 
+        // ===========================================================
+        // HOVER del color principal
+        // ===========================================================
         if ( $color_principal_hover ) {
             $css .= "
             .welow-modelo-card__interesa:hover,
             .welow-modelo-card__interesa:focus,
-            .welow-conc-card__btn:hover {
+            .welow-conc-card__btn:hover,
+            .welow-form__submit:hover:not(:disabled),
+            .welow-coche-formulario__submit:hover {
                 background: $color_principal_hover !important;
             }
             ";
         }
 
+        // ===========================================================
+        // COLOR DE TÍTULOS — h2/h3 de cards y fichas
+        // ===========================================================
         if ( $color_titulos ) {
             $css .= "
             .welow-modelo-card__nombre,
@@ -164,34 +240,54 @@ class Welow_Main {
             .welow-conc-card__localidad,
             .welow-conc-card__localidad a,
             .welow-conc-section-title,
-            .welow-coche-resaltado__rotulo {
+            .welow-coche-resaltado__rotulo,
+            .welow-form__titulo,
+            .welow-mi__nombre,
+            .welow-mi__intro-titulo,
+            .welow-conc-ficha__titulo,
+            .welow-marca-banner__overlay-titulo,
+            .welow-conc-banner__overlay-titulo {
                 color: $color_titulos !important;
             }
             ";
         }
 
+        // ===========================================================
+        // COLOR TEXTO DE BOTONES — texto dentro de botones primarios
+        // ===========================================================
         if ( $color_boton_texto ) {
             $css .= "
             .welow-modelo-card__interesa,
             .welow-conc-card__btn,
-            .welow-conc-banner__overlay-boton:hover {
+            .welow-conc-banner__overlay-boton:hover,
+            .welow-form__submit,
+            .welow-form__submit:hover,
+            .welow-coche-formulario__submit,
+            .welow-coche-formulario__submit:hover {
                 color: $color_boton_texto !important;
             }
             ";
         }
 
+        // ===========================================================
+        // COLOR DE RÓTULOS — píldoras destacadas
+        // ===========================================================
         if ( $rotulo_efectivo ) {
             $css .= "
-            .welow-modelo-card__rotulo {
+            .welow-modelo-card__rotulo,
+            .welow-mi__marca,
+            .welow-conc-banner__overlay-rotulo {
                 background: $rotulo_efectivo !important;
             }
             ";
         }
 
+        // ===========================================================
+        // TIPOGRAFÍA — aplicada a todos los componentes del plugin
+        // ===========================================================
         if ( $font_family ) {
-            // Comillas para nombres con espacios
             $family_css = strpos( $font_family, ' ' ) !== false && strpos( $font_family, "'" ) === false && strpos( $font_family, '"' ) === false
-                ? '"' . $font_family . '"'
+                ? '\"' . $font_family . '\"'
                 : $font_family;
             $css .= "
             .welow-modelo-card,
@@ -200,9 +296,13 @@ class Welow_Main {
             .welow-conc-ficha,
             .welow-coche-ficha,
             .welow-header,
+            .welow-footer,
+            .welow-form,
+            .welow-mi,
+            .welow-marca-card,
             .welow-conc-banner__overlay-inner,
             .welow-marca-banner__overlay-inner {
-                font-family: $family_css, system-ui, sans-serif;
+                font-family: $family_css, system-ui, sans-serif !important;
             }
             ";
         }

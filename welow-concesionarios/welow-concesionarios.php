@@ -3,7 +3,7 @@
  * Plugin Name: Welow Concesionarios
  * Plugin URI:  https://welow.es
  * Description: Sistema de gestión para concesionarios multimarca. CPTs, shortcodes y herramientas para coches nuevos y de segunda mano.
- * Version:     2.51.0
+ * Version:     2.52.0
  * Author:      Welow
  * Author URI:  https://welow.es
  * License:     GPL-2.0+
@@ -14,6 +14,28 @@
  *
  * CHANGELOG
  * ---------
+ * 2.52.0 — Estilos globales: cubrir TODO el plugin (formularios, footer, etc)
+ *
+ *   PROBLEMA: el inyector de "Estilos generales" solo cubría cards de modelo
+ *   y concesionario, dejando azul hardcoded en formularios, footer, links,
+ *   focus de inputs, accent-color de checkboxes, etc.
+ *
+ *   FIX: ampliado el bloque de overrides con selectores para:
+ *     • Botón submit del formulario (.welow-form__submit y .welow-coche-formulario__submit)
+ *     • Focus de inputs/textarea/select (border-color + box-shadow rgba)
+ *     • accent-color para checkboxes y radios HTML5 (incluyendo el RGPD y
+ *       el segundo consentimiento de marketing)
+ *     • Borde izquierdo del bloque de consentimiento
+ *     • Footer: variable --welow-f-link
+ *     • Asterisco de campos obligatorios
+ *     • Enlaces del consentimiento RGPD
+ *     • Links del menú footer en hover
+ *     • Títulos de hero Me Interesa
+ *     • Tipografía aplicada también a .welow-form, .welow-footer, .welow-mi, etc.
+ *
+ *   Ahora todo lo que sea visible en el frontend usa el color/tipografía que
+ *   configures en Configuraciones → Estilos.
+ *
  * 2.51.0 — Segundo consentimiento (marketing) opcional en formularios
  *
  *   CONFIGURACIONES → FORMULARIOS → "Segundo consentimiento (opcional)":
@@ -1779,7 +1801,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constantes del plugin
-define( 'WELOW_CONC_VERSION', '2.51.0' );
+define( 'WELOW_CONC_VERSION', '2.52.0' );
 define( 'WELOW_CONC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WELOW_CONC_URL', plugin_dir_url( __FILE__ ) );
 define( 'WELOW_CONC_BASENAME', plugin_basename( __FILE__ ) );
